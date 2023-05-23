@@ -283,14 +283,15 @@ def main():
     server = xmlrpc.client.ServerProxy(
         '%s://%s:%s@%s/RPC2' % (PROTO, USERNAME, lava_api_key, HOSTNAME)
     )
+    print("{}".format(server))
 
     for attempt in range(1, send_retry_limit + 1):
         try:
             jobid = server.scheduler.submit_job(render)
         except xmlrpc.client.ProtocolError as error:
             print(
-                'Protocol error on submit, sleeping and retrying. Attempt #{}'.format(
-                    attempt
+                'Protocol error on submit, sleeping and retrying: "{}". Attempt #{}'.format(
+                    error, attempt
                 )
             )
             time.sleep(5)
