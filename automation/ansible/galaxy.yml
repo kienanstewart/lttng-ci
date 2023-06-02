@@ -1,0 +1,11 @@
+---
+namespace: "lttng"
+name: "ci"
+version: "1.0.0"
+readme: "README.md"
+authors:
+  - Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+  - Kienan Stewart <kstewart@efficios.com>
+  - Michael Jeanson <mjeanson@efficios.com>
+dependencies:
+  "community.general": ">=5.4.0"
