@@ -7,7 +7,6 @@ params:
     LTTNG_VERSION_STRING: "invalid_version_string"
 run:
         steps:
-                - apt install -y curl
                 - git clone "${CI_REPO}" --branch="${CI_BRANCH}" ci
                 - export TMPDIR="/tmp"
                 - mkdir -p /tmp/coredump
@@ -21,4 +20,4 @@ run:
                 - systemctl start systemd-timesyncd.service
                 - popd
                 - tar czf coredump.tar.gz /tmp/coredump
-                - ./ci/lava/upload_artifact.sh coredump.tar.gz coredump.tar.gz "results/${JENKINS_BUILD_ID}/${TESTRUN_ID}-coredump.tar.gz"
+                - ./ci/lava/upload_artifact.sh coredump.tar.gz "results/${JENKINS_BUILD_ID}/${TESTRUN_ID}-coredump.tar.gz"

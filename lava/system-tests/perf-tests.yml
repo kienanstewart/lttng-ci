@@ -7,7 +7,6 @@ params:
     LTTNG_VERSION_STRING: "invalid_version_string"
 run:
         steps:
-                - apt install -y libpfm4-dev curl
                 - git clone "${CI_REPO}" --branch="${CI_BRANCH}" ci
                 - export TMPDIR="/tmp"
                 - mkdir -p /tmp/coredump
@@ -21,4 +20,4 @@ run:
                 - lava-test-case run-tests --shell "if [ -e perf_regression ]; then prove --nocolor --verbose --merge --exec '' - < perf_regression; else echo 'perf_regression not found'; fi"
                 - popd
                 - tar czf coredump.tar.gz /tmp/coredump
-                - ./ci/lava/upload_artifact.sh coredump.tar.gz coredump.tar.gz "results/${JENKINS_BUILD_ID}/${TESTRUN_ID}-coredump.tar.gz"
+                - ./ci/lava/upload_artifact.sh coredump.tar.gz "results/${JENKINS_BUILD_ID}/${TESTRUN_ID}-coredump.tar.gz"

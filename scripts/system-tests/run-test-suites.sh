@@ -77,7 +77,7 @@ make --keep-going check || failed_tests=1
 
 if [ -f "./tests/root_regression" ]; then
     cd "./tests" || exit 1
-    prove --nocolor --verbose --merge --exec '' - < root_regression || failed_tests=1
+    prove --nocolor --verbose --merge --exec '' - < root_regression || failed_tests=2
     cd ..
 fi
 
@@ -85,10 +85,19 @@ fi
 # should be retained until lttng-tools 2.13 is no longer supported
 if [ -f "./tests/root_destructive_tests" ]; then
     cd "./tests" || exit 1
-    prove --nocolor --verbose --merge --exec '' - < root_destructive_tests || failed_tests=2
+    prove --nocolor --verbose --merge --exec '' - < root_destructive_tests || failed_tests=3
     cd ..
 else
     echo 'root_destructive_tests not found'
+fi
+
+if [[ "${failed_tests}" != "0" ]] && [[ -d '/tmp/coredump' ]]; then
+    mkdir /tmp/coredump/{log,tap}
+    rsync -a --exclude 'test-suite.log' --include '*/' --include '*.trs' --include '*.log' \
+	  --exclude '*' tests/ /tmp/coredump/tap
+    rsync -a --include 'test-suite.log' --include '*/' --exclude '*' tests/ /tmp/coredump/log
+
+    dmesg > /tmp/coredump/dmesg
 fi
 
 exit $failed_tests
