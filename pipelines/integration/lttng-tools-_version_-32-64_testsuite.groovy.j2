@@ -364,6 +364,9 @@ pipeline {
              * Run 'destructive' tests as well.
              */
             LTTNG_ENABLE_DESTRUCTIVE_TESTS = "will-break-my-system"
+            LTTNG_TEST_VERBOSE_SESSIOND = "1"
+            LTTNG_TEST_VERBOSE_CLIENT = "1"
+            LTTNG_TEST_VERBOSE_RELAYD = "1"
           }
 
           stages {
@@ -472,7 +475,7 @@ pipeline {
                 /* Gather the TAP logs */
                 sh '''
                   mkdir -p "$WORKSPACE/tap/{{ test_type }}"
-                  rsync -a --exclude 'test-suite.log' --include '*/' --include '*.log' --exclude='*' ./ "$WORKSPACE/tap/{{ test_type }}"
+                  rsync -a --exclude 'test-suite.log' --include '*/' --include '*.log' --include '**log.d/*' --exclude='*' ./ "$WORKSPACE/tap/{{ test_type }}"
                 '''
 
                 /* Gather the test suites top-level log which includes all tests failures */
