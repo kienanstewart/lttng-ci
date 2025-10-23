@@ -22,5 +22,10 @@ WORKSPACE=${WORKSPACE:-}
 
 # Move any custom dependencies to the deps folder
 if [ -d "$WORKSPACE/build/" ]; then
+    # Copy is used since a job may be several 'Depends-on:'
     cp -r "$WORKSPACE/build/" "$WORKSPACE/deps/"
+    # Remove the copy from the build directory to avoid having the libraries
+    # in both build/ and deps/build/
+    rm -rf "${WORKSPACE}/build"
+    mkdir -p "${WORKSPACE}/build"
 fi
