@@ -698,6 +698,8 @@
       - workspace-cleanup: &lttng-tools_publisher_workspace-cleanup_defaults
           clean-if:
             - failure: false
+            - unstable: false
+            - aborted: false
 
       - raw: &lttng-tools_publisher_proc-cleaner_defaults
           xml: |
