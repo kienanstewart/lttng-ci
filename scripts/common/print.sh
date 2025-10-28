@@ -47,6 +47,11 @@ print_os() {
     echo -n "Kernel: "
     uname -a
 
+    print_blue "Locale"
+    locale
+
+    print_blue "Current character map"
+    locale -c charmap
     set -ex
 }
 
