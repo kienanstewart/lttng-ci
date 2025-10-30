@@ -20,4 +20,4 @@
       - genisoimage  # used for agent:config vm disks
       - incus
       - incus-base
-      - incus-extras
+      - incus-extra

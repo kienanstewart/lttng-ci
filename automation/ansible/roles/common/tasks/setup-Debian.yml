@@ -48,12 +48,14 @@
         dest: /etc/apt/apt.conf.d/20auto-upgrades
         content: "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";\n"
       when: unattended_upgrades | bool
+      ignore_errors: "{{ansible_check_mode}}"
     - file:
         path: /etc/apt/apt.conf.d/20auto-upgrades
         state: "{{(unattended_upgrades|bool)|ternary('file', 'absent')}}"
         owner: root
         group: root
         mode: '0644'
+      ignore_errors: "{{ansible_check_mode}}"
 - name: Install microcode for physical hosts
   when: ansible_virtualization_role == 'host'
   block:
