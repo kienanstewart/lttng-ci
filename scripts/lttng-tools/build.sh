@@ -697,6 +697,9 @@ if [ "$LTTNG_TOOLS_RUN_TESTS" = "yes" ] && [[ ! "$conf" =~ (no-ust|relayd-only) 
             LTTNG_SESSION_CONFIG_XSD_PATH="${WORKSPACE}/build/share/xml/lttng"
             BABELTRACE_PLUGIN_PATH="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugins"
             LIBBABELTRACE2_PLUGIN_PROVIDER_DIR="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugin-providers"
+            # lttng-ust-java-tests doesn't yet use the MI and relies on the legacy
+            # output format from `lttng list`
+            LTTNG_LIST_LEGACY="1"
         )
         LTTNG_UST_JAVA_TESTS_MAVEN_OPTS=(
             "-Dmaven.test.failure.ignore=true"
