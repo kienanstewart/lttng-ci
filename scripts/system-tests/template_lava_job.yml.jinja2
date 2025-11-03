@@ -21,8 +21,13 @@ timeouts:
 priority: medium
 visibility: public
 
+{% set extra_kernel_args = "cpuidle.off=1 TERM=dumb" %}
+{% if device_type == DeviceType.kvm and configure_dax|default(false) %}
+{% set extra_kernel_args = extra_kernel_args + " memmap=1G!2M" %}
+{% endif %}
+
 context:
-  extra_kernel_args: "cpuidle.off=1 TERM=dumb"
+  extra_kernel_args: "{{ extra_kernel_args }}"
   extra_nfsroot_args: ",nfsvers=3 nfsrootdebug"
 
 environment:
@@ -51,6 +56,7 @@ environment:
 {% elif device_type == DeviceType.kvm %}
   SCRATCH_DEVICE: "/dev/sda"
 {% endif %}
+  CONFIGURE_DAX: "{{ configure_dax|default(false) }}"
 
 tags:
 {% if device_type == DeviceType.kvm %}

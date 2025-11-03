@@ -126,6 +126,7 @@ def main():
     parser.add_argument("--ci-repo", required=True)
     parser.add_argument("--ci-branch", required=False, default="master")
     parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--configure-dax", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -191,6 +192,9 @@ def main():
     context["s3_host"] = S3_HOST
     context["s3_bucket"] = S3_BUCKET
     context["s3_base_dir"] = S3_BASE_DIR
+
+    if args.configure_dax:
+        context["configure_dax"] = True
 
     # Render the lava job template
     jinja_loader = FileSystemLoader(os.path.dirname(os.path.realpath(__file__)))

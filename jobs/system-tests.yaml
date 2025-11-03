@@ -88,6 +88,63 @@
           description: 'Base url to access the s3 bucket over unauthenticated HTTP'
           default: 'https://obj-lava.internal.efficios.com'
 
+- defaults:
+    name: system-tests-defaults
+    project-type: freestyle
+    node: 'deb13-amd64'
+    scm:
+      - git:
+          url: "${{LTTNG_CI_REPO}}"
+          basedir: src/lttng-ci/
+          branches:
+            - "${{LTTNG_CI_BRANCH}}"
+
+    <<: *system_tests_parameters_defaults
+
+    properties:
+      - build-discarder:
+          num-to-keep: 10
+          artifact-num-to-keep: 2
+      - throttle:
+          max-total: 4
+          option: 'category'
+          categories:
+            - 'kvm-tests'
+
+    wrappers:
+      - workspace-cleanup
+      - timestamps
+      - ansicolor
+      - credentials-binding:
+          - text:
+              credential-id: jenkins_lava2_key
+              variable: LAVA2_JENKINS_TOKEN
+          - username-password-separated:
+              credential-id: s3_obj_lava_key
+              username: S3_ACCESS_KEY
+              password: S3_SECRET_KEY
+      - inject:
+          properties-content: |
+            BUILD_DEVICE={build_device}
+            LTTNG_VERSION={lttngversion}
+            CONFIGURE_DAX={configure_dax}
+    builders:
+      # First build the kernel and modules and upload to object storage
+      - shell: !include-raw-verbatim: scripts/system-tests/build-kernel-param.sh
+      # Then trigger the lava job to boot the kernel and run the tests
+      - shell: !include-raw-verbatim: scripts/system-tests/run-lava-tests.sh
+
+    publishers:
+      - archive:
+          artifacts: 'results/**'
+          allow-empty: true
+      - workspace-cleanup
+
+    # job variables
+    build_device: kvm
+    configure_dax: 'false'
+    suffix: ''
+
 - publisher:
     name: 'system_tests_email_ext_default'
     publishers:
@@ -115,116 +172,20 @@
             - recipients
 
 - job-template:
-    name: vm_tests_k{kversion}_l{lttngversion}
+    name: vm_tests_k{kversion}_l{lttngversion}{suffix}
+    defaults: system-tests-defaults
     description: |
       Runs root tests on a virtual machine over different combinations of kernel and lttng configurations.
-    project-type: freestyle
-    node: 'deb13-amd64'
-    <<: *system_tests_parameters_defaults
-
-    properties:
-      - build-discarder:
-          num-to-keep: 10
-          artifact-num-to-keep: 2
-      - throttle:
-          max-total: 4
-          option: 'category'
-          categories:
-            - 'kvm-tests'
-
-    wrappers:
-      - workspace-cleanup
-      - timestamps
-      - ansicolor
-      - credentials-binding:
-          - text:
-              credential-id: jenkins_lava2_key
-              variable: LAVA2_JENKINS_TOKEN
-          - username-password-separated:
-              credential-id: s3_obj_lava_key
-              username: S3_ACCESS_KEY
-              password: S3_SECRET_KEY
-      - inject:
-          properties-content: |
-            BUILD_DEVICE=kvm
-            LTTNG_VERSION={lttngversion}
-
-    scm:
-      - git:
-          url: "${{LTTNG_CI_REPO}}"
-          basedir: src/lttng-ci/
-          branches:
-            - "${{LTTNG_CI_BRANCH}}"
-
-    builders:
-      # First build the kernel and modules and upload to object storage
-      - shell: !include-raw-verbatim: scripts/system-tests/build-kernel-param.sh
-      # Then trigger the lava job to boot the kernel and run the tests
-      - shell: !include-raw-verbatim: scripts/system-tests/run-lava-tests.sh
-
-    publishers:
-      - archive:
-          artifacts: 'results/**'
-          allow-empty: true
-      - workspace-cleanup
 
 - job-template:
     name: baremetal_tests_k{kversion}_l{lttngversion}
+    defaults: system-tests-defaults
     description: |
       Runs perf_regression tests on a baremetal machine over different combinations of kernel and lttng configurations.
-    project-type: freestyle
-    node: 'deb13-amd64'
-
-    <<: *system_tests_parameters_defaults
-
-    properties:
-      - build-discarder:
-          num-to-keep: 10
-          artifact-num-to-keep: 2
-      - throttle:
-          max-total: 2
-          option: 'category'
-          categories:
-            - 'baremetal-tests'
-
-    wrappers:
-      - workspace-cleanup
-      - timestamps
-      - ansicolor
-      - credentials-binding:
-          - text:
-              credential-id: jenkins_lava2_key
-              variable: LAVA2_JENKINS_TOKEN
-          - username-password-separated:
-              credential-id: s3_obj_lava_key
-              username: S3_ACCESS_KEY
-              password: S3_SECRET_KEY
-      - inject:
-          properties-content: |
-            BUILD_DEVICE=baremetal
-            LTTNG_VERSION={lttngversion}
-
-    scm:
-      - git:
-          url: "${{LTTNG_CI_REPO}}"
-          basedir: src/lttng-ci/
-          branches:
-            - "${{LTTNG_CI_BRANCH}}"
-
-    builders:
-      # First build the kernel and modules and upload to object storage
-      - shell: !include-raw-verbatim: scripts/system-tests/build-kernel-param.sh
-      # Then trigger the lava job to boot the kernel and run the tests
-      - shell: !include-raw-verbatim: scripts/system-tests/run-lava-tests.sh
-
-    publishers:
-      - archive:
-          artifacts: 'results/**'
-          allow-empty: true
-      - workspace-cleanup
+    build_device: 'baremetal'
 
 - job-template:
-    name: system_ALL_{test_type}_trigger
+    name: system_ALL_{test_type}_trigger{suffix}
     description: |
       This job will trigger the build of jobs when a new tag is push specific
       tracked Linux branches and new commits on LTTng tracked branches
@@ -276,6 +237,9 @@
     publishers:
       - system_tests_email_ext_default
 
+    # Job variables
+    suffix: ''
+
 ## Project
 
 # Canary jobs are made to confirm that the whole Lava pipeline is working.
@@ -294,7 +258,10 @@
       - stable-2.14
       - stable-2.13
     jobs:
-      - 'vm_tests_k{kversion}_l{lttngversion}'
+      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}'
+      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}':
+          configure_dax: 'true'
+          suffix: '_dax'
       - 'baremetal_tests_k{kversion}_l{lttngversion}'
 
 ## Views
@@ -311,7 +278,10 @@
     lttngversion:
       - canary
     jobs:
-      - 'vm_tests_k{kversion}_l{lttngversion}'
+      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}'
+      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}':
+          configure_dax: 'true'
+          suffix: '_dax'
       - 'baremetal_tests_k{kversion}_l{lttngversion}'
 
 # Test against particular linux version.
@@ -332,7 +302,10 @@
       - stable-2.14
       - stable-2.13
     jobs:
-      - 'vm_tests_k{kversion}_l{lttngversion}'
+      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}'
+      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}':
+          configure_dax: 'true'
+          suffix: '_dax'
       - 'baremetal_tests_k{kversion}_l{lttngversion}'
 
 # Stable-2.12 doesn't support kernels over v5.18
@@ -346,7 +319,7 @@
     lttngversion:
       - stable-2.12
     jobs:
-      - 'vm_tests_k{kversion}_l{lttngversion}'
+      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}'
       - 'baremetal_tests_k{kversion}_l{lttngversion}'
 
 - project:
@@ -355,7 +328,10 @@
       - vm_tests
       - baremetal_tests
     jobs:
-      - 'system_ALL_{test_type}_trigger'
+      - 'system_ALL_{test_type}_trigger{suffix}'
+      - 'system_ALL_{test_type}_trigger{suffix}':
+          test_type: vm_tests
+          suffix: '_dax'
 
 - project:
     name: system-tests-views

@@ -44,6 +44,11 @@ secret_key = $S3_SECRET_KEY
 signature_v2 = False" > "$S3CMD_CONFIG"
 
 # Trigger the lava job and wait for completion
+EXTRA_ARGS=()
+if [[ "${CONFIGURE_DAX}" == "true" ]]; then
+    EXTRA_ARGS+=(--configure-dax)
+fi
+
 python3 -u "$WORKSPACE/src/lttng-ci/scripts/system-tests/lava2-submit.py" \
                           --type "$BUILD_DEVICE-tests" \
                           --lttng-version "$LTTNG_VERSION" \
@@ -61,7 +66,8 @@ python3 -u "$WORKSPACE/src/lttng-ci/scripts/system-tests/lava2-submit.py" \
                           --bt-repo "$BT_REPO" \
                           --bt-branch "$BT_BRANCH" \
                           --ci-repo "$LTTNG_CI_REPO" \
-                          --ci-branch "$LTTNG_CI_BRANCH"
+                          --ci-branch "$LTTNG_CI_BRANCH" \
+                          "${EXTRA_ARGS[@]}"
 
 mkdir results
 

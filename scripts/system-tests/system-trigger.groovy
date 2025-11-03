@@ -251,8 +251,8 @@ def GetLastTagIds = { remoteRepo, branchesOfInterest ->
   return remoteLastTagCommit
 }
 
-def CraftJobName = { jobType, linuxBranch, lttngBranch ->
-  return "${jobType}_k${linuxBranch}_l${lttngBranch}"
+def CraftJobName = { jobType, linuxBranch, lttngBranch, suffix ->
+  return "${jobType}_k${linuxBranch}_l${lttngBranch}${suffix}"
 }
 
 def LaunchJob = { jobName, jobInfo ->
@@ -407,6 +407,11 @@ if (triggerJobName.contains("vm_tests")) {
   jobType = 'baremetal_tests';
 }
 
+suffix = '';
+if (triggerJobName.contains("_dax")) {
+  suffix = "_dax";
+}
+
 // Hashmap containing all the jobs, their configuration (commit id, etc. )and
 // their status (SUCCEEDED, FAILED, etc.). This Hashmap is made of basic strings
 // rather than objects and enums because strings are easily serializable.
@@ -414,12 +419,12 @@ def currentJobs = [:];
 
 // Get an up to date view of all the branches of interest.
 configurationOfInterest.each { lttngBr, linuxBr  ->
-  def jobName = CraftJobName(jobType, linuxBr, lttngBr);
+  def jobName = CraftJobName(jobType, linuxBr, lttngBr, suffix);
   currentJobs[jobName] = CraftConfig(linuxBr, lttngBr);
 }
 
 // Add canary job
-def jobNameCanary = jobType + "_kcanary_lcanary";
+def jobNameCanary = jobType + "_kcanary_lcanary${suffix}";
 currentJobs[jobNameCanary] = [:];
 currentJobs[jobNameCanary]['config'] = [:];
 currentJobs[jobNameCanary]['config']['linuxBranch'] = 'linux-6.12.y';
