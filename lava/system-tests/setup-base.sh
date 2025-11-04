@@ -28,11 +28,13 @@ cp lava/system-tests/authorized_keys /root/.ssh/authorized_keys
 chmod 600 /root/.ssh/authorized_keys
 
 if [[ "${CONFIGURE_DAX}" == "True" ]]; then
+    findmnt
     fdisk -l /dev/pmem0
     modprobe dax_pmem
     apt-get install -y ndctl
     ndctl list -v
     ndctl create-namespace --mode fsdax --map mem -e namespace0.0 -f
     mkfs.ext4 -b 4096 -E stride=512 -F /dev/pmem0
+    umount /dev/shm
     mount -o dax=always /dev/pmem0 /dev/shm
 fi
