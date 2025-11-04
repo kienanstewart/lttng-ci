@@ -306,6 +306,13 @@
       - 'vm_tests_k{kversion}_l{lttngversion}{suffix}':
           configure_dax: 'true'
           suffix: '_dax'
+          # DAX support was introduced in linux 4.7
+          kversion:
+            - linux-5.10.y
+            - linux-5.15.y
+            - linux-6.1.y
+            - linux-6.6.y
+            - linux-6.12.y
       - 'baremetal_tests_k{kversion}_l{lttngversion}'
 
 # Stable-2.12 doesn't support kernels over v5.18
