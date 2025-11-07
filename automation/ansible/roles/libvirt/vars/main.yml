@@ -36,3 +36,9 @@ isos:
   - url: https://cdimage.debian.org/cdimage/release/13.1.0/amd64/iso-cd/debian-13.1.0-amd64-netinst.iso
     checksum: 'sha256:658b28e209b578fe788ec5867deebae57b6aac5fce3692bbb116bab9c65568b3'
     dest: /var/lib/iso/deb-13.1.0-amd64-netinst.iso
+  - url: https://cdimage.debian.org/debian-cd/current/arm64/iso-cd/debian-13.1.0-arm64-netinst.iso
+    checksum: "sha256:9ecd75a62d90ecedfc3f7fcdf46c349bb4ebfb79553514c9d96239cd9bada820"
+    dest: /var/lib/iso/deb-13.1.0-arm64-netinst.iso
+  - url: https://cdimage.debian.org/debian-cd/current/armhf/iso-cd/debian-13.1.0-armhf-netinst.iso
+    checksum: "sha256:0f4105dbe9c3078cb0ad6131ca122ffc439c2cc26f20b3043f3959cbbc428c13"
+    dest: /var/lib/iso/deb-13.1.0-armhf-netinst.iso

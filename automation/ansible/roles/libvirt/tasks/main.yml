@@ -21,6 +21,8 @@
     dest: "{{item.dest}}"
     url: "{{item.url}}"
     checksum: "{{item.checksum}}"
+  tags:
+    - libvirt_iso
 - name: Create VM disks
   loop: "{{ lookup('vars', 'vms', default=[]) }}"
   vars:
