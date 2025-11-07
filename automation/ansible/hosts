@@ -94,11 +94,8 @@ ci-rootnode-deb13-amd64-2a-02-linux5
 ci-rootnode-deb12-i386-1[a:c]-01
 ci-rootnode-deb12-arm64-1a-01
 ci-rootnode-deb12-arm64-1b-01
-ci-rootnode-deb13-arm64-2a-01
-ci-rootnode-deb13-arm64-2b-01
-ci-rootnode-deb12-armhf-1a-01
-ci-rootnode-deb12-armhf-1b-01
-ci-rootnode-deb13-armhf-2a-01
+ci-rootnode-deb13-arm64-[1:2][a:b]-01
+ci-rootnode-deb13-armhf-1[a:b]-01
 ci-rootnode-deb13-armhf-2b-01
 ci-rootnode-sles15sp5-amd64-1d-01
 ci-rootnode-sles15sp5-amd64-2a-01

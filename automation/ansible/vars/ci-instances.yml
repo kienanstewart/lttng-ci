@@ -26,17 +26,17 @@ _anchors:
       retentionStrategy/idleDelay: '5'
     config_libvirt: &jenkins_ssh_agent_libvirt_default_config
       remoteFS: '/root'
-      launcher/delegate: 'hudson.plugins.sshslaves.SSHLauncher=class'
-      launcher/delegate/credentialsId: 'bb5a81cf-346b-43fc-8586-3dc5e43801be'
-      launcher/delegate/port: '22'
-      launcher/delegate/launchTimeoutSeconds: '5'
-      launcher/delegate/retryWaitTime: '5'
-      launcher/delegate/maxNumRetries: '2'
+      launcher/launcher: 'hudson.plugins.sshslaves.SSHLauncher=class'
+      launcher/launcher/credentialsId: 'bb5a81cf-346b-43fc-8586-3dc5e43801be'
+      launcher/launcher/port: '22'
+      launcher/launcher/launchTimeoutSeconds: '5'
+      launcher/launcher/retryWaitTime: '5'
+      launcher/launcher/maxNumRetries: '2'
       retentionStrategy: 'hudson.slaves.RetentionStrategy$Always=class'
       snapshotName: ''
       beforeJobSnapshotName: 'base-configuration'
       startupWaitingPeriodSeconds: '20'
-      launcher/waitTimeMs: '20000'
+      launcher/waitingTimeSecs: '20'
       shutdownMethod: 'destroy'
 
 # @see https://docs.ansible.com/ansible/latest/collections/community/general/lxd_container_module.html#ansible-collections-community-general-lxd-container-module
@@ -1506,7 +1506,7 @@ containers:
         ./hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1d.internal.efficios.com'
         ./virtualMachineName: 'ci-rootnode-el8-amd64-1d-01'
         startupWaitingPeriodSeconds: '30'
-        launcher/waitTimeMs: '30000'
+        launcher/waitingTimeSecs: '30'
     vm:
       name: 'ci-rootnode-el8-amd64-1d-01'
       disk: '/var/lib/libvirt/images/ci-rootnode-el8-amd64-1d-01.qcow'
@@ -1840,3 +1840,126 @@ containers:
         ./virtualMachineName: 'ci-rootnode-deb13-amd64-2a-02-linux5'
     meta:
       address: 172.18.17.34
+  # 172.18.17.35-172.18.17.38 - Win11
+  - vm:
+      name: 'ci-rootnode-deb13-arm64-1a-01'
+      host: 'ci-host-arm64-1a.internal.efficios.com'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-arm64-1a.qcow'
+      template: 'vm_template.arm.xml.j2'
+    jenkins:
+      name: 'ci-rootnode-deb13-arm64-1a-01'
+      label: 'deb13 deb13-arm64-rootnode'
+      config:
+        <<: *jenkins_ssh_agent_libvirt_default_config
+        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1a.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-arm64-1a-01'
+        launcher/launcher/host: 'ci-rootnode-deb13-arm64-1a-01.internal.efficios.com'
+        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1a.internal.efficios.com'
+        ./virtualMachineName: 'ci-rootnode-deb13-arm64-1a-01'
+    meta:
+      address: 172.18.17.39
+  - vm:
+      name: 'ci-rootnode-deb13-armhf-1a-01'
+      host: 'ci-host-arm64-1a.internal.efficios.com'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-armhf-1a.qcow'
+      template: 'vm_template.arm.xml.j2'
+      arch: armv7l
+    jenkins:
+      name: 'ci-rootnode-deb13-armhf-1a-01'
+      label: 'deb13 deb13-armhf-rootnode'
+      config:
+        <<: *jenkins_ssh_agent_libvirt_default_config
+        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1a.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-armhf-1a-01'
+        launcher/launcher/host: 'ci-rootnode-deb13-armhf-1a-01.internal.efficios.com'
+        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1a.internal.efficios.com'
+        ./virtualMachineName: 'ci-rootnode-deb13-armhf-1a-01'
+    meta:
+      address: 172.18.17.40
+  - vm:
+      name: 'ci-rootnode-deb13-arm64-1b-01'
+      host: 'ci-host-arm64-1b.internal.efficios.com'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-arm64-1b.qcow'
+      template: 'vm_template.arm.xml.j2'
+    jenkins:
+      name: 'ci-rootnode-deb13-arm64-1b-01'
+      label: 'deb13 deb13-arm64-rootnode'
+      config:
+        <<: *jenkins_ssh_agent_libvirt_default_config
+        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1b.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-arm64-1b-01'
+        launcher/launcher/host: 'ci-rootnode-deb13-arm64-1b-01.internal.efficios.com'
+        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1b.internal.efficios.com'
+        ./virtualMachineName: 'ci-rootnode-deb13-arm64-1b-01'
+    meta:
+      address: 172.18.17.41
+  - vm:
+      name: 'ci-rootnode-deb13-armhf-1b-01'
+      host: 'ci-host-arm64-1b.internal.efficios.com'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-armhf-1b.qcow'
+      template: 'vm_template.arm.xml.j2'
+      arch: armv7l
+    jenkins:
+      name: 'ci-rootnode-deb13-armhf-1b-01'
+      label: 'deb13 deb13-armhf-rootnode'
+      config:
+        <<: *jenkins_ssh_agent_libvirt_default_config
+        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1b.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-armhf-1b-01'
+        launcher/launcher/host: 'ci-rootnode-deb13-armhf-1b-01.internal.efficios.com'
+        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1b.internal.efficios.com'
+        ./virtualMachineName: 'ci-rootnode-deb13-armhf-1b-01'
+    meta:
+      address: 172.18.17.42
+  - vm:
+      name: 'ci-rootnode-deb13-arm64-2a-01'
+      host: 'ci-host-arm64-2a.internal.efficios.com'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-arm64-2a.qcow'
+      template: 'vm_template.arm.xml.j2'
+    jenkins:
+      name: 'ci-rootnode-deb13-arm64-2a-01'
+      label: 'deb13 deb13-arm64-rootnode'
+      config:
+        <<: *jenkins_ssh_agent_libvirt_default_config
+        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2a.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-arm64-2a-01'
+        launcher/launcher/host: 'ci-rootnode-deb13-arm64-2a-01.internal.efficios.com'
+        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2a.internal.efficios.com'
+        ./virtualMachineName: 'ci-rootnode-deb13-arm64-2a-01'
+    meta:
+      address: 172.18.17.43
+  - vm:
+      name: 'ci-rootnode-deb13-armhf-2a-01'
+      host: 'ci-host-arm64-2a.internal.efficios.com'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-armhf-2a.qcow'
+      template: 'vm_template.arm.xml.j2'
+      arch: armv7l
+    jenkins:
+      name: 'ci-rootnode-deb13-armhf-2a-01'
+      label: 'deb13 deb13-armhf-rootnode'
+      config:
+        <<: *jenkins_ssh_agent_libvirt_default_config
+        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2a.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-armhf-2a-01'
+        launcher/launcher/host: 'ci-rootnode-deb13-armhf-2a-01.internal.efficios.com'
+        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2a.internal.efficios.com'
+        ./virtualMachineName: 'ci-rootnode-deb13-armhf-2a-01'
+    meta:
+      address: 172.18.17.44
+  - vm:
+      name: 'ci-rootnode-deb13-arm64-2b-01'
+      host: 'ci-host-arm64-2b.internal.efficios.com'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-arm64-2b.qcow'
+      template: 'vm_template.arm.xml.j2'
+    jenkins:
+      name: 'ci-rootnode-deb13-arm64-ba-01'
+      label: 'deb13 deb13-arm64-rootnode'
+      config:
+        <<: *jenkins_ssh_agent_libvirt_default_config
+        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2b.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-arm64-2b-01'
+        launcher/launcher/host: 'ci-rootnode-deb13-arm64-2b-01.internal.efficios.com'
+        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2b.internal.efficios.com'
+        ./virtualMachineName: 'ci-rootnode-deb13-arm64-2b-01'
+    meta:
+      address: 172.18.17.45
