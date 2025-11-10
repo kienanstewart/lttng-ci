@@ -3,6 +3,7 @@
 import argparse
 import configparser
 import json
+import logging
 import sys
 import xml.etree.ElementTree
 
@@ -59,6 +60,9 @@ def get_argument_parser():
         default="",
         help="Additional config in a json dictionary which will be appended after -c items",
     )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Increase verbosity"
+    )
     return parser
 
 
@@ -82,6 +86,8 @@ def manage_node(url, user, password, node, state, offline_message="", config={})
         # Check configuration
         updated = False
         node_config = xml.etree.ElementTree.fromstring(server.get_node_config(node))
+        logging.debug("Original config")
+        logging.debug(server.get_node_config(node))
         for key, value in config.items():
             element = node_config.find(key)
             new_element = None
@@ -122,8 +128,14 @@ def manage_node(url, user, password, node, state, offline_message="", config={})
             xml_string = xml.etree.ElementTree.tostring(
                 node_config, xml_declaration=True, encoding="unicode"
             )
+            logging.debug("Updated config string")
+            logging.debug(xml_string)
             server.reconfig_node(node, xml_string)
             changed = True
+            logging.debug("Post-config update")
+            logging.debug(server.get_node_config(node))
+        else:
+            logging.debug("No update required")
         # Online/offline
         node_info = server.get_node_info(node)
         if node_info["offline"] and state == "online":
@@ -138,6 +150,11 @@ def manage_node(url, user, password, node, state, offline_message="", config={})
 if __name__ == "__main__":
     parser = get_argument_parser()
     args = parser.parse_args()
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else None,
+        format="[%(asctime)s] - %(levelname)s - %(message)s",
+    )
+
     if args.config_file is not None:
         config = configparser.ConfigParser()
         config.read_file(args.config_file)
