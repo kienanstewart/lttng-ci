@@ -27,6 +27,8 @@ _anchors:
     config_libvirt: &jenkins_ssh_agent_libvirt_default_config
       remoteFS: '/root'
       launcher/launcher: 'hudson.plugins.sshslaves.SSHLauncher=class'
+      launcher/launcher/sshHostKeyVerificationStrategy: 'hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy=class'
+      launcher/launcher/sshHostKeyVerificationStrategy/requireInitialManualTrust: 'false'
       launcher/launcher/credentialsId: 'bb5a81cf-346b-43fc-8586-3dc5e43801be'
       launcher/launcher/port: '22'
       launcher/launcher/launchTimeoutSeconds: '5'
