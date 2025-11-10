@@ -104,7 +104,7 @@ def manage_node(url, user, password, node, state, offline_message="", config={})
                     element = node_config.find(key)
                 else:
                     parent = node_config.find(head)
-                    if parent:
+                    if parent is not None:
                         parent.append(e)
                         element = node_config.find(key)
                     else:
