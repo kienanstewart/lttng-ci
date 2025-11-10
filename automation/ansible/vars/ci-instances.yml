@@ -1552,22 +1552,6 @@ containers:
       disk_capacity: '10G'
       host: 'ci-host-amd64-2d.internal.efficios.com'
   - jenkins:
-      name: "ci-rootnode-deb12-arm64-1a-01"
-      label: 'deb12 deb12-arm64-rootnode arm64-rootnode'
-      config:
-        <<: *jenkins_ssh_agent_libvirt_default_config
-        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1a.internal.efficios.com'
-        launcher/virtualMachineName: 'ci-rootnode-deb12-arm64-1a-01'
-        launcher/delegate/host: 'ci-rootnode-deb12-arm64-1a-01.internal.efficios.com'
-        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-1a.internal.efficios.com'
-        ./virtualMachineName: 'ci-rootnode-deb12-arm64-1a-01'
-    vm:
-      name: 'ci-rootnode-deb12-arm64-1a-01'
-      disk: '/var/lib/libvirt/images/ci-rootnode-deb12-arm64-1a-01.qcow'
-      host: 'ci-host-arm64-1a.internal.efficios.com'
-    meta:
-      address: 172.18.17.15
-  - jenkins:
       label: 'sles15sp5-amd64-rootnode'
       name: 'ci-rootnode-sles15sp5-amd64-1d-01'
       config:
@@ -1673,32 +1657,6 @@ containers:
         lm: disable
     meta:
       address: 172.18.17.23
-  - jenkins:
-      name: 'ci-rootnode-deb12-arm64-2a-01'
-      node_name: 'ci-rootnode-deb12-arm64-2a-01'
-      label: 'deb12 deb12-arm64-rootnode'
-      config:
-        <<: *jenkins_ssh_agent_libvirt_default_config
-        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2a.internal.efficios.com'
-        launcher/virtualMachineName: 'ci-rootnode-deb12-arm64-2a-01'
-        launcher/delegate/host: 'ci-rootnode-deb12-arm64-2a-01.internal.efficios.com'
-        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2a.internal.efficios.com'
-        ./virtualMachineName: 'ci-rootnode-deb12-arm64-2a-01'
-    meta:
-      address: 172.18.17.24
-  - jenkins:
-      name: 'ci-rootnode-deb12-armhf-2a-01'
-      node_name: 'ci-rootnode-deb12-armhf-2a-01'
-      label: 'deb12 deb12-armhf-rootnode'
-      config:
-        <<: *jenkins_ssh_agent_libvirt_default_config
-        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2a.internal.efficios.com'
-        launcher/virtualMachineName: 'ci-rootnode-deb12-armhf-2a-01'
-        launcher/delegate/host: 'ci-rootnode-deb12-armhf-2a-01.internal.efficios.com'
-        ./hypervisorDescription: 'QEMU+ssh - ci-host-arm64-2a.internal.efficios.com'
-        ./virtualMachineName: 'ci-rootnode-deb12-armhf-2a-01'
-    meta:
-      address: 172.18.17.25
   - vm:
       name: 'ci-rootnode-deb13-amd64-1a-01'
       host: 'ci-host-amd64-1a.internal.efficios.com'
