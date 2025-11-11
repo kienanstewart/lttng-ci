@@ -812,14 +812,6 @@
             result: 'success'
 
 - job-template:
-    name: 'dev_{user}_lttng-tools_{version}_{buildtype}'
-    defaults: lttng-tools
-
-    <<: *lttng-tools_matrix_axes_defaults
-    <<: *lttng-tools_builders_defaults
-    <<: *lttng-tools_publishers_defaults
-
-- job-template:
     name: '{job_prefix}lttng-tools_{version}_root_{buildtype}'
     defaults: lttng-tools
 
@@ -1950,62 +1942,6 @@
           urcuversion: stable-0.13
           babelversion: stable-2.1
 
-- project:
-    name: dev_jgalar_lttng-tools
-    job_prefix: 'dev_jgalar_'
-    user: jgalar
-    github_user: jgalar
-    email_to: 'jgalar@efficios.com'
-    version: master-staging
-    ustversion: master
-    platforms: !!python/tuple [deb13-amd64]
-    builds: !!python/tuple [std, oot, dist]
-    confs: !!python/tuple [std, no-ust, agents]
-    urcuversions: !!python/tuple [master]
-    babelversions: !!python/tuple [stable-2.0, stable-2.1, master]
-    jobs:
-      # Master
-      - 'dev_{user}_lttng-tools_{version}_{buildtype}': {}
-      - 'dev_{user}_lttng-tools_{version}_{buildtype}':
-          buildtype: portbuild
-          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
-          builds: !!python/tuple [std]
-          babelversions: !!python/tuple [stable-1.5, master]
-      - 'dev_{user}_lttng-tools_{version}_{buildtype}':
-          buildtype: macosbuild
-          platforms: !!python/tuple [macos-arm64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [relayd-only]
-          babelversions: !!python/tuple [stable-2.0]
-          wrapper_proc_cleaner: false
-
-      # stable-2.13
-      - 'dev_{user}_lttng-tools_{version}_{buildtype}':
-          version: stable-2.13-staging
-          ustversion: stable-2.13
-          urcuversions: !!python/tuple [stable-0.13]
-      - 'dev_{user}_lttng-tools_{version}_{buildtype}':
-          buildtype: portbuild
-          version: stable-2.13-staging
-          ustversion: stable-2.13
-          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
-          builds: !!python/tuple [std]
-          urcuversions: !!python/tuple [stable-0.13]
-          babelversions: !!python/tuple [stable-2.0]
-
-      # stable-2.12
-      - 'dev_{user}_lttng-tools_{version}_{buildtype}':
-          version: stable-2.12-staging
-          ustversion: stable-2.12
-          urcuversions: !!python/tuple [stable-0.13]
-      - 'dev_{user}_lttng-tools_{version}_{buildtype}':
-          buildtype: portbuild
-          version: stable-2.12-staging
-          ustversion: stable-2.12
-          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
-          builds: !!python/tuple [std]
-          urcuversions: !!python/tuple [stable-0.13]
-          babelversions: !!python/tuple [stable-2.0]
 
 - project:
     name: review-lttng-tools-master
