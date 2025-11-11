@@ -255,6 +255,7 @@
       - master
     lttngversion:
       - master
+      - stable-2.15
       - stable-2.14
       - stable-2.13
     jobs:
@@ -299,6 +300,7 @@
       - linux-6.12.y
     lttngversion:
       - master
+      - stable-2.15
       - stable-2.14
       - stable-2.13
     jobs:

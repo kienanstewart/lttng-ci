@@ -307,6 +307,7 @@ final String pastJobsPath = build.getEnvironment(listener).get('WORKSPACE') + "/
 
 def recentLttngBranchesOfInterest = [
   'master',
+  'stable-2.15',
   'stable-2.14',
   'stable-2.13',
 ]
@@ -374,7 +375,7 @@ def CraftConfig = { linuxBranch, lttngBranch ->
   // Select the userspace-rcu branch
   if (lttngBranch == "master") {
     job['config']['urcuBranch'] = "master";
-  } else if (lttngBranch == "stable-2.14") {
+  } else if (lttngBranch == "stable-2.14" || lttngBranch == "stable-2.15") {
     job['config']['urcuBranch'] = "stable-0.15";
   } else {
     job['config']['urcuBranch'] = "stable-0.14";
@@ -383,7 +384,7 @@ def CraftConfig = { linuxBranch, lttngBranch ->
   // Select the babeltrace branch
   if (lttngBranch == "master") {
     job['config']['btBranch'] = "master";
-  } else if (lttngBranch == "stable-2.14") {
+  } else if (lttngBranch == "stable-2.14" || lttngBranch == "stable-2.15") {
     job['config']['btBranch'] = "stable-2.1";
   } else {
     job['config']['btBranch'] = "stable-1.5";
