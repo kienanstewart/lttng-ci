@@ -226,6 +226,13 @@
           job_suffix: '_lttng-tools-master'
       - 'dev_review_lttng-ivc-{version}-modules{job_suffix}':
           <<: *job-lttng-ivc-master-tools-master
+      # Only stable-2.15
+      - 'lttng-ivc-{version}-modules{job_suffix}': &job-lttng-ivc-master-tools-stable-2-15
+          job_suffix: '_lttng-tools-stable-2.15'
+          pytest_filter: '2.15 and not master'
+      - 'dev_review_lttng-ivc-{version}-modules{job_suffix}':
+          <<: *job-lttng-ivc-master-tools-stable-2-15
+          enable_gerrit_trigger: false
       # Only stable-2.14
       - 'lttng-ivc-{version}-modules{job_suffix}': &job-lttng-ivc-master-tools-stable-2-14
           job_suffix: '_lttng-tools-stable-2.14'
