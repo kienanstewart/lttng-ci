@@ -1282,6 +1282,8 @@
     categorization_criteria:
       - group_regex: 'lttng-tools_master_.*'
         naming_rule: 'Master'
+      - group_regex: '.*_stable-2.15_.*'
+        naming_rule: 'Stable 2.15'
       - group_regex: '.*_stable-2.14_.*'
         naming_rule: 'Stable 2.14'
       - group_regex: '.*_stable-2.13_.*'
@@ -1418,6 +1420,157 @@
           ustversion: master
           babelversion: master
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_master_root_linuxbuild_coverage
+          buildtype: linuxbuild_coverage
+          babeltrace_buildtype: linuxbuild
+          urcu_buildtype: linuxbuild
+          ust_buildtype: linuxbuild
+          job_properties:
+            - name: LTTNG_TOOLS_RUN_TESTS_LONG_REGRESSION
+              value: 'yes'
+            - name: LTTNG_TOOLS_PARALLEL_TESTS
+              value: 'no'
+            - name: LTTNG_TOOLS_COVERAGE
+              value: 'yes'
+            - name: LTTNG_TEST_SERIAL_TEST_TIMEOUT_MINUTES
+              value: '270'
+          nodes: !!python/tuple [deb13-amd64-rootnode]
+          confs: !!python/tuple [agents]
+          urcuversions: !!python/tuple [master]
+          filter: '(node=="deb13-amd64-rootnode" && platform=="deb13-amd64")'
+          # ust/stall-buffer/test_stall_buffer_complex.py has a _long_ run-time
+          timeout: '300'
+
+- project:
+    name: lttng-tools-stable-2.15
+    email_to: 'ci-notification@lists.lttng.org, cc:jgalar@efficios.com'
+    urcuversions: !!python/tuple [stable-0.15, master]
+    babelversions: !!python/tuple [stable-2.1]
+    platforms: !!python/tuple [deb13-amd64]
+    version: 'stable-2.15'
+    job_properties:
+      - name: LTTNG_TOOLS_PARALLEL_TESTS
+        value: 'yes'
+    jobs:
+      # Master #
+      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_linuxbuild
+          builds: !!python/tuple [std, oot, dist, oot-dist]
+          confs: !!python/tuple [std, no-ust, agents, debug-rcu, tls_fallback]
+          babelversions: !!python/tuple [stable-2.0, stable-2.1, master]
+          filter: '(build=="std") || ((babeltrace_version=="master" && (conf=="std" || conf=="agents" || conf=="no-ust") && liburcu_version=="master"))'
+      - '{job_prefix}lttng-tools_{version}_{cctype}': &job_lttng-tools_stable-2-15_clangbuild
+          cctype: clangbuild
+          ccs: !!python/tuple [clang-17, clang-18, clang-19]
+          builds: !!python/tuple [std]
+          filter: '(platform == "deb13-amd64" && cc ==~ /clang-1[7-9]/)'
+      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_elbuild
+          buildtype: elbuild
+          confs: !!python/tuple [agents]
+          java_agents: 'false'
+          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
+      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_portbuild
+          buildtype: portbuild
+          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
+          confs: !!python/tuple [std, no-ust, agents]
+          timeout: '45'
+          job_properties:
+            - name: LTTNG_TOOLS_PARALLEL_TESTS
+              value: 'no'
+      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_slesbuild
+          buildtype: slesbuild
+          platforms: !!python/tuple [sles15sp5-amd64]
+          confs: !!python/tuple [agents]
+          java_preferred_jdk: '8'
+      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_yoctobuild
+          buildtype: yoctobuild
+          platforms: !!python/tuple [yocto23-powerpc, yocto40-powerpc, yocto40-ppc64]
+          job_properties:
+            - name: LTTNG_TOOLS_PARALLEL_TESTS
+              value: 'no'
+      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_yoctobuild_extended
+          buildtype: yoctobuild_extended
+          babeltrace_buildtype: yoctobuild
+          platforms: !!python/tuple [yocto33-amd64, yocto33-arm64]
+          confs: !!python/tuple [agents]
+          java_preferred_jdk: '8'
+      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_macosbuild
+          buildtype: macosbuild
+          platforms: !!python/tuple [macos-arm64]
+          confs: !!python/tuple [relayd-only]
+          wrapper_proc_cleaner: false
+      - 'lttng-tools_{version}_winbuild': &job_lttng-tools_stable-2-15_winbuild
+          platforms: !!python/tuple [cygwin64]
+          confs: !!python/tuple [relayd-only]
+      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_long_regression
+          buildtype: long_regression
+          babeltrace_buildtype: linuxbuild
+          urcu_buildtype: linuxbuild
+          ust_buildtype: linuxbuild
+          job_properties:
+            - name: LTTNG_TOOLS_PARALLEL_TESTS
+              value: 'no'
+            - name: LTTNG_TOOLS_RUN_TESTS_LONG_REGRESSION
+              value: 'yes'
+            - name: LTTNG_TEST_SERIAL_TEST_TIMEOUT_MINUTES
+              value: '270'
+          # ust/stall-buffer/test_stall_buffer_complex.py has a _long_ run-time
+          timeout: '300'
+      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_linuxbuild
+          nodes: !!python/tuple [deb13-amd64-rootnode]
+          confs: !!python/tuple [agents]
+          babelversions: !!python/tuple [stable-2.0, stable-2.1, master]
+          filter: '((node=="deb13-amd64-rootnode" && platform=="deb13-amd64") && (modules_aligned_access=="default" || (modules_aligned_access="force" && liburcu_version=="master" && babeltrace_version=="stable-2.1")))'
+          modules_aligned_access: !!python/tuple ['default', 'force']
+      - '{job_prefix}lttng-tools_{version}_root_{cctype}': &job_lttng-tools_stable-2-15_root_clangbuild
+          cctype: clangbuild
+          ccs: !!python/tuple [clang-19]
+          builds: !!python/tuple [std]
+          nodes: !!python/tuple [deb13-amd64-rootnode]
+          confs: !!python/tuple [agents]
+          filter: '(node=="deb13-amd64-rootnode" && platform=="deb13-amd64" && cc=="clang-19")'
+      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_elbuild
+          buildtype: elbuild
+          confs: !!python/tuple [agents]
+          java_agents: 'false'
+          platforms: !!python/tuple [el8-amd64]
+          nodes: !!python/tuple [el8-amd64-rootnode]
+          filter: '(node=="el8-amd64-rootnode" && platform=="el8-amd64")'
+      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_portbuild
+          buildtype: portbuild
+          platforms: !!python/tuple [deb12-i386, deb13-armhf, deb13-arm64]
+          nodes: !!python/tuple [deb12-i386-rootnode, deb13-armhf-rootnode, deb13-arm64-rootnode]
+          confs: !!python/tuple [agents]
+          filter: '((node=="deb12-i386-rootnode" && platform=="deb12-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
+          timeout: '90'
+          job_properties:
+            - name: LTTNG_TOOLS_PARALLEL_TESTS
+              value: 'no'
+      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_slesbuild
+          buildtype: slesbuild
+          platforms: !!python/tuple [sles15sp5-amd64]
+          nodes: !!python/tuple [sles15sp5-amd64-rootnode]
+          confs: !!python/tuple [agents]
+          filter: '(node=="sles15sp5-amd64-rootnode" && platform=="sles15sp5-amd64")'
+          java_preferred_jdk: '8'
+      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_yoctobuild_extended
+          buildtype: yoctobuild_extended
+          babeltrace_buildtype: yoctobuild
+          confs: !!python/tuple [agents]
+          java_preferred_jdk: '8'
+          platforms: !!python/tuple [yocto33-amd64]
+          nodes: !!python/tuple [yocto33-amd64-rootnode]
+          filter: '(node=="yocto33-amd64-rootnode" && platform=="yocto33-amd64")'
+      - 'lttng-tools_{version}_scan-build': &job_lttng-tools_stable-2-15_scan-build
+          urcuversion: master
+          babelversion: master
+      - 'lttng-tools_{version}_coverity': &job_lttng-tools_stable-2-15_coverity
+          urcuversion: master
+          babelversion: master
+      - 'lttng-tools_{version}_release':
+          version: v2.15
+          ustversion: stable-2.15
+          urcuversion: stable-0.15
+          babelversion: stable-2.1
+      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_linuxbuild_coverage
           buildtype: linuxbuild_coverage
           babeltrace_buildtype: linuxbuild
           urcu_buildtype: linuxbuild
@@ -1905,7 +2058,7 @@
           nodes: !!python/tuple [deb13-amd64-rootnode]
           confs: !!python/tuple [agents]
           filter: '((node=="deb13-amd64-rootnode" && platform=="deb13-amd64") && (modules_aligned_access=="default" || (modules_aligned_access="force" && liburcu_version=="master")))'
-          modules_branch_pattern: 'master|stable-2.14'
+          modules_branch_pattern: 'master|stable-2.15|stable-2.14'
           modules_aligned_access: !!python/tuple ['default', 'force']
           # This job is triggered by lttng-ust which doesn't use the same CI-Build levels
           gerrit_approval_values: !!python/tuple [1]
@@ -1920,6 +2073,69 @@
             - name: 'LTTNG_TOOLS_RUN_TESTS'
               value: 'no'
           gerrit_approval_values: !!python/tuple [1]
+      - 'dev_review_lttng-tools_{version}_clang-tidy':
+          confs: !!python/tuple [agents]
+          gerrit_approval_values: !!python/tuple [1]
+      - 'dev_review_lttng-tools_{version}_check-format':
+          gerrit_approval_values: !!python/tuple [1]
+
+- project:
+    name: review-lttng-tools-stable-2.15
+    version: stable-2.15
+    platforms: !!python/tuple [deb13-amd64]
+    urcuversions: !!python/tuple [master]  # For C++ support
+    babelversions: !!python/tuple [stable-2.1]
+    job_properties:
+      - name: LTTNG_TOOLS_PARALLEL_TESTS
+        value: 'yes'
+    jobs:
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_linuxbuild
+          gerrit_approval_values: '{_gerrit_approval_fast_and_more}'
+      - 'dev_review_lttng-tools_{version}_{cctype}':
+          <<: *job_lttng-tools_stable-2-15_clangbuild
+          gerrit_approval_values: "{_gerrit_approval_fast_and_more}"
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_elbuild
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_portbuild
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_slesbuild
+          gerrit_approval_values: "{_gerrit_approval_build_only_and_more}"
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_yoctobuild
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_yoctobuild_extended
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_macosbuild
+      - 'dev_review_lttng-tools_{version}_winbuild':
+          <<: *job_lttng-tools_stable-2-15_winbuild
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_long_regression
+      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_root_linuxbuild
+          gerrit_approval_values: "{_gerrit_approval_fast_and_more}"
+      - 'dev_review_lttng-tools_{version}_root_{cctype}':
+          <<: *job_lttng-tools_stable-2-15_root_clangbuild
+      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_root_elbuild
+      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_root_portbuild
+      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_root_slesbuild
+          gerrit_approval_values: "{_gerrit_approval_fast_and_more}"
+      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_root_yoctobuild_extended
+      - 'dev_review_lttng-modules_with_lttng-tools_{version}_root_{buildtype}':
+          nodes: !!python/tuple [deb13-amd64-rootnode]
+          confs: !!python/tuple [agents]
+          filter: '((node=="deb13-amd64-rootnode" && platform=="deb13-amd64") && (modules_aligned_access=="default" || (modules_aligned_access="force" && liburcu_version=="master")))'
+          modules_branch_pattern: 'master|stable-2.15'
+          modules_aligned_access: !!python/tuple ['default', 'force']
+          # This job is triggered by lttng-ust which doesn't use the same CI-Build levels
+          gerrit_approval_values: !!python/tuple [1]
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_smokebuild
       - 'dev_review_lttng-tools_{version}_clang-tidy':
           confs: !!python/tuple [agents]
           gerrit_approval_values: !!python/tuple [1]
