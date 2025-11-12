@@ -91,11 +91,11 @@ print_header() {
 
 # Variables from the job parameters.
 #
+# 'BUILD_DEVICE': 'The target device. (kvm or baremetal)'
 # 'LTTNG_MODULES_COMMIT_ID': 'The lttng-modules commmit to build.'
 # 'LTTNG_MODULES_REPO': 'The LTTng Modules git repo to fetch from'
 # 'KERNEL_COMMIT_ID': 'The kernel commit to build.'
 # 'KERNEL_REPO': 'The kernel git repo to fetch from'
-# 'BUILD_DEVICE': 'The target device. (kvm or baremetal)'
 # 'LTTNG_CI_REPO': 'lttng-ci git repo to checkout the CI scripts'
 # 'LTTNG_CI_BRANCH': 'The branch of the lttng-ci repo to clone for job scripts'
 # 'S3_HOST': 'Host for the s3 object storage'

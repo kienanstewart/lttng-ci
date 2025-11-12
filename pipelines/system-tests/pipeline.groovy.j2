@@ -1,0 +1,427 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2025 Kienan Stewart <kstewart@efficios.com>
+
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.lib.Ref
+
+class InvalidKVersionException extends Exception {
+  public InvalidKVersionException(String message) {
+    super(message)
+  }
+}
+
+class EmptyKVersionException extends Exception {
+  public EmptyKVersionException(String message) {
+    super(message)
+  }
+}
+
+class VanillaKVersion implements Comparable<VanillaKVersion> {
+
+  Integer major = 0
+  Integer majorB = 0
+  Integer minor = 0
+  Integer patch = 0
+  Integer rc = Integer.MAX_VALUE
+  Boolean inStable = false;
+
+  VanillaKVersion() {}
+
+  VanillaKVersion(version) {
+    this.parse(version)
+  }
+
+  static VanillaKVersion minKVersion() {
+    return new VanillaKVersion("v0.0.0")
+  }
+
+  static VanillaKVersion maxKVersion() {
+    return new VanillaKVersion("v" + Integer.MAX_VALUE + ".0.0")
+  }
+
+  static VanillaKVersion factory(version) {
+    return new VanillaKVersion(version)
+  }
+
+  @NonCPS
+  def parse(version) {
+    this.major = 0
+    this.majorB = 0
+    this.minor = 0
+    this.patch = 0
+    this.rc = Integer.MAX_VALUE
+
+    if (!version) {
+      throw new EmptyKVersionException("Empty kernel version")
+    }
+
+    def match = version =~ /^v(\d+)\.(\d+)(\.(\d+))?(\.(\d+))?(-rc(\d+))?$/
+    if (!match) {
+      throw new InvalidKVersionException("Invalid kernel version: ${version}")
+    }
+
+    Integer offset = 0;
+
+    // Major
+    this.major = Integer.parseInt(match.group(1))
+    if (this.major <= 2) {
+      offset = 2
+      this.majorB = Integer.parseInt(match.group(2))
+    }
+
+    // Minor
+    if (match.group(2 + offset) != null) {
+      this.minor = Integer.parseInt(match.group(2 + offset))
+    }
+
+    // Patch level
+    if (match.group(4 + offset) != null) {
+      this.patch = Integer.parseInt(match.group(4 + offset))
+      this.inStable = true
+    }
+
+    // RC
+    if (match.group(8) != null) {
+      this.rc = Integer.parseInt(match.group(8))
+    }
+  }
+
+  @NonCPS
+  Boolean isInStableBranch() {
+    return this.inStable
+  }
+
+  // Return true if both version are of the same stable branch
+  @NonCPS
+  Boolean isSameStable(VanillaKVersion o) {
+    if (this.major != o.major) {
+      return false
+    }
+    if (this.majorB != o.majorB) {
+      return false
+    }
+    if (this.minor != o.minor) {
+      return false
+    }
+
+    return true
+  }
+
+  @NonCPS
+  @Override
+  int compareTo(VanillaKVersion o) {
+    if (this.major != o.major) {
+      return Integer.compare(this.major, o.major)
+    }
+    if (this.majorB != o.majorB) {
+      return Integer.compare(this.majorB, o.majorB)
+    }
+    if (this.minor != o.minor) {
+      return Integer.compare(this.minor, o.minor)
+    }
+    if (this.patch != o.patch) {
+      return Integer.compare(this.patch, o.patch)
+    }
+    if (this.rc != o.rc) {
+      return Integer.compare(this.rc, o.rc)
+    }
+
+    // Same version
+    return 0;
+  }
+
+  @NonCPS
+  String toString() {
+    String vString = "v${this.major}"
+
+    if (this.majorB > 0) {
+      vString = vString.concat(".${this.majorB}")
+    }
+
+    vString = vString.concat(".${this.minor}")
+
+    if (this.patch > 0) {
+      vString = vString.concat(".${this.patch}")
+    }
+
+    if (this.rc > 0 && this.rc < Integer.MAX_VALUE) {
+      vString = vString.concat("-rc${this.rc}")
+    }
+    return vString
+  }
+}
+
+@NonCPS
+def GetHeadCommits(remoteRepo, branches) {
+  def remoteHeads = [:]
+  def remoteHeadRefs = Git.lsRemoteRepository()
+                          .setTags(false)
+                          .setHeads(true)
+                          .setRemote(remoteRepo).call()
+
+  remoteHeadRefs.each {
+    def branch = it.getName().replaceAll('refs/heads/', '')
+    if (branches.contains(branch))
+      remoteHeads[branch] = it.getObjectId().name()
+  }
+
+  return remoteHeads
+}
+
+@NonCPS
+def GetTagIds(remoteRepo) {
+  def remoteTags = [:]
+  def remoteTagRefs = Git.lsRemoteRepository()
+                         .setTags(true)
+                         .setHeads(false)
+                         .setRemote(remoteRepo).call()
+
+  remoteTagRefs.each {
+    // Exclude release candidate tags
+    if (!it.getName().contains('-rc')) {
+      remoteTags[it.getName().replaceAll('refs/tags/', '')] = it.getObjectId().name()
+    }
+  }
+
+  return remoteTags
+}
+
+@NonCPS
+def GetLastTagOfBranch(tagRefs, branch) {
+  def tagVersions = tagRefs.collect {new VanillaKVersion(it.key)}
+  def currMax = new VanillaKVersion('v0.0.0');
+  if (!branch.contains('master')){
+    def targetVersion = new VanillaKVersion(branch.replaceAll('linux-', 'v').replaceAll('.y', ''))
+    tagVersions.each {
+      if (it.isSameStable(targetVersion) && currMax.compareTo(it) < 0) {
+        currMax = it;
+      }
+    }
+  } else {
+    tagVersions.each {
+      if (!it.isInStableBranch() && currMax.compareTo(it) < 0) {
+        currMax = it;
+      }
+    }
+  }
+
+  return currMax.toString()
+}
+
+// Returns the latest tags of each of the branches passed in the argument
+@NonCPS
+def GetLastTagIds(remoteRepo, branches) {
+  def remoteTagRefs = GetTagIds(remoteRepo)
+  def remoteLastTagCommit = [:]
+
+  remoteTagRefs = remoteTagRefs.findAll { !it.key.contains("v2.") }
+  for (branch in branches) {
+    remoteLastTagCommit[branch] = remoteTagRefs[GetLastTagOfBranch(remoteTagRefs, branch)]
+  }
+
+  return remoteLastTagCommit
+}
+
+def buildDevices = {{build_device | to_groovy}}
+def kernelBranches = {{kversion | to_groovy}}
+def lttngBranch = "{{lttngversion}}"
+
+def toolsCommits = GetHeadCommits(params.LTTNG_TOOLS_REPO, lttngBranch)
+def modulesCommits = GetHeadCommits(params.LTTNG_MODULES_REPO, lttngBranch)
+def ustCommits = GetHeadCommits(params.LTTNG_UST_REPO, lttngBranch)
+def kernelCommits = GetLastTagIds(params.KERNEL_REPO, kernelBranches)
+def btCommits = GetHeadCommits(params.BT_REPO, params.BT_BRANCH)
+def urcuCommits = GetHeadCommits(params.URCU_REPO, params.URCU_BRANCH)
+
+def canaryJobs = [:]
+canaryJobs['failFast'] = false
+def kernelJobs = [:]
+kernelJobs['failFast'] = false
+def skippedKernelJobs = []
+
+// Use a closure, not a loop. @see https://issues.jenkins.io/browse/JENKINS-55426
+buildDevices.each { build_device ->
+  canaryJobs["${build_device}:canary"] = { ->
+    build(
+      job: '{{modules_job}}',
+      parameters: [
+        string(name: 'BUILD_DEVICE', value: "${build_device}"),
+        string(name: 'KERNEL_COMMIT_ID', value: "{{canary['linuxCommit']}}"),
+        string(name: 'KERNEL_REPO', value: params.KERNEL_REPO),
+        string(name: 'LTTNG_MODULES_COMMIT_ID', value: "{{canary['modulesCommit']}}"),
+        string(name: 'LTTNG_MODULES_REPO', value: params.LTTNG_MODULES_REPO),
+        string(name: 'S3_BASE_DIR', value: params.S3_BASE_DIR),
+        string(name: 'S3_BUCKET', value: params.S3_BUCKET),
+        string(name: 'S3_HOST', value: params.S3_HOST),
+        string(name: 'S3_HTTP_BUCKET_URL', value: params.S3_HTTP_BUCKET_URL),
+      ]
+    )
+
+    throttle(["${build_device}-tests"]) {
+      build(
+        job: '{{lava_job}}',
+        parameters: [
+          string(name: 'BT_BRANCH', value: "{{canary['btBranch']}}"),
+          string(name: 'BT_REPO', value: params.BT_REPO),
+          string(name: 'BUILD_DEVICE', value: "${build_device}"),
+          string(name: 'CONFIGURE_DAX', value: params.CONFIGURE_DAX),
+          string(name: 'KERNEL_COMMIT_ID', value: "{{canary['linuxCommit']}}"),
+          string(name: 'KERNEL_REPO', value: params.KERNEL_REPO),
+          string(name: 'LAVA_HOST', value: params.LAVA_HOST),
+          string(name: 'LAVA_PROTO', value: params.LAVA_PROTO),
+          string(name: 'LAVA_USERNAME', value: params.LAVA_USERNAME),
+          string(name: 'LTTNG_CI_BRANCH', value: params.LTTNG_CI_BRANCH),
+          string(name: 'LTTNG_CI_REPO', value: params.LTTNG_CI_REPO),
+          string(name: 'LTTNG_MODULES_COMMIT_ID', value: "{{canary['modulesCommit']}}"),
+          string(name: 'LTTNG_MODULES_REPO', value: params.LTTNG_MODULES_REPO),
+          string(name: 'LTTNG_TOOLS_COMMIT_ID', value: "{{canary['toolsCommit']}}"),
+          string(name: 'LTTNG_TOOLS_REPO', value: params.LTTNG_TOOLS_REPO),
+          string(name: 'LTTNG_UST_COMMIT_ID', value: "{{canary['ustCommit']}}"),
+          string(name: 'LTTNG_UST_REPO', value: params.LTTNG_UST_REPO),
+          string(name: 'LTTNG_VERSION', value: "{{lttngversion}}"),
+          string(name: 'S3_BASE_DIR', value: params.S3_BASE_DIR),
+          string(name: 'S3_BUCKET', value: params.S3_BUCKET),
+          string(name: 'S3_HOST', value: params.S3_HOST),
+          string(name: 'S3_HTTP_BUCKET_URL', value: params.S3_HTTP_BUCKET_URL),
+          string(name: 'URCU_BRANCH', value: "{{canary['urcuBranch']}}"),
+          string(name: 'URCU_REPO', value: params.URCU_REPO),
+        ]
+      )
+    }
+  }
+
+  kernelCommits.each { kernelBranch, kernelCommit ->
+    // garagehq keys are limited to 511 bytes with the LMDB backend
+    // this key structure creates strings 381 bytes long with
+    // the 'baremetal' device and 'master' branch.
+    def parameter_keys = [
+      'BUILD_DEVICE': "${build_device}",
+      'CONFIGURE_DAX': params.CONFIGURE_DAX,
+      'BT_COMMIT': "${btCommits[params.BT_BRANCH]}",
+      'KERNEL_COMMIT': "${kernelCommit}",
+      'LTTNG_MODULES_COMMIT': "${modulesCommits[lttngBranch]}",
+      'LTTNG_TOOLS_COMMIT': "${toolsCommits[lttngBranch]}",
+      'LTTNG_UST_COMMIT': "${ustCommits[lttngBranch]}",
+      'URCU_COMMIT': "${urcuCommits[params.BT_BRANCH]}",
+    ]
+    def parameter_key = parameter_keys.collect { key, value -> "${key}=${value}" }.join(';')
+
+    // An alternative to using s3:// to store the previous job state would be to
+    // install the lockable resources plugin and coordinate between jobs with that.
+    def skip = false
+    if (!params.FORCE_JOB_RUN) {
+      // Check state of the last run with this parameter set
+      def last_passed = false
+      def last_state = 'UNKNOWN'
+      def url = "${S3_HTTP_BUCKET_URL}/${params.S3_BASE_DIR}/job-state/${parameter_key}"
+      try {
+        last_state = url.toURL().text
+        print("Last state for '${url}': `${last_state}`")
+        last_passed = last_state == "SUCCESS"
+      }
+      catch (exc) {
+        print("Exception while getting '${url}': ${exc}")
+      }
+
+      if (last_passed || (!last_passed && !params.FORCE_FAILED_JOB_RUN)) {
+        // Can't use `continue` inside an iterator, only in for/while loops
+        print("Skipping ${build_device}:${kernelBranch} @ ${kernelCommit}: last run ${last_state}")
+        skippedKernelJobs.add("${build_device}:${kernelBranch}")
+        skip = true
+      }
+    }
+
+    if (!skip) {
+      def parameters = [
+        string(name: 'BT_BRANCH', value: params.BT_BRANCH),
+        string(name: 'BT_REPO', value: params.BT_REPO),
+        string(name: 'BUILD_DEVICE', value: "${build_device}"),
+        string(name: 'CONFIGURE_DAX', value: params.CONFIGURE_DAX),
+        string(name: 'LAVA_HOST', value: params.LAVA_HOST),
+        string(name: 'LAVA_PROTO', value: params.LAVA_PROTO),
+        string(name: 'LAVA_USERNAME', value: params.LAVA_USERNAME),
+        string(name: 'KERNEL_COMMIT_ID', value: "${kernelCommit}"),
+        string(name: 'KERNEL_REPO', value: params.KERNEL_REPO),
+        string(name: 'LTTNG_CI_BRANCH', value: params.LTTNG_CI_BRANCH),
+        string(name: 'LTTNG_CI_REPO', value: params.LTTNG_CI_REPO),
+        string(name: 'LTTNG_MODULES_COMMIT_ID', value: "${modulesCommits[lttngBranch]}"),
+        string(name: 'LTTNG_MODULES_REPO', value: params.LTTNG_MODULES_REPO),
+        string(name: 'LTTNG_TOOLS_COMMIT_ID', value: "${toolsCommits[lttngBranch]}"),
+        string(name: 'LTTNG_TOOLS_REPO', value: params.LTTNG_TOOLS_REPO),
+        string(name: 'LTTNG_UST_COMMIT_ID', value: "${ustCommits[lttngBranch]}"),
+        string(name: 'LTTNG_UST_REPO', value: params.LTTNG_UST_REPO),
+        string(name: 'LTTNG_VERSION', value: "{{lttngversion}}"),
+        string(name: 'S3_BASE_DIR', value: params.S3_BASE_DIR),
+        string(name: 'S3_BUCKET', value: params.S3_BUCKET),
+        string(name: 'S3_HOST', value: params.S3_HOST),
+        string(name: 'S3_HTTP_BUCKET_URL', value: params.S3_HTTP_BUCKET_URL),
+        string(name: 'URCU_BRANCH', value: params.URCU_BRANCH),
+        string(name: 'URCU_REPO', value: params.URCU_REPO),
+      ]
+
+      kernelJobs["${build_device}:${kernelBranch}"] = { ->
+        build(
+          job: '{{modules_job}}',
+          parameters: [
+            string(name: 'BUILD_DEVICE', value: "${build_device}"),
+            string(name: 'KERNEL_COMMIT_ID', value: "${kernelCommit}"),
+            string(name: 'KERNEL_REPO', value: params.KERNEL_REPO),
+            string(name: 'LTTNG_MODULES_COMMIT_ID', value: "${modulesCommits[lttngBranch]}"),
+            string(name: 'LTTNG_MODULES_REPO', value: params.LTTNG_MODULES_REPO),
+            string(name: 'S3_BASE_DIR', value: params.S3_BASE_DIR),
+            string(name: 'S3_BUCKET', value: params.S3_BUCKET),
+            string(name: 'S3_HOST', value: params.S3_HOST),
+            string(name: 'S3_HTTP_BUCKET_URL', value: params.S3_HTTP_BUCKET_URL),
+          ]
+        )
+
+        throttle(["${build_device}-tests"]) {
+          try {
+            def job = build(
+              job: '{{lava_job}}',
+              parameters: parameters
+            )
+            echo "Job ${job} result: ${job.result}"
+            // A node is assigned since s3Upload requires a file context even if only text is used
+            node('master') {
+              withAWS(endpointUrl: "https://${params.S3_HOST}", credentials: 's3_obj_lava_key') {
+                s3Upload(text: "${job.result}", bucket: params.S3_BUCKET, path: "${params.S3_BASE_DIR}/job-state/${parameter_key}",pathStyleAccessEnabled: true)
+              }
+            }
+          }
+          catch (exc) {
+            print("Job failed: ${exc}")
+            // A node is assigned since s3Upload requires a file context even if only text is used
+            node('master') {
+              withAWS(endpointUrl: "https://${params.S3_HOST}", credentials: 's3_obj_lava_key') {
+                s3Upload(text: "FAILED", bucket: params.S3_BUCKET, path: "${params.S3_BASE_DIR}/job-state/${parameter_key}", pathStyleAccessEnabled: true)
+              }
+            }
+            throw exc
+          }
+        }
+      }
+    }
+  }
+}
+
+stage('Determined versions') {
+  print("Kernel Branches: ${kernelBranches}")
+  print("LTTng branch: ${lttngBranch}")
+  print("Kernel commits: ${kernelCommits}")
+  print("LTTng-Tools commits: ${toolsCommits}")
+  print("LTTng-UST commits: ${ustCommits}")
+  print("LTTng-modules commits: ${modulesCommits}")
+  print("Babeltrace commits: ${btCommits}")
+  print("URCU commits: ${urcuCommits}")
+  print("Jobs skipped due last parameter set status: ${skippedKernelJobs}")
+}
+
+stage('Canary') {
+    parallel(canaryJobs)
+}
+
+stage('Jobs') {
+   parallel(kernelJobs)
+}

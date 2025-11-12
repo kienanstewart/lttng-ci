@@ -4,14 +4,28 @@
     name: 'system_tests_parameters_defaults'
     parameters:
       - string:
-          name: 'LTTNG_TOOLS_COMMIT_ID'
-          description: 'The lttng-tools commit id to build.'
+          name: 'BT_BRANCH'
+          default: 'master'
       - string:
-          name: 'LTTNG_MODULES_COMMIT_ID'
-          description: 'The lttng-modules commit id to build.'
+          name: 'BT_REPO'
+          default: 'git://git-mirror.internal.efficios.com/efficios/babeltrace.git'
+          description: 'Babeltrace git repo to checkout'
       - string:
-          name: 'LTTNG_UST_COMMIT_ID'
-          description: 'The lttng-ust commit id to build.'
+          name: 'BUILD_DEVICE'
+          description: 'The lava device (e.g.: kvm, baremetal)'
+          default: 'kvm'
+      - string:
+          name: 'CONFIGURE_DAX'
+          description: 'Should the modules required for DAX be built? true/false'
+          default: '{configure_dax}'
+      - bool:
+          name: 'FORCE_JOB_RUN'
+          default: false
+          description: 'Force the child jobs to run regardless of if the last run with those parameters was a success or failure'
+      - bool:
+          name: 'FORCE_FAILED_JOB_RUN'
+          default: true
+          description: 'Force the failed child jobs to run, even if the last run with those parameters failed'
       - string:
           name: 'KERNEL_COMMIT_ID'
           description: 'The linux kernel commit id to build against.'
@@ -19,48 +33,6 @@
           name: 'KERNEL_REPO'
           default: 'git://git-mirror.internal.efficios.com/kernel/stable/linux-stable.git'
           description: 'Linux kernel git repo to checkout'
-      - string:
-          name: 'LTTNG_TOOLS_REPO'
-          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-tools.git'
-          description: 'LTTng-Tools git repo to checkout'
-      - string:
-          name: 'LTTNG_MODULES_REPO'
-          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-modules.git'
-          description: 'LTTng-Modules git repo to checkout'
-      - string:
-          name: 'LTTNG_UST_REPO'
-          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-ust.git'
-          description: 'LTTng-UST git repo to checkout'
-      - string:
-          name: 'URCU_REPO'
-          default: 'git://git-mirror.internal.efficios.com/lttng/userspace-rcu.git'
-          description: 'UserspaceRCU git repo to checkout'
-      - string:
-          name: 'URCU_BRANCH'
-          default: 'master'
-      - string:
-          name: 'BT_REPO'
-          default: 'git://git-mirror.internal.efficios.com/efficios/babeltrace.git'
-          description: 'Babeltrace git repo to checkout'
-      - string:
-          name: 'BT_BRANCH'
-          default: 'master'
-      - string:
-          name: 'ROOTFS_URL'
-          default: 'https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2025-09-25.tar.xz'
-          description: 'The URL at which the system root FS can be downloaded'
-      - string:
-          name: 'LTTNG_CI_REPO'
-          default: 'https://github.com/lttng/lttng-ci.git'
-          description: 'LTTng-ci git repo to checkout the CI scripts'
-      - string:
-          name: 'LTTNG_CI_BRANCH'
-          default: 'master'
-          description: 'The branch of the CI repository to clone for job scripts'
-      - string:
-          name: 'LAVA_USERNAME'
-          default: 'lava-jenkins'
-          description: 'The username to authenticate with the LAVA instance'
       - string:
           name: 'LAVA_HOST'
           default: 'lava-master-03.internal.efficios.com'
@@ -72,21 +44,91 @@
             - 'https'
           description: 'The protocol to use with the LAVA host'
       - string:
-          name: 'S3_HOST'
-          description: 'Host for the s3 object storage'
-          default: 'obj.internal.efficios.com'
+          name: 'LAVA_USERNAME'
+          default: 'lava-jenkins'
+          description: 'The username to authenticate with the LAVA instance'
       - string:
-          name: 'S3_BUCKET'
-          description: 'Bucket for the s3 object storage'
-          default: 'lava'
+          name: 'LTTNG_CI_BRANCH'
+          default: 'master'
+          description: 'The branch of the CI repository to clone for job scripts'
+      - string:
+          name: 'LTTNG_CI_REPO'
+          default: 'https://github.com/lttng/lttng-ci.git'
+          description: 'LTTng-ci git repo to checkout the CI scripts'
+      - string:
+          name: 'LTTNG_MODULES_COMMIT_ID'
+          description: 'The lttng-modules commit id to build.'
+      - string:
+          name: 'LTTNG_MODULES_REPO'
+          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-modules.git'
+          description: 'LTTng-Modules git repo to checkout'
+      - string:
+          name: 'LTTNG_TOOLS_COMMIT_ID'
+          description: 'The lttng-tools commit id to build.'
+      - string:
+          name: 'LTTNG_TOOLS_REPO'
+          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-tools.git'
+          description: 'LTTng-Tools git repo to checkout'
+      - string:
+          name: 'LTTNG_UST_COMMIT_ID'
+          description: 'The lttng-ust commit id to build.'
+      - string:
+          name: 'LTTNG_UST_REPO'
+          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-ust.git'
+          description: 'LTTng-UST git repo to checkout'
+      - string:
+          name: 'LTTNG_VERSION'
+          description: 'The LTTng version string (e.g. stable-2.14)'
+      - string:
+          name: 'ROOTFS_URL'
+          default: 'https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2025-09-25.tar.xz'
+          description: 'The URL at which the system root FS can be downloaded'
       - string:
           name: 'S3_BASE_DIR'
           description: 'Base directory for the s3 object storage'
           default: 'system-tests'
       - string:
+          name: 'S3_BUCKET'
+          description: 'Bucket for the s3 object storage'
+          default: 'lava'
+      - string:
+          name: 'S3_HOST'
+          description: 'Host for the s3 object storage'
+          default: 'obj.internal.efficios.com'
+      - string:
           name: 'S3_HTTP_BUCKET_URL'
           description: 'Base url to access the s3 bucket over unauthenticated HTTP'
           default: 'https://obj-lava.internal.efficios.com'
+      - string:
+          name: 'URCU_BRANCH'
+          default: 'master'
+      - string:
+          name: 'URCU_REPO'
+          default: 'git://git-mirror.internal.efficios.com/lttng/userspace-rcu.git'
+          description: 'UserspaceRCU git repo to checkout'
+
+- _system_tests_email_ext_defaults: &system_tests_email_ext_defaults
+    recipients: '{email_to}'
+    reply-to: ci-notification@lists.lttng.org
+    always: false
+    unstable: false
+    first-failure: true
+    first-unstable: true
+    not-built: false
+    aborted: false
+    regression: false
+    failure: false
+    second-failure: false
+    improvement: false
+    still-failing: false
+    success: false
+    fixed: false
+    fixed-unhealthy: true
+    still-unstable: false
+    pre-build: false
+    matrix-trigger: only-parent
+    send-to:
+      - recipients
 
 - defaults:
     name: system-tests-defaults
@@ -105,12 +147,78 @@
       - build-discarder:
           num-to-keep: 10
           artifact-num-to-keep: 2
-      - throttle:
-          max-total: 4
-          option: 'category'
-          categories:
-            - 'kvm-tests'
 
+    wrappers:
+      - workspace-cleanup
+      - timestamps
+      - ansicolor
+
+    publishers:
+      - archive:
+          artifacts: 'results/**'
+          allow-empty: true
+      - workspace-cleanup
+      - email-ext:
+          <<: *system_tests_email_ext_defaults
+
+    # job variables
+    configure_dax: 'false'
+    email_to: ''
+    prefix: ''
+    suffix: ''
+
+- job-template:
+    name: '{prefix}system_tests-{lttngversion}{suffix}'
+    defaults: system-tests-defaults
+    description: |
+      Run system tests on Lava with LTTng {lttngversion}
+    project-type: pipeline
+    sandbox: true
+    dsl: !include-jinja2: pipelines/system-tests/pipeline.groovy.j2
+
+    properties:
+      - build-discarder:
+          num-to-keep: 10
+          artifact-num-to-keep: 2
+
+    triggers:
+      - timed: '@weekly'
+
+    # Job variables
+    build_device:
+      - baremetal
+      - kvm
+    lava_job: 'system_tests_run_lava_job'
+    modules_job: "system_tests_build_kernel_and_modules"
+    canary:
+      linuxBranch: 'linux-6.12.y'
+      linuxCommit: 'a9152eb181adaac576e8ac1ab79989881e0f301b'  # v6.12.51
+      lttngBranch: 'stable-2.14'
+      toolsCommit: '1c76ceab22ac87269c37800bb6a47bd9c0039ae1'  # v2.14.x
+      modulesCommit: '6826c7f85f59567cffd99fd679f3a32b08ce20e6'  # v2.14.2
+      ustCommit: '0c8cb8ea5394f057e15bcc033efa468a8f0b0f55'  # v2.14.0
+      urcuBranch: 'v0.15.3'
+      btBranch: 'v2.1.2'
+    kversion:
+      - linux-6.12.y
+      - linux-6.6.y
+      - linux-6.1.y
+      - linux-5.15.y
+      - linux-5.10.y
+      - linux-4.4.y
+    prefix: ''
+    suffix: ''
+
+- job-template:
+    # This job should be throttled by the pipelines that execute it
+    name: system_tests_run_lava_job
+    defaults: system-tests-defaults
+    concurrent: true
+    description: |
+      Run an LTTng system test on Lava
+    builders:
+      # Launch the test, but do not wait for completion
+      - shell: !include-raw-verbatim: scripts/system-tests/run-lava-tests.sh
     wrappers:
       - workspace-cleanup
       - timestamps
@@ -123,191 +231,43 @@
               credential-id: s3_obj_lava_key
               username: S3_ACCESS_KEY
               password: S3_SECRET_KEY
-      - inject:
-          properties-content: |
-            BUILD_DEVICE={build_device}
-            LTTNG_VERSION={lttngversion}
-            CONFIGURE_DAX={configure_dax}
+
+- job-template:
+    name: system_tests_build_kernel_and_modules
+    defaults: system-tests-defaults
+    concurrent: true
+    description: |
+      Built a Linux kernel and LTTng-modules for Lava system tests
     builders:
-      # First build the kernel and modules and upload to object storage
+      # Build the kernel and modules and upload to object storage
       - shell: !include-raw-verbatim: scripts/system-tests/build-kernel-param.sh
-      # Then trigger the lava job to boot the kernel and run the tests
-      - shell: !include-raw-verbatim: scripts/system-tests/run-lava-tests.sh
-
-    publishers:
-      - archive:
-          artifacts: 'results/**'
-          allow-empty: true
-      - workspace-cleanup
-
-    # job variables
-    build_device: kvm
-    configure_dax: 'false'
-    suffix: ''
-
-- publisher:
-    name: 'system_tests_email_ext_default'
-    publishers:
-      - email-ext:
-          recipients: 'ci-notification@lists.lttng.org'
-          reply-to: ci-notification@lists.lttng.org
-          always: false
-          unstable: false
-          first-failure: true
-          first-unstable: true
-          not-built: false
-          aborted: false
-          regression: false
-          failure: false
-          second-failure: false
-          improvement: false
-          still-failing: false
-          success: false
-          fixed: false
-          fixed-unhealthy: true
-          still-unstable: false
-          pre-build: false
-          matrix-trigger: only-parent
-          send-to:
-            - recipients
-
-- job-template:
-    name: vm_tests_k{kversion}_l{lttngversion}{suffix}
-    defaults: system-tests-defaults
-    description: |
-      Runs root tests on a virtual machine over different combinations of kernel and lttng configurations.
-
-- job-template:
-    name: baremetal_tests_k{kversion}_l{lttngversion}
-    defaults: system-tests-defaults
-    description: |
-      Runs perf_regression tests on a baremetal machine over different combinations of kernel and lttng configurations.
-    build_device: 'baremetal'
-
-- job-template:
-    name: system_ALL_{test_type}_trigger{suffix}
-    description: |
-      This job will trigger the build of jobs when a new tag is push specific
-      tracked Linux branches and new commits on LTTng tracked branches
-
-    project-type: freestyle
-    node: 'master'
-    parameters:
-      - string:
-          name: 'LTTNG_MODULES_REPO'
-          description: 'The LTTng Modules git repo to fetch from'
-          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-modules.git'
-      - string:
-          name: 'LTTNG_TOOLS_REPO'
-          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-tools.git'
-          description: 'LTTng-Tools git repo to checkout the tools id'
-      - string:
-          name: 'LTTNG_UST_REPO'
-          default: 'git://git-mirror.internal.efficios.com/lttng/lttng-ust.git'
-          description: 'LTTng-UST git repo to checkout the UST id'
-      - string:
-          name: 'KERNEL_REPO'
-          default: 'git://git-mirror.internal.efficios.com/kernel/stable/linux-stable.git'
-          description: 'Linux kernel git repo to checkout the kernel id'
-      - bool:
-          name: 'FORCE_JOB_RUN'
-          default: false
-          description: 'Force the child jobs to run'
-      - bool:
-          name: 'FORCE_FAILED_JOB_RUN'
-          default: true
-          description: 'Force the failed child jobs to run'
-
-    properties:
-      - build-discarder:
-          num-to-keep: 10
-
-    triggers:
-      - timed: "H 0 * * 1-5"
-
     wrappers:
+      - workspace-cleanup
       - timestamps
       - ansicolor
-
-    builders:
-      - system-groovy:
-         command:
-           !include-raw-verbatim: scripts/system-tests/system-trigger.groovy
-
-    publishers:
-      - system_tests_email_ext_default
-
-    # Job variables
-    suffix: ''
+      - credentials-binding:
+          - username-password-separated:
+              credential-id: s3_obj_lava_key
+              username: S3_ACCESS_KEY
+              password: S3_SECRET_KEY
 
 ## Project
-
-# Canary jobs are made to confirm that the whole Lava pipeline is working.
-# They are scheduled once a day always on the same (LTTng, Kernel) code. If any
-# of those jobs fails, it means that there is an issue with the configuration
-
-# Only build the "supported" version against the master kernel since
-# "unsupported" version do not get backport for new kernel.
-- project:
-    name: system-tests-supported-kmaster
-    email_to: 'ci-notification@lists.lttng.org, cc:jgalar@efficios.com'
-    kversion:
-      - master
-    lttngversion:
-      - master
-      - stable-2.15
-      - stable-2.14
-      - stable-2.13
-    jobs:
-      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}'
-      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}':
-          configure_dax: 'true'
-          suffix: '_dax'
-      - 'baremetal_tests_k{kversion}_l{lttngversion}'
-
-## Views
-- view-template:
-    name: 'System tests'
-    view-type: list
-    regex: 'vm_tests_.*|baremetal_tests_.*|baremetal_benchmarks_.*|system_.*'
-
-- project:
-    name: system-tests-canary
-    email_to: 'ci-notification@lists.lttng.org, cc:jgalar@efficios.com'
-    kversion:
-      - canary
-    lttngversion:
-      - canary
-    jobs:
-      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}'
-      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}':
-          configure_dax: 'true'
-          suffix: '_dax'
-      - 'baremetal_tests_k{kversion}_l{lttngversion}'
-
-# Test against particular linux version.
-
-# Test against upstream Linux supported LTS branches and the SLTS v4.4
 - project:
     name: system-tests
-    email_to: 'ci-notification@lists.lttng.org, cc:jgalar@efficios.com'
-    kversion:
-      - linux-4.4.y
-      - linux-5.10.y
-      - linux-5.15.y
-      - linux-6.1.y
-      - linux-6.6.y
-      - linux-6.12.y
+    email_to: 'kstewart@efficios.com,jgalar@efficios.com'
     lttngversion:
       - master
       - stable-2.15
       - stable-2.14
       - stable-2.13
     jobs:
-      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}'
-      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}':
-          configure_dax: 'true'
+      - '{prefix}system_tests-{lttngversion}{suffix}':
+      - '{prefix}system_tests-{lttngversion}{suffix}':
           suffix: '_dax'
+          build_device:
+            # We only run the DAX test on kvm nodes
+            - kvm
+          configure_dax: 'true'
           # DAX support was introduced in linux 4.7
           kversion:
             - linux-5.10.y
@@ -315,32 +275,23 @@
             - linux-6.1.y
             - linux-6.6.y
             - linux-6.12.y
-      - 'baremetal_tests_k{kversion}_l{lttngversion}'
+      - '{prefix}system_tests-{lttngversion}{suffix}':
+          lttngversion:
+            - stable-2.12
+          kversion:
+            - linux-4.4.y
+            - linux-5.10.y
+            - linux-5.15.y
+      - 'system_tests_build_kernel_and_modules':
+          email_to: ''
+      - 'system_tests_run_lava_job':
+          email_to: ''
 
-# Stable-2.12 doesn't support kernels over v5.18
-- project:
-    name: system-tests-2.12
-    email_to: 'ci-notification@lists.lttng.org, cc:jgalar@efficios.com'
-    kversion:
-      - linux-4.4.y
-      - linux-5.10.y
-      - linux-5.15.y
-    lttngversion:
-      - stable-2.12
-    jobs:
-      - 'vm_tests_k{kversion}_l{lttngversion}{suffix}'
-      - 'baremetal_tests_k{kversion}_l{lttngversion}'
-
-- project:
-    name: system-general
-    test_type:
-      - vm_tests
-      - baremetal_tests
-    jobs:
-      - 'system_ALL_{test_type}_trigger{suffix}'
-      - 'system_ALL_{test_type}_trigger{suffix}':
-          test_type: vm_tests
-          suffix: '_dax'
+## Views
+- view-template:
+    name: 'System tests'
+    view-type: list
+    regex: 'system_.*'
 
 - project:
     name: system-tests-views
