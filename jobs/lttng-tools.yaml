@@ -2014,6 +2014,9 @@
           gerrit_approval_values: !!python/tuple [1]
       - 'dev_review_lttng-tools_{version}_check-format':
           gerrit_approval_values: !!python/tuple [1]
+      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
+          <<: *job_lttng-tools_master_root_linuxbuild_coverage
+          enable_gerrit_trigger: false
 
 - project:
     name: review-lttng-tools-stable-2.15
@@ -2077,6 +2080,9 @@
           gerrit_approval_values: !!python/tuple [1]
       - 'dev_review_lttng-tools_{version}_check-format':
           gerrit_approval_values: !!python/tuple [1]
+      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
+          <<: *job_lttng-tools_stable-2-15_root_linuxbuild_coverage
+          enable_gerrit_trigger: false
 
 - project:
     name: review-lttng-tools-stable-2.14
