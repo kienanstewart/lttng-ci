@@ -36,6 +36,36 @@ def _print_data(output_format, data):
         raise Exception("Unknown output format")
 
 
+def delete_job(server, nodes, args):
+    data = {}
+    jobs = server.get_jobs()
+    logging.debug("{} jobs before filtering".format(len(jobs)))
+    if "job" in args and args.job != "":
+        pattern = re.compile(args.job)
+        jobs = [j for j in jobs if pattern.match(j["name"])]
+
+    logging.debug("{} jobs after filtering".format(len(jobs)))
+    if not jobs:
+        return
+
+    if not args.yes:
+        print("The following jobs will be deleted:")
+        for job in jobs:
+            print("\t{}".format(job["name"]))
+
+        confirm = input("Delete {} jobs? [y/N]".format(len(jobs)))
+        if confirm.lower() not in ["y", "yes"]:
+            print("Aborting")
+            return
+
+    for job in jobs:
+        if args.dry_run:
+            print("Would have deleted job '{}'".format(job["name"]))
+        else:
+            server.delete_job(job["name"])
+            logging.debug("Deleted job '{}'".format(job["name"]))
+
+
 def get_job_config(server, nodes, args):
     data = {}
     jobs = server.get_jobs()
@@ -323,6 +353,15 @@ def get_argument_parser():
         help="The output format",
         type=OutputFormat,
         choices=list(OutputFormat),
+    )
+
+    delete_job_parser = subparsers.add_parser("delete-job", help="Delete job(s)")
+    delete_job_parser.set_defaults(callback=delete_job)
+    delete_job_parser.add_argument(
+        "job", default="", help="A python regex to filter jobs by", nargs="?"
+    )
+    delete_job_parser.add_argument(
+        "-y", "--yes", action="store_true", help="Do not prompt for confirmation"
     )
 
     get_job_config_parser = subparsers.add_parser(
