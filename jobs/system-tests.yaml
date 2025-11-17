@@ -5,7 +5,7 @@
     parameters:
       - string:
           name: 'BT_BRANCH'
-          default: 'master'
+          default: '{bt_branch}'
       - string:
           name: 'BT_REPO'
           default: 'git://git-mirror.internal.efficios.com/efficios/babeltrace.git'
@@ -101,7 +101,7 @@
           default: 'https://obj-lava.internal.efficios.com'
       - string:
           name: 'URCU_BRANCH'
-          default: 'master'
+          default: '{urcu_branch}'
       - string:
           name: 'URCU_REPO'
           default: 'git://git-mirror.internal.efficios.com/lttng/userspace-rcu.git'
@@ -162,10 +162,12 @@
           <<: *system_tests_email_ext_defaults
 
     # job variables
+    bt_branch: 'master'
     configure_dax: 'false'
     email_to: ''
     prefix: ''
     suffix: ''
+    urcu_branch: 'master'
 
 - job-template:
     name: '{prefix}system_tests-{lttngversion}{suffix}'
@@ -255,27 +257,24 @@
 - project:
     name: system-tests
     email_to: 'kstewart@efficios.com,jgalar@efficios.com'
+    bt_branch: stable-2.1
     lttngversion:
-      - master
       - stable-2.15
       - stable-2.14
-      - stable-2.13
+    urcu_branch: stable-0.15
     jobs:
       - '{prefix}system_tests-{lttngversion}{suffix}':
+          bt_branch: master
+          lttngversion:
+            - master
+          urcu_branch: master
+      - '{prefix}system_tests-{lttngversion}{suffix}'
       - '{prefix}system_tests-{lttngversion}{suffix}':
-          suffix: '_dax'
-          build_device:
-            # We only run the DAX test on kvm nodes
-            - kvm
-          configure_dax: 'true'
-          # DAX support was introduced in linux 4.7
-          kversion:
-            - linux-5.10.y
-            - linux-5.15.y
-            - linux-6.1.y
-            - linux-6.6.y
-            - linux-6.12.y
+          bt_branch: stable-2.0
+          lttngversion:
+            - stable-2.13
       - '{prefix}system_tests-{lttngversion}{suffix}':
+          bt_branch: stable-2.0
           lttngversion:
             - stable-2.12
           kversion:
@@ -286,6 +285,33 @@
           email_to: ''
       - 'system_tests_run_lava_job':
           email_to: ''
+
+- project:
+    name: system-tests-dax
+    email_to: 'kstewart@efficios.com,jgalar@efficios.com'
+    bt_branch: stable-2.1
+    build_device:
+      - kvm
+    configure_dax: 'true'
+    kversion:
+      - linux-5.10.y
+      - linux-5.15.y
+      - linux-6.1.y
+      - linux-6.6.y
+      - linux-6.12.y
+    lttngversion:
+      - stable-2.15
+      - stable-2.14
+      - stable-2.13
+    suffix: '_dax'
+    urcu_branch: stable-0.15
+    jobs:
+      - '{prefix}system_tests-{lttngversion}{suffix}':
+          bt_branch: 'master'
+          lttngversion:
+            - master
+          urcu_branch: 'master'
+      - '{prefix}system_tests-{lttngversion}{suffix}'
 
 ## Views
 - view-template:
