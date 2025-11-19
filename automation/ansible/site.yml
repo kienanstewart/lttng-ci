@@ -42,3 +42,10 @@
   roles:
     - developer
     - docker
+- hosts: epycamd
+  tasks:
+    - include_role:
+        name: common
+      tags:
+        - never
+        - special

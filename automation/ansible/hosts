@@ -141,3 +141,6 @@ ansible_python_interpreter=python3
 
 [gitmirror]
 git-mirror02
+
+[misc]
+epycamd
