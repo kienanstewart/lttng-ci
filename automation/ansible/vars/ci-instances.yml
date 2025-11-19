@@ -1452,6 +1452,12 @@ containers:
       node_name: 'ci-node-deb13-arm64-osuosl-04'
       config:
         <<: *jenkins_ssh_agent_default_config
+  - meta:
+      address: 'epycamd'
+    jenkins:
+      node_name: 'epycamd'
+      config:
+        <<: *jenkins_ssh_agent_default_config
   # "Root " nodes in libvirt, since Jenkins can use the "libvirt agents" plugin
   # to revert to a specific snapshot before running a job
   #
