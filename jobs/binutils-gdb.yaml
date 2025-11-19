@@ -51,6 +51,19 @@
           cron: '@weekly'
 
 - job-template:
+    name: binutils-gdb_{version}_multitarget_{buildtype}_{cctype}
+    defaults: binutils-gdb
+    dsl: !include-jinja2: pipelines/binutils-gdb/multitarget.groovy.j2
+    # Job variables
+    cctype: gcc
+    buildtype: linuxbuild
+    platform: deb13-amd64
+    git_url: 'git://git-mirror.internal.efficios.com/git/binutils-gdb.git'
+    triggers:
+      - pollscm:
+          cron: '@weekly'
+
+- job-template:
     name: dev_review_binutils-gdb_{version}_{buildtype}_{cctype}
     defaults: binutils-gdb
     dsl: !include-jinja2: pipelines/binutils-gdb/pipeline.groovy.j2
@@ -98,6 +111,27 @@
             - cc-with-dwz-5
             - fission
             - fission-dwp
+      - 'binutils-gdb_{version}_multitarget_{buildtype}_{cctype}':
+          platform: epycamd
+          target_boards: []
+          targets:
+            - aarch64
+            - arc
+            - arm
+            - loongarch64
+            - m68k
+            - microblazeel
+            - mipsel
+            - mips64el
+            - or1k
+            - powerpc
+            - powerpc64le
+            - riscv64
+            - s390x
+            - sh4
+            - sparc
+            - sparc64
+            - xtensa
 
 - project:
     name: review-gdb

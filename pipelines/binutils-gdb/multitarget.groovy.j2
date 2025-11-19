@@ -1,0 +1,223 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2025 Kienan Stewart <kstewart@efficios.com>
+
+@NonCPS
+def get_cc(cc) {
+  result = cc
+  switch(cc) {
+    case 'gcc':
+      result = 'gcc'
+      break
+    case 'clang':
+      result = 'clang'
+      break
+    case ~/clang-\d+/:
+      result = 'clang-' + cc.split('-')[1]
+      break
+    case ~/gcc-\d+/:
+      result = 'gcc-' + cc.split('-')[1]
+      break
+  }
+  return "ccache ${result}"
+}
+
+@NonCPS
+def get_cxx(cc) {
+  result = '${cc}++'
+  switch(cc) {
+    case 'gcc':
+      result = 'g++'
+      break
+    case 'clang':
+      result = 'clang++'
+      break
+    case ~/clang-\d+/:
+      result = 'clang++-' + cc.split('-')[1]
+      break
+    case ~/gcc-\d+/:
+      result = 'g++-' + cc.split('-')[1]
+      break
+  }
+  return "ccache ${result}"
+}
+
+@NonCPS
+def target_configuration_options(target) {
+  options = [
+    "--host=${target}-linux",
+  ]
+
+  return options.join(" ")
+}
+
+@NonCPS
+def platform_configuration_options(platform) {
+  options = [
+    "--prefix=/build",
+
+    // Build only GDB/GDBserver.
+    "--disable-binutils",
+    "--disable-ld",
+    "--disable-gold",
+    "--disable-gas",
+    "--disable-sim",
+    "--disable-gprof",
+    "--disable-gprofng",
+  ]
+
+  return options.join(" ")
+}
+
+pipeline {
+  agent none
+
+  environment {
+    PROJECT_NAME = "{{project_name}}"
+  }
+
+  options {
+    ansiColor('xterm')
+    buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '2'))
+    skipDefaultCheckout()
+    preserveStashes()
+    timestamps()
+    timeout(time: 180, unit: 'MINUTES')
+  }
+
+  parameters {
+    string(name: 'email_to', defaultValue: '{{email_to}}',
+           description: 'Email(s) to notify on build completion')
+    string(name: 'GIT_URL', defaultValue: "{{git_url}}",
+           description: "Git URL to clone from")
+    string(name: 'GIT_BRANCH', defaultValue: "{{version}}",
+           description: "Git branch to checkout")
+  }
+
+  stages {
+    stage('Checkout') {
+      agent {
+        label 'deb13-amd64'
+      }
+
+      stages {
+        stage('Checkout') {
+          steps {
+            dir('src/binutils-gdb') {
+              checkout([
+                $class: 'GitSCM',
+                branches: [[name: "${params.GIT_BRANCH}"]],
+                userRemoteConfigs: [[url: "${params.GIT_URL}"]]
+              ])
+
+              script {
+                if (env.GERRIT_PROJECT == "binutils-gdb") {
+                  sh('git fetch "https://${GERRIT_HOST}/${GERRIT_PROJECT}" "${GERRIT_PATCHSET_REVISION}" ; git checkout FETCH_HEAD')
+                }
+              }
+            }
+
+            stash(name: 'binutils-gdb-source', includes: 'src/binutils-gdb/**')
+          }
+        }
+      }
+
+      post {
+        always {
+          cleanWs()
+        }
+      }
+    }
+
+    stage('Configure and Build') {
+      matrix {
+        agent {
+          label 'epycamd'
+        }
+
+        axes {
+          axis {
+            name 'TARGET'
+            values {{targets|to_groovy(skip_list_wrap=true)}}
+          }
+        }
+
+        environment {
+          PATH = "/data1/smarchi/many-buildroots/toolchains/${TARGET}/bin:${env.PATH}"
+        }
+
+        stages {
+          stage('Prep') {
+            steps {
+              cleanWs()
+              sh('env')
+              sh('mkdir -p $WORKSPACE/build')
+              unstash('binutils-gdb-source')
+            }
+          }
+
+          stage('Print env') {
+            steps {
+              sh('echo "PATH=$PATH"')
+            }
+          }
+
+          stage('Configure') {
+            steps {
+              dir('build') {
+                script {
+                  try {
+                    sh("\${WORKSPACE}/src/binutils-gdb/configure " + platform_configuration_options("{{platform}}") + " " + target_configuration_options(TARGET))
+                  }
+                  catch (err) {
+                    sh('cat config.log')
+                    throw err
+                  }
+                }
+              }
+            }
+          }
+
+          stage('Build') {
+            steps {
+              dir('build') {
+                sh '''
+                THREADS=$(nproc)
+                JOBS=$(( THREADS / 4 ))
+                if [ "$JOBS" -lt 1 ]; then JOBS=1; fi
+                nice make V=1 MAKEINFO=true -j${JOBS}
+                '''
+              }
+            }
+          }
+
+        }
+
+        post {
+          always {
+            cleanWs(cleanWhenFailure: false)
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      emailext(
+        subject: "${currentBuild.projectName} ${currentBuild.displayName} ${currentBuild.result} in ${currentBuild.durationString}",
+        to: params.email_to,
+        body: """
+${currentBuild.result} in ${currentBuild.durationString}
+description: ${currentBuild.description}
+
+See job logs at ${currentBuild.absoluteUrl}/pipeline-console
+See pipeline overview at ${currentBuild.absoluteUrl}/pipeline-graph
+
+-- scm --
+${env.CHANGE_URL} commit ${env.CHANGE_ID} branch ${env.CHANGE_BRANCH}
+"""
+      )
+    }
+  }
+}
