@@ -909,7 +909,8 @@
           mversion:
             - stable-2.15
           buildtype: nocompat
-          parambuildtype: nocompat
+          kconfig_profile: nocompat
+          parambuildtype: build
           kverfloor: v4.4
           kverceil: ''
           kverfilter: stable-head
