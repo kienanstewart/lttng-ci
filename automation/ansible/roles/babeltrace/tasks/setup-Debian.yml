@@ -4,3 +4,8 @@
 
 - name: Ensure babeltrace build dependencies are installed.
   apt: "name={{ babeltrace_packages }} state=present"
+
+- name: Ensure babeltrace test dependencies are installed
+  ansible.builtin.pip:
+    name: "{{babeltrace_packages_pip|default([])}}"
+    extra_args: '--break-system-packages'

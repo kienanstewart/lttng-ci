@@ -1,3 +1,7 @@
 ---
 - name: Ensure babeltrace build dependencies are installed.
   zypper: "name={{ babeltrace_packages }} state=installed update_cache=yes"
+
+- name: Ensure babeltrace test dependencies are installed
+  ansible.builtin.pip:
+    name: "{{babeltrace_packages_pip|default([])}}"

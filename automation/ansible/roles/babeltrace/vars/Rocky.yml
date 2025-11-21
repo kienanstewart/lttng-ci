@@ -6,5 +6,11 @@ babeltrace_packages:
   - libuuid-devel
   - popt-devel
   - python3-devel
+  - python3-pip
+  - python3-pytest
+  - python3-pytest-xdist
   - python3-sphinx
   - swig
+
+babeltrace_packages_pip:
+  - pytest-tap  # optional dependency

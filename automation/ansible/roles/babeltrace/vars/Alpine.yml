@@ -6,6 +6,13 @@ babeltrace_packages:
   - libelf-dev
   - popt-dev
   - python3-dev
-#  - python3-sphinx
+  - py3-pip
+  - py3-pytest
+  - py3-pytest-xdist
+  - py3-sphinx
+  - py3-tap
   - swig
   - util-linux-dev
+
+babeltrace_packages_pip:
+  - pytest-tap  # optional dependency
