@@ -32,4 +32,4 @@ netplan_content: |
           search:
             - internal.efficios.com
           addresses:
-            - 172.18.0.13
+            - 172.18.0.1
