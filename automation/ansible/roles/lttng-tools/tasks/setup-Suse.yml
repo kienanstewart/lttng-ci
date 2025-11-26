@@ -4,8 +4,10 @@
   include_role:
     name: suse
     tasks_from: product
-  with_items:
+  loop:
     - PackageHub
+  loop_control:
+    loop_var: 'product'
 
 - name: Ensure lttng-tools build dependencies are installed.
   zypper: "name={{ lttng_tools_packages }} state=installed update_cache=yes"
