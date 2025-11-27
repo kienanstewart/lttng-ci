@@ -174,6 +174,7 @@ PREFIX="${PREFIX:-/build}"
 LIBDIR="lib"
 LIBDIR_ARCH="$LIBDIR"
 DEPSDIR="$WORKSPACE/deps"
+FAILED_TEST_ENV_DIR="$(mktemp -d)"
 
 # RHEL and SLES both use lib64 but don't bother shipping a default autoconf
 # site config that matches this.
@@ -616,6 +617,10 @@ if [ "$LTTNG_TOOLS_RUN_TESTS" = "yes" ] && [[ ! "$conf" =~ (no-ust|relayd-only) 
     # lttng-sessiond --daemonize on "lttng create"
     export LTTNG_SESSIOND_PATH="/bin/true"
 
+    # Applies to 2.15+
+    export LTTNG_TEST_PRESERVE_TEST_ENV_ON_FAILURE=1
+    export LTTNG_TEST_PRESERVE_TEST_ENV_DIR="${FAILED_TEST_ENV_DIR}"
+
     # It is implied that tests depending on LTTNG_ENABLE_DESTRUCTIVE_TESTS
     # only run for the root user. Note that here `destructive` means that
     # operations are performed at the host level (add user etc.) that
@@ -735,6 +740,15 @@ else
     mkdir -p "$TAPDIR/no-tests"
     echo "1..1" > "$TAPDIR/no-tests/tests.log"
     echo "ok 1 - Test suite disabled" >> "$TAPDIR/no-tests/tests.log"
+fi
+
+if test -d "${FAILED_TEST_ENV_DIR}" ; then
+    # tar the files since Jenkins doesn't handle archiving a huge number of files
+    # very well.
+    if [ "$(find "${FAILED_TEST_ENV_DIR}" | wc -l)" -ge 2 ]; then
+        tar -czf "${TAPDIR}/failed_envs.tgz" -C "${FAILED_TEST_ENV_DIR}" ./
+    fi
+    rm -rf "${FAILED_TEST_ENV_DIR}"
 fi
 
 # Clean the build directory
