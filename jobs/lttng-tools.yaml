@@ -1299,7 +1299,7 @@
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_linuxbuild
           builds: !!python/tuple [std, oot, dist, oot-dist]
           confs: !!python/tuple [std, no-ust, agents, debug-rcu, tls_fallback]
-          babelversions: !!python/tuple [stable-2.0, stable-2.1, master]
+          babelversions: !!python/tuple [stable-2.1, master]
           filter: '(build=="std") || ((babeltrace_version=="master" && (conf=="std" || conf=="agents" || conf=="no-ust") && liburcu_version=="master"))'
       - '{job_prefix}lttng-tools_{version}_{cctype}': &job_lttng-tools_master_clangbuild
           cctype: clangbuild
@@ -1361,7 +1361,7 @@
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_master_root_linuxbuild
           nodes: !!python/tuple [deb13-amd64-rootnode]
           confs: !!python/tuple [agents]
-          babelversions: !!python/tuple [stable-2.0, stable-2.1, master]
+          babelversions: !!python/tuple [stable-2.1, master]
           filter: '((node=="deb13-amd64-rootnode" && platform=="deb13-amd64") && (modules_aligned_access=="default" || (modules_aligned_access="force" && liburcu_version=="master" && babeltrace_version=="stable-2.1")))'
           modules_aligned_access: !!python/tuple ['default', 'force']
       - '{job_prefix}lttng-tools_{version}_root_{cctype}': &job_lttng-tools_master_root_clangbuild
@@ -1447,7 +1447,7 @@
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_linuxbuild
           builds: !!python/tuple [std, oot, dist, oot-dist]
           confs: !!python/tuple [std, no-ust, agents, debug-rcu, tls_fallback]
-          babelversions: !!python/tuple [stable-2.0, stable-2.1, master]
+          babelversions: !!python/tuple [stable-2.1, master]
           filter: '(build=="std") || ((babeltrace_version=="master" && (conf=="std" || conf=="agents" || conf=="no-ust") && liburcu_version=="master"))'
       - '{job_prefix}lttng-tools_{version}_{cctype}': &job_lttng-tools_stable-2-15_clangbuild
           cctype: clangbuild
@@ -1509,7 +1509,7 @@
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_linuxbuild
           nodes: !!python/tuple [deb13-amd64-rootnode]
           confs: !!python/tuple [agents]
-          babelversions: !!python/tuple [stable-2.0, stable-2.1, master]
+          babelversions: !!python/tuple [stable-2.1, master]
           filter: '((node=="deb13-amd64-rootnode" && platform=="deb13-amd64") && (modules_aligned_access=="default" || (modules_aligned_access="force" && liburcu_version=="master" && babeltrace_version=="stable-2.1")))'
           modules_aligned_access: !!python/tuple ['default', 'force']
       - '{job_prefix}lttng-tools_{version}_root_{cctype}': &job_lttng-tools_stable-2-15_root_clangbuild
