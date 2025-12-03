@@ -52,6 +52,27 @@ def target_configuration_options(target) {
 }
 
 @NonCPS
+def target_cflags(target) {
+  switch(target) {
+    case 'xtensa':
+      return '-mlongcalls'
+    default:
+      return ''
+  }
+}
+
+@NonCPS
+def target_ldflags(target) {
+  switch(target) {
+    case 'microblazeel':
+    case 'sparc':
+      return '-latomic'
+    default:
+      return ''
+  }
+}
+
+@NonCPS
 def platform_configuration_options(platform) {
   options = [
     "--prefix=/build",
@@ -144,6 +165,9 @@ pipeline {
 
         environment {
           PATH = "/data1/smarchi/many-buildroots/toolchains/${TARGET}/bin:${env.PATH}"
+          CFLAGS = "${ -> target_cflags(TARGET) }"
+          CXXFLAGS = "${ -> target_cflags(TARGET) }"
+          LDFLAGS = "${ -> target_ldflags(TARGET) }"
         }
 
         stages {
