@@ -1590,6 +1590,9 @@
     babelversions: !!python/tuple [stable-2.1]
     platforms: !!python/tuple [deb13-amd64]
     version: 'stable-2.14'
+    job_properties:
+      - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+        value: 'stable-2.14'
     jobs:
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_linuxbuild
           builds: !!python/tuple [std, oot, dist, oot-dist]
@@ -1604,6 +1607,8 @@
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
+            - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+              value: 'stable-2.14'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_slesbuild
           buildtype: slesbuild
           platforms: !!python/tuple [sles15sp5-amd64]
@@ -1646,6 +1651,8 @@
               value: 'yes'
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
+            - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+              value: 'stable-2.14'
           timeout: '45'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-14_root_linuxbuild
           nodes: !!python/tuple [deb13-amd64-rootnode]
@@ -1663,6 +1670,8 @@
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
+            - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+              value: 'stable-2.14'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-14_root_slesbuild
           buildtype: slesbuild
           platforms: !!python/tuple [sles15sp5-amd64]
@@ -1711,6 +1720,9 @@
     babelversions: !!python/tuple [stable-2.1]
     platforms: !!python/tuple [deb13-amd64]
     version: 'stable-2.13'
+    job_properties:
+      - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+        value: 'stable-2.14'
     jobs:
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-13_linuxbuild
           builds: !!python/tuple [std, oot, dist]
@@ -1726,6 +1738,8 @@
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
+            - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+              value: 'stable-2.14'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-13_slesbuild
           buildtype: slesbuild
           platforms: !!python/tuple [sles15sp5-amd64]
@@ -1770,6 +1784,8 @@
               value: 'yes'
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
+            - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+              value: 'stable-2.14'
           timeout: '45'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-13_root_linuxbuild
           nodes: !!python/tuple [deb13-amd64-rootnode]
@@ -1786,6 +1802,8 @@
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
+            - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+              value: 'stable-2.14'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-13_root_slesbuild
           buildtype: slesbuild
           platforms: !!python/tuple [sles15sp5-amd64]
@@ -1832,6 +1850,9 @@
     babelversions: !!python/tuple [stable-2.1]
     platforms: !!python/tuple [deb13-amd64]
     version: 'stable-2.12'
+    job_properties:
+      - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+        value: 'stable-2.14'
     jobs:
       - '{job_prefix}lttng-tools_{version}_{buildtype}':
           builds: !!python/tuple [std, oot, dist]
@@ -1846,6 +1867,8 @@
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
+            - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+              value: 'stable-2.14'
       - '{job_prefix}lttng-tools_{version}_{buildtype}':
           buildtype: slesbuild
           platforms: !!python/tuple [sles15sp5-amd64]
@@ -1892,6 +1915,8 @@
               value: 'yes'
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
+            - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+              value: 'stable-2.14'
           timeout: '45'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}':
           nodes: !!python/tuple [deb12-amd64-rootnode-linux5]
@@ -2090,6 +2115,9 @@
     platforms: !!python/tuple [deb13-amd64]
     babelversions: !!python/tuple [stable-2.1]
     urcuversions: !!python/tuple [master]
+    job_properties:
+      - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+        value: 'stable-2.14'
     jobs:
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-14_linuxbuild
@@ -2148,6 +2176,9 @@
     platforms: !!python/tuple [deb13-amd64]
     urcuversions: !!python/tuple [master]
     babelversions: !!python/tuple [stable-2.1]
+    job_properties:
+      - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+        value: 'stable-2.14'
     jobs:
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_linuxbuild
@@ -2197,6 +2228,9 @@
     babelversions: !!python/tuple [stable-2.1]
     # Run the few dev review jobs on any CI-Build vote as before
     gerrit_approval_values: !!python/tuple [1, 2, 3]
+    job_properties:
+      - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
+        value: 'stable-2.14'
     jobs:
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           nodes: !!python/tuple [deb13-amd64-rootnode]
