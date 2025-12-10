@@ -5,6 +5,7 @@ lttng_tools_packages:
   - libmsgpack-dev
   - libpopt-dev
   - libxml2-dev
+  - python3-clang
   - shellcheck
   - systemtap-sdt-dev
 
