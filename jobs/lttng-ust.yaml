@@ -586,18 +586,104 @@
                 - branch-compare-type: 'PLAIN'
                   branch-pattern: '{version}'
     builders:
-      - copyartifact:
-          <<: *lttng-ust_steps_copyartifact_defaults
-          project: 'liburcu_{liburcu_versions[0]}_{buildtype}/platform=${{platform}},conf=std,build=std'
-      - copyartifact:
-          <<: *lttng-ust_steps_copyartifact_defaults
-          project: 'lttng-ust_{lttngust_versions[0]}_{buildtype}/liburcu_version={liburcu_versions[0]},platform=${{platform}},conf=agents,build=std'
-      - copyartifact:
-          <<: *lttng-ust_steps_copyartifact_defaults
-          project: 'lttng-tools_{lttngtools_versions[0]}_{buildtype}/babeltrace_version={babeltrace_versions[0]},liburcu_version={liburcu_versions[0]},platform=${{platform}},conf=agents,build=std'
-      - copyartifact:
-          <<: *lttng-ust_steps_copyartifact_defaults
-          project: 'babeltrace_{babeltrace_versions[0]}_{buildtype}/platform=${{platform}},conf=std,build=std'
+      - shell:
+          !include-raw-verbatim: scripts/common/gerrit-depends-on.sh
+      - inject:
+          properties-file: gerrit_custom_dependencies.properties
+      # babeltrace
+      - conditional-step:
+          condition-kind: shell
+          condition-command: 'test -z "$GERRIT_DEP_BABELTRACE"'
+          on-evaluation-failure: dont-run
+          steps:
+            - copyartifact:
+                <<: *lttng-ust_steps_copyartifact_defaults
+                project: 'babeltrace_{babeltrace_versions[0]}_{buildtype}/platform=${{platform}},conf=std,build=std'
+      - conditional-step:
+          condition-kind: shell
+          condition-command: 'test -n "$GERRIT_DEP_BABELTRACE"'
+          on-evaluation-failure: dont-run
+          steps:
+            - shell:
+                !include-raw-verbatim:
+                  - scripts/common/override-build-std.sh
+                  - scripts/common/print.sh
+                  - scripts/babeltrace/build.sh
+            - shell:
+                !include-raw-verbatim:
+                  # Copy to deps/build and leave build/ empty
+                  - scripts/lttng-tools/gerrit-install-deps.sh
+      # usespace-rcu
+      - conditional-step:
+          condition-kind: shell
+          condition-command: 'test -z "$GERRIT_DEP_USERSPACE_RCU"'
+          on-evaluation-failure: dont-run
+          steps:
+            - copyartifact:
+                <<: *lttng-ust_steps_copyartifact_defaults
+                project: 'liburcu_{liburcu_versions[0]}_{buildtype}/platform=${{platform}},conf=std,build=std'
+      - conditional-step:
+          condition-kind: shell
+          condition-command: 'test -n "$GERRIT_DEP_USERSPACE_RCU"'
+          on-evaluation-failure: dont-run
+          steps:
+            - shell:
+                !include-raw-verbatim:
+                  - scripts/common/override-build-std.sh
+                  - scripts/common/print.sh
+                  - scripts/liburcu/build.sh
+            - shell:
+                !include-raw-verbatim:
+                  # Copy to deps/build and leave build/ empty
+                  - scripts/lttng-tools/gerrit-install-deps.sh
+      # lttng-ust
+      - conditional-step:
+          condition-kind: shell
+          condition-command: 'test -z "$GERRIT_DEP_USERSPACE_RCU" && test -z "$GERRIT_DEP_LTTNG_UST"'
+          on-evaluation-failure: dont-run
+          steps:
+            - copyartifact:
+                <<: *lttng-ust_steps_copyartifact_defaults
+                project: 'lttng-ust_{lttngust_versions[0]}_{buildtype}/liburcu_version={liburcu_versions[0]},platform=${{platform}},conf=agents,build=std'
+      - conditional-step:
+          condition-kind: shell
+          condition-command: 'test -n "$GERRIT_DEP_USERSPACE_RCU" || test -n "$GERRIT_DEP_LTTNG_UST"'
+          on-evaluation-failure: dont-run
+          steps:
+            - shell:
+                !include-raw-verbatim:
+                  - scripts/common/override-build-std.sh
+                  - scripts/common/override-conf-agents.sh
+                  - scripts/common/print.sh
+                  - scripts/lttng-ust/build.sh
+            - shell:
+                !include-raw-verbatim:
+                  # Copy to deps/build and leave build/ empty
+                  - scripts/lttng-tools/gerrit-install-deps.sh
+      - conditional-step:
+          condition-kind: shell
+          condition-command: 'test -z "$GERRIT_DEP_USERSPACE_RCU" && test -z "$GERRIT_DEP_LTTNG_UST" && test -z "$GERRIT_DEP_LTTNG_TOOLS"'
+          on-evaluation-failure: dont-run
+          steps:
+            - copyartifact:
+                <<: *lttng-ust_steps_copyartifact_defaults
+                project: 'lttng-tools_{lttngtools_versions[0]}_{buildtype}/babeltrace_version={babeltrace_versions[0]},liburcu_version={liburcu_versions[0]},platform=${{platform}},conf=agents,build=std'
+      # lttng-tools
+      - conditional-step:
+          condition-kind: shell
+          condition-command: 'test -n "$GERRIT_DEP_USERSPACE_RCU" || test -n "$GERRIT_DEP_LTTNG_UST" || test -n "$GERRIT_DEP_LTTNG_TOOLS"'
+          on-evaluation-failure: dont-run
+          steps:
+            - shell:
+                !include-raw-verbatim:
+                  - scripts/common/override-build-std.sh
+                  - scripts/common/override-conf-agents.sh
+                  - scripts/common/print.sh
+                  - scripts/lttng-tools/build.sh
+            - shell:
+                !include-raw-verbatim:
+                  # Copy to deps/build and leave build/ empty
+                  - scripts/lttng-tools/gerrit-install-deps.sh
       - shell:
           !include-raw-verbatim: scripts/lttng-ust/lttng-ust-java-tests.sh
     properties:
