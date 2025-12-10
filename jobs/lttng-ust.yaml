@@ -604,6 +604,8 @@
       - inject:
           properties-content: |
             PROJECT_NAME=lttng-ust-java-tests
+            LTTNG_UST_JAVA_AGENTS={java_agents|true}
+            java_preferred_jdk={java_preferred_jdk}
       - build-discarder:
           days-to-keep: 1
       - throttle:

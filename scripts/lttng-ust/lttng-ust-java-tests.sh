@@ -5,6 +5,76 @@
 #
 set -exu
 
+os_field() {
+    field=$1
+    if [ -f /etc/os-release ]; then
+        echo "$(source /etc/os-release; echo "${!field}")"
+    fi
+}
+
+os_id() {
+    os_field 'ID'
+}
+
+os_version_id() {
+    os_field 'VERSION_ID'
+}
+
+# Version compare functions
+vercomp () {
+    set +u
+    if [[ "$1" == "$2" ]]; then
+        return 0
+    fi
+    local IFS=.
+    # Ignore the shellcheck warning, we want splitting to happen based on IFS.
+    # shellcheck disable=SC2206
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++)); do
+        if [[ -z ${ver2[i]} ]]; then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]})); then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 2
+        fi
+    done
+    set -u
+    return 0
+}
+
+verlte() {
+    vercomp "$1" "$2"; local res="$?"
+    [ "$res" -eq "0" ] || [ "$res" -eq "2" ]
+}
+
+verlt() {
+    vercomp "$1" "$2"; local res="$?"
+    [ "$res" -eq "2" ]
+}
+
+vergte() {
+    vercomp "$1" "$2"; local res="$?"
+    [ "$res" -eq "0" ] || [ "$res" -eq "1" ]
+}
+
+vergt() {
+    vercomp "$1" "$2"; local res="$?"
+    [ "$res" -eq "1" ]
+}
+
+verne() {
+    vercomp "$1" "$2"; local res="$?"
+    [ "$res" -ne "0" ]
+}
+
 # shellcheck disable=SC2317
 function cleanup
 {
@@ -50,6 +120,33 @@ fi
 
 DEPS_JAVA="${WORKSPACE/deps/build/share/java}"
 export CLASSPATH="$DEPS_JAVA/lttng-ust-agent-all.jar:/usr/share/java/log4j-api.jar:/usr/share/java/log4j-core.jar:/usr/share/java/log4j-1.2.jar"
+case "${java_preferred_jdk:-}" in
+    'default')
+        ;;
+    '8')
+        case "$(os_id)" in
+            'sles')
+                export JAVA_HOME="/usr/${LIBDIR_ARCH}/jvm/java-1.8.0-openjdk-1.8.0"
+                export PATH="/usr/${LIBDIR_ARCH}/jvm/java-1.8.0-openjdk-1.8.0/bin:/usr/${LIBDIR_ARCH}/jvm/jre-1.8.0-openjdk/bin:${PATH}"
+                SLES_VERSION="$(grep -E '</version>' /etc/products.d/SLES.prod | grep -E -o '[0-9]+\.[0-9]+')"
+                if vergte "${SLES_VERSION}" "15.4" ; then
+                    export CLASSPATH="${JAVA_PATH}/lttng-ust-agent-all.jar:/usr/share/java/log4j/log4j-api.jar:/usr/share/java/log4j/log4j-core.jar:/usr/share/java/log4j12/log4j-12.jar"
+                fi
+                ;;
+            'ci') # yocto
+                export JAVA_HOME="/usr/${LIBDIR_ARCH}/jvm/openjdk-8/"
+                export PATH="/usr/${LIBDIR_ARCH}/jvm/openjdk-8/bin/:${PATH}"
+                ;;
+            *)
+                echo "OS id '$(os_id)' not supported for java_preferred_jdk '${java_preferred_jdk}'"
+                exit 1
+        esac
+        ;;
+    *)
+      echo "Unsupported java_preferred_jdk: '${java_preferred_jdk}'"
+      exit 1
+      ;;
+esac
 
 LTTNG_UST_JAVA_TESTS_ENV=(
     # Some ci nodes (eg. SLES12) don't have maven distributed by their
@@ -71,8 +168,16 @@ LTTNG_UST_JAVA_TESTS_MAVEN_OPTS=(
     "-Dlog4j-jar-location=${WORKSPACE}/deps/build/share/java/lttng-ust-agent-log4j.jar"
     "-Dlog4j2-jar-location=${WORKSPACE}/deps/build/share/java/lttng-ust-agent-log4j2.jar"
     "-DargLine=-Djava.library.path=${WORKSPACE}/deps/build/${LIBDIR_ARCH}"
-    '-Dgroups=!domain:log4j2'
 )
+
+# Check lttng-tools version
+# Merged into master ~ 47abf22b48023960069e1d3e23f42298ce4b3c2a
+LTTNG_VERSION="$(env "${LTTNG_UST_JAVA_TESTS_ENV[@]}" lttng --version | cut -d ' ' -f 5)"
+if verlt "${LTTNG_VERSION}" "2.14" ; then
+    LTTNG_UST_JAVA_TESTS_MAVEN_OPTS+=(
+        '-Dgroups=!domain:log4j2'
+    )
+fi
 
 # Start the lttng-sessiond
 mkdir -p "${WORKSPACE}/log"
