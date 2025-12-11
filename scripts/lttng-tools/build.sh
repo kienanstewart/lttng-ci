@@ -168,6 +168,11 @@ LTTNG_TOOLS_RUN_TESTS_LONG_REGRESSION="${LTTNG_TOOLS_RUN_TESTS_LONG_REGRESSION:-
 LTTNG_TOOLS_RUN_UST_JAVA_TESTS="${LTTNG_TOOLS_RUN_UST_JAVA_TESTS:-yes}"
 LTTNG_TOOLS_CLANG_TIDY="${LTTNG_TOOLS_CLANG_TIDY:-no}"
 
+VERBOSE_BABELTRACE="${VERBOSE_BABELTRACE:-}"
+VERBOSE_LTTNG_CLIENT="${VERBOSE_LTTNG_CLIENT:-}"
+VERBOSE_RELAYD="${VERBOSE_RELAYD:-}"
+VERBOSE_SESSIOND="${VERBOSE_SESSIOND:-}"
+
 SRCDIR="$WORKSPACE/src/lttng-tools"
 TAPDIR="$WORKSPACE/tap"
 PREFIX="${PREFIX:-/build}"
@@ -620,6 +625,21 @@ if [ "$LTTNG_TOOLS_RUN_TESTS" = "yes" ] && [[ ! "$conf" =~ (no-ust|relayd-only) 
     # Applies to 2.15+
     export LTTNG_TEST_PRESERVE_TEST_ENV_ON_FAILURE=1
     export LTTNG_TEST_PRESERVE_TEST_ENV_DIR="${FAILED_TEST_ENV_DIR}"
+    if [[ "${VERBOSE_BABELTRACE}" == "true" ]]; then
+        export LTTNG_TEST_VERBOSE_BABELTRACE=1
+    fi
+
+    if [[ "${VERBOSE_LTTNG_CLIENT}" == "true" ]]; then
+        export LTTNG_TEST_VERBOSE_CLIENT=1
+    fi
+
+    if [[ "${VERBOSE_RELAYD}" == "true" ]]; then
+        export LTTNG_TEST_VERBOSE_RELAYD=1
+    fi
+
+    if [[ "${VERBOSE_SESSIOND}" == "true" ]]; then
+        export LTTNG_TEST_VERBOSE_SESSIOND=1
+    fi
 
     # It is implied that tests depending on LTTNG_ENABLE_DESTRUCTIVE_TESTS
     # only run for the root user. Note that here `destructive` means that

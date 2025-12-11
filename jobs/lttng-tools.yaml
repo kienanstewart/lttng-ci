@@ -117,6 +117,22 @@
       - string:
           name: 'GERRIT_PROJECT'
           default: 'lttng-tools'
+      - bool:
+          name: 'VERBOSE_BABELTRACE'
+          default: 'false'
+          description: 'Enable verbose output for babeltrace'
+      - bool:
+          name: 'VERBOSE_LTTNG_CLIENT'
+          default: 'false'
+          description: 'Enable verbose output for the lttng client'
+      - bool:
+          name: 'VERBOSE_SESSIOND'
+          default: 'false'
+          description: 'Enable verbose sessiond and consumerd output'
+      - bool:
+          name: 'VERBOSE_RELAYD'
+          default: 'false'
+          description: 'Enable verbose relayd output'
     scm:
       - git: &lttng-tools_scm_git_review
           url: https://review.lttng.org/lttng-tools
