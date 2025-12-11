@@ -233,6 +233,8 @@
               credential-id: s3_obj_lava_key
               username: S3_ACCESS_KEY
               password: S3_SECRET_KEY
+      - build-discarder:
+          days-to-keep: 7
 
 - job-template:
     name: system_tests_build_kernel_and_modules
@@ -252,6 +254,8 @@
               credential-id: s3_obj_lava_key
               username: S3_ACCESS_KEY
               password: S3_SECRET_KEY
+      - build-discarder:
+          days-to-keep: 7
 
 ## Project
 - project:
