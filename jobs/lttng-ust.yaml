@@ -1049,14 +1049,14 @@
           buildtype: linuxbuild
           builds: !!python/tuple [std, oot, dist, oot-dist]
           confs: !!python/tuple [std, agents]
-          babeltrace_version: stable-2.0
+          babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
           version: master
           buildtype: slesbuild
           platforms: !!python/tuple [sles15sp5-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
-          babeltrace_version: stable-2.0
+          babeltrace_version: stable-2.1
           java_preferred_jdk: '8'
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: master
@@ -1093,14 +1093,14 @@
           buildtype: linuxbuild
           builds: !!python/tuple [std, oot, dist, oot-dist]
           confs: !!python/tuple [std, agents]
-          babeltrace_version: stable-2.0
+          babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
           version: stable-2.15
           buildtype: slesbuild
           platforms: !!python/tuple [sles15sp5-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
-          babeltrace_version: stable-2.0
+          babeltrace_version: stable-2.1
           java_preferred_jdk: '8'
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: stable-2.15
