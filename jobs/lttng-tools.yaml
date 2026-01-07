@@ -13,6 +13,24 @@
 
     project-type: freestyle
 
+    parameters:
+      - bool:
+          name: 'VERBOSE_BABELTRACE'
+          default: 'false'
+          description: 'Enable verbose output for babeltrace'
+      - bool:
+          name: 'VERBOSE_LTTNG_CLIENT'
+          default: 'false'
+          description: 'Enable verbose output for the lttng client'
+      - bool:
+          name: 'VERBOSE_SESSIOND'
+          default: 'false'
+          description: 'Enable verbose sessiond and consumerd output'
+      - bool:
+          name: 'VERBOSE_RELAYD'
+          default: 'false'
+          description: 'Enable verbose relayd output'
+
     wrappers:
       - ansicolor: &lttng-tools_wrapper_ansicolor_defaults
           colormap: xterm
