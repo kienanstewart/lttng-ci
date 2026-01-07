@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+#
+# SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Verify that one or more mirrors of a git repository are synced for given
+# branches.
+#
+
+import argparse
+import enum
+import logging
+import subprocess
+import sys
+
+
+class CheckState(enum.IntEnum):
+    OK = 0
+    WARNING = 1
+    CRITICAL = 2
+    UNKNOWN = 3
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(
+        prog="check_gitmirror",
+        description="Check the state of a branch in git repo vs one or more mirrors",
+    )
+    parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_const",
+        dest="loglevel",
+        const=logging.ERROR,
+        default=logging.INFO,
+        help="Only output errors",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_const",
+        dest="loglevel",
+        const=logging.DEBUG,
+        help="Increase verbosity",
+    )
+
+    parser.add_argument("-b", "--branch", default="main", help="Git branch")
+    parser.add_argument("-m", "--mirror", default=[], action="append", help="Mirror")
+    parser.add_argument(
+        "-r", "--repository", required=True, help="The canonical repository"
+    )
+    return parser
+
+
+def check(repo, mirrors=[], branch="main"):
+    assert repo not in mirrors
+    assert len(mirrors) > 0
+
+    state = CheckState.OK
+    repos = [repo] + mirrors
+    heads = {}
+    for repo in repos:
+        command = ["git", "ls-remote", "--branches", repo, branch]
+        logging.debug("Command: {}".format(command))
+        proc = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        output, error = proc.communicate()
+        logging.debug("Output: {}".format(output))
+        logging.debug("Returncode: {}".format(proc.returncode))
+        if proc.returncode != 0:
+            logging.error(
+                "git ls-remote to '{}' failed with code {}: {}".format(
+                    repo, proc.returncode, error
+                )
+            )
+            state = CheckState.CRITICAL
+
+        for line in output.splitlines():
+            commit, ref = line.split("\t")
+            if ref not in heads:
+                heads[ref] = {}
+            heads[ref][repo] = commit
+
+    logging.debug(heads)
+    if len(heads) == 0:
+        state = CheckState.WARNING
+        logging.warning("No refs found matching '{}'".format(branch))
+
+    for ref, by_repo in heads.items():
+        if len(repos) != len(by_repo):
+            if state < CheckState.WARNING:
+                state = CheckState.WARNING
+            logging.warning(
+                "Only found {} results for ref '{}', expected {}\n\tMissing from: {}".format(
+                    len(by_repo), ref, len(repos), set(repos).difference(by_repo)
+                )
+            )
+
+        all_match = len(set(by_repo.values())) == 1
+        if not all_match:
+            state = CheckState.CRITICAL
+            logging.error(
+                "Not all repos are synced for ref {}: {}".format(ref, by_repo)
+            )
+
+    return state
+
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    logging.basicConfig(
+        level=args.loglevel, format="[%(asctime)s] - %(levelname)s - %(message)s"
+    )
+
+    state = check(args.repository, args.mirror, args.branch)
+    if state == CheckState.OK:
+        logging.info("All refs matching branch '{}' synced".format(args.branch))
+
+    sys.exit(int(state))
