@@ -765,7 +765,7 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild
           version: master
-          platforms: !!python/tuple [yocto23-powerpc, yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
@@ -845,7 +845,7 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild
           version: stable-2.15
-          platforms: !!python/tuple [yocto23-powerpc, yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
@@ -902,7 +902,7 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild
           version: stable-2.14
-          platforms: !!python/tuple [yocto23-powerpc, yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
@@ -959,7 +959,7 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild
           version: stable-2.13
-          platforms: !!python/tuple [yocto23-powerpc, yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           liburcu_versions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
@@ -1006,7 +1006,7 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild
           version: stable-2.12
-          platforms: !!python/tuple [yocto23-powerpc, yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           liburcu_versions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
