@@ -1785,10 +1785,6 @@
           confs: !!python/tuple [agents]
           java_agents: 'false'
           platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
-      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-13_yoctobuild
-          buildtype: yoctobuild
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
-          urcuversions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-13_yoctobuild_extended
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild
@@ -1921,10 +1917,6 @@
           java_agents: 'false'
           urcuversions: !!python/tuple [stable-0.12]
           platforms: !!python/tuple [el8-amd64, el9-amd64]
-      - '{job_prefix}lttng-tools_{version}_{buildtype}':
-          buildtype: yoctobuild
-          urcuversions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
       - '{job_prefix}lttng-tools_{version}_{buildtype}':
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild
@@ -2224,8 +2216,6 @@
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_slesbuild
           gerrit_approval_values: '{_gerrit_approval_build_only_and_more}'
-      - 'dev_review_lttng-tools_{version}_{buildtype}':
-          <<: *job_lttng-tools_stable-2-13_yoctobuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_yoctobuild_extended
       - 'dev_review_lttng-tools_{version}_{buildtype}':

@@ -905,7 +905,7 @@
           platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
-          liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
+          liburcu_versions: !!python/tuple [stable-0.15, master]
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: freebsdbuild
           version: stable-2.14
@@ -956,13 +956,6 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
           java_agents: 'false'
-      - '{job_prefix}lttng-ust_{version}_{buildtype}':
-          buildtype: yoctobuild
-          version: stable-2.13
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std]
-          liburcu_versions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
       - '{job_prefix}lttng-ust_{version}_{cctype}':
           buildtype: linuxbuild
           cctype: clangbuild
@@ -1003,13 +996,6 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
           java_agents: 'false'
-      - '{job_prefix}lttng-ust_{version}_{buildtype}':
-          buildtype: yoctobuild
-          version: stable-2.12
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std]
-          liburcu_versions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild_extended
           version: stable-2.12
