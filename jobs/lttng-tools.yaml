@@ -14,6 +14,14 @@
     project-type: freestyle
 
     parameters:
+      - string:
+          name: 'MATRIX_FILTER'
+          default: '{filter}'
+          description: 'The groovy filter for the matrix jobs to execute'
+      - string:
+          name: 'MATRIX_TOUCHSTONE'
+          default: '{touchstone}'
+          description: 'The groovy filter for the jobs to execute first'
       - bool:
           name: 'VERBOSE_BABELTRACE'
           default: 'false'
@@ -92,7 +100,7 @@
     buildtype: 'linuxbuild'
     confs: !!python/tuple [std]
     email_to: ''
-    filter: ''
+    filter: 'true'
     github_user: lttng
     java_agents: 'true'  # when building with the agents config, include java agents
     java_preferred_jdk: 'default'
@@ -135,6 +143,14 @@
       - string:
           name: 'GERRIT_PROJECT'
           default: 'lttng-tools'
+      - string:
+          name: 'MATRIX_FILTER'
+          default: '{filter}'
+          description: 'The groovy filter for the matrix jobs to execute'
+      - string:
+          name: 'MATRIX_TOUCHSTONE'
+          default: '{touchstone}'
+          description: 'The groovy filter for the jobs to execute first'
       - bool:
           name: 'VERBOSE_BABELTRACE'
           default: 'false'
@@ -204,9 +220,9 @@
     project-type: matrix
     node: 'master' # Applies only to matrix flyweight task
     execution-strategy: &lttng-tools_matrix_execution-strategy_defaults
-      combination-filter: '{filter}'
+      combination-filter: 'evaluate(MATRIX_FILTER)'
       touchstone:
-        expr: '{touchstone}'
+        expr: 'evaluate(MATRIX_TOUCHSTONE)'
         result: unstable
     axes:
       - axis: &lttng-tools_matrix_axis_platform
