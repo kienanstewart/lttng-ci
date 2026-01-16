@@ -4,40 +4,48 @@
 # @TODO: Ensure kernel package is installed
 # @TODO: Should a 2nd sshd be started on a non-standard port in case of failure?
 - name: dpkg audit
-  command:
+  ansible.builtin.command:
     cmd: 'dpkg --audit'
+
 - name: show holds
-  command:
+  ansible.builtin.command:
     cmd: 'apt-mark showhold'
+
 - name: remove all holds
-  command:
+  ansible.builtin.command:
     cmd: "apt-mark unhold '*'"
+
 - name: Replace release in apt sources.list
-  replace:
+  ansible.builtin.replace:
     regexp: "{{ansible_distribution_release}}"
     replace: "{{next_release}}"
     path: /etc/apt/sources.list
+
 - name: Replace release in apt sources.list.d
-  shell:
+  ansible.builtin.shell:
     cmd: "sed -i 's/{{ansible_distribution_release}}/{{next_release}}/' /etc/apt/sources.list.d/*"
     warn: false
   ignore_errors: true
-- apt:
+
+- ansible.builtin.apt:
     update_cache: true
+
 # @TODO: Check required disk space and available disk space
 - name: Download packages
-  command:
+  ansible.builtin.command:
     cmd: 'apt-get -y -d upgrade {{apt_common_options}}'
     warn: false
   environment: "{{apt_noninteractive_environment}}"
+
 - name: Minimal upgrade run
-  command:
-    cmd: 'apt upgrade -y --without-new-pkgs {{apt_common_options}}'
+  ansible.builtin.command:
+    cmd: 'apt-get upgrade -y --without-new-pkgs {{apt_common_options}}'
     warn: false
   environment: "{{apt_noninteractive_environment}}"
+
 - name: Full upgrade run
-  command:
-    cmd: 'apt full-upgrade -y {{apt_common_options}}'
+  ansible.builtin.command:
+    cmd: 'apt-get full-upgrade -y {{apt_common_options}}'
     warn: false
   environment: "{{apt_noninteractive_environment}}"
 
@@ -62,11 +70,12 @@
 # it would be handy to do a replace in /etc/hostname
 # before rebooting
 - name: Reboot
-  command: /usr/sbin/reboot
+  ansible.builtin.command: /usr/sbin/reboot
   async: 0
   poll: 0
   ignore_errors: true
   register: last_result
+
 - name: wait for the server to reboot
   local_action: wait_for host={{ inventory_hostname }}
                port=22
@@ -88,12 +97,13 @@
     argv: ['../scripts/manage_jenkins_node.py', 'enable', jenkins_node_regex]
 
 - name: Purge configuration of removed packages
-  command:
-    cmd: "apt -y purge '~c'"
+  ansible.builtin.command:
+    cmd: "apt-get -y purge '~c'"
     warn: false
   environment: "{{apt_noninteractive_environment}}"
+
 - name: Purge obsolete packages
-  command:
-    cmd: "apt -y purge '~o'"
+  ansible.builtin.command:
+    cmd: "apt-get -y purge '~o'"
     warn: false
   environment: "{{apt_noninteractive_environment}}"

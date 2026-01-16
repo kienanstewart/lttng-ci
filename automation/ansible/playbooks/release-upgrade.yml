@@ -2,13 +2,13 @@
 - name: Set next release
   hosts: all
   tasks:
-    - set_fact:
+    - ansible.builtin.set_fact:
         release_index: "{{lookup('ansible.utils.index_of', data=lookup('vars', ansible_distribution+'_releases', default=[]), test='eq', value=ansible_distribution_release)}}"
     # If there is not a next release available (as defined below in Debian_releasess
     # or Ubuntu_releases), the execution of the playbook will fail at this step.
-    - set_fact:
+    - ansible.builtin.set_fact:
         next_release: "{{lookup('vars', ansible_distribution+'_releases')[release_index|int + 1]}}"
-    - debug:
+    - ansible.builtin.debug:
         msg: "Upgrading from {{ansible_distribution_release}} to {{next_release}}"
   vars:
     # 'stable' releases ordered from oldest to newest
@@ -28,67 +28,71 @@
 - name: Run any outstanding upgrades
   hosts: all
   tasks:
-    - apt:
+    - ansible.builtin.apt:
         update_cache: true
-    - apt:
+    - ansible.builtin.apt:
         upgrade: dist
-    - apt:
+    - ansible.builtin.apt:
         autoremove: true
         purge: true
+
 - name: Pre-upgrade backups
   hosts: all
   tasks:
     - name: Check if /etc is a git repo
       register: etckeeper
-      command:
+      ansible.builtin.command:
         cmd: test -d /etc/.git
       ignore_errors: true
+
     - name: Tag etc configuration
       when: etckeeper.rc == 0
       block:
-        - command:
+        - ansible.builtin.command:
             chdir: /etc
             argv:
               - git
               - tag
               - "pre-{{next_release}}"
-        - command:
+        - ansible.builtin.command:
             chdir: /etc
             cmd: 'git gc --prune'
     - name: Backup package state
       block:
-        - shell:
+        - ansible.builtin.shell:
             cmd: "tar czf /var/backups/pre-{{next_release}}-backup.tgz /etc /var/lib/dpkg /var/lib/apt/extended_states"
             # Mitogen doesn't seem to work with the 'archive' module, since tarfile is
             # "present in the Mitogent importer blacklist", so a shell command is used
             # here instead
             warn: false
-        - shell:
+        - ansible.builtin.shell:
             cmd: "dpkg --get-selections '*' > /var/backups/dpkg-selections-pre-{{next_release}}.txt"
-        - file:
+        - ansible.builtin.file:
             path: "{{item}}"
             mode: '0600'
           with_items:
             - "/var/backups/pre-{{next_release}}-backup.tgz"
             - "/var/backups/dpkg-selections-pre-{{next_release}}.txt"
+
 - name: Update hostname
   hosts: all
   vars:
     # eg. ansible-playbook -e '{"UPDATE_HOSTNAME":true}' playbooks/release-upgrade.yml
     update_hostname: "{{lookup('vars', 'UPDATE_HOSTNAME', default='false')}}"
   tasks:
-    - debug:
+    - ansible.builtin.debug:
         msg: "update_hostname: {{update_hostname}}"
-    - replace:
+    - ansible.builtin.replace:
         path: /etc/hostname
         regexp: "{{ansible_distribution_release}}"
         replace: "{{next_release}}"
       when: update_hostname | bool
-    - replace:
+    - ansible.builtin.replace:
         path: /etc/hostname
         regexp: "deb{{ansible_distribution_version}}"
         replace: "deb{{ansible_distribution_version|int + 1 }}"
       when: update_hostname | bool and ansible_distribution == 'Debian'
+
 - name: Debian major version upgrade
   hosts: all
   vars:
@@ -97,26 +101,28 @@
       APT_LISTCHANGES_FRONTEND: mail
     apt_common_options: "-o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confnew'"
   tasks:
-    - import_tasks: ../tasks/debian_release_upgrade.yml
+    - ansible.builtin.import_tasks: ../tasks/debian_release_upgrade.yml
       when: ansible_distribution == 'Debian'
+
 - name: Ubuntu major version upgrade
   hosts: all
   tasks:
     - name: Do release upgrade
       when: ansible_distribution == 'Ubuntu'
-      command:
+      ansible.builtin.command:
         cmd: 'do-release-upgrade -m server --frontend=DistUpgradeViewNonInteractive'
+
 - name: Post-upgrade tasks
   hosts: all
   tasks:
     - name: Mark rsyslog as auto
       when: next_release == 'bookworm'
-      command:
+      ansible.builtin.command:
         cmd: 'apt-mark auto rsyslog'
     - name: Autoremove any packages
-      apt:
+      ansible.builtin.apt:
         autoremove: true
         purge: true
     - name: Clean apt cache
-      apt:
+      ansible.builtin.apt:
         autoclean: true
