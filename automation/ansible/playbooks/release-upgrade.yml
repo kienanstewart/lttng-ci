@@ -71,10 +71,6 @@
       block:
         - ansible.builtin.shell:
             cmd: "tar czf /var/backups/pre-{{next_release}}-backup.tgz /etc /var/lib/dpkg /var/lib/apt/extended_states"
-            # Mitogen doesn't seem to work with the 'archive' module, since tarfile is
-            # "present in the Mitogent importer blacklist", so a shell command is used
-            # here instead
-            warn: false
         - ansible.builtin.shell:
             cmd: "dpkg --get-selections '*' > /var/backups/dpkg-selections-pre-{{next_release}}.txt"
         - ansible.builtin.file:

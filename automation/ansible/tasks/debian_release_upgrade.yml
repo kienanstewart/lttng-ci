@@ -24,7 +24,6 @@
 - name: Replace release in apt sources.list.d
   ansible.builtin.shell:
     cmd: "sed -i 's/{{ansible_distribution_release}}/{{next_release}}/' /etc/apt/sources.list.d/*"
-    warn: false
   ignore_errors: true
 
 - ansible.builtin.apt:
@@ -34,19 +33,16 @@
 - name: Download packages
   ansible.builtin.command:
     cmd: 'apt-get -y -d upgrade {{apt_common_options}}'
-    warn: false
   environment: "{{apt_noninteractive_environment}}"
 
 - name: Minimal upgrade run
   ansible.builtin.command:
     cmd: 'apt-get upgrade -y --without-new-pkgs {{apt_common_options}}'
-    warn: false
   environment: "{{apt_noninteractive_environment}}"
 
 - name: Full upgrade run
   ansible.builtin.command:
     cmd: 'apt-get full-upgrade -y {{apt_common_options}}'
-    warn: false
   environment: "{{apt_noninteractive_environment}}"
 
 - name: Offline jenkins nodes
@@ -99,11 +95,9 @@
 - name: Purge configuration of removed packages
   ansible.builtin.command:
     cmd: "apt-get -y purge '~c'"
-    warn: false
   environment: "{{apt_noninteractive_environment}}"
 
 - name: Purge obsolete packages
   ansible.builtin.command:
     cmd: "apt-get -y purge '~o'"
-    warn: false
   environment: "{{apt_noninteractive_environment}}"
