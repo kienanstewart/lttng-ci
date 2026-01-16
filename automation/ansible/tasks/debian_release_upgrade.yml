@@ -29,7 +29,42 @@
 - ansible.builtin.apt:
     update_cache: true
 
-# @TODO: Check required disk space and available disk space
+- name: Check space required during upgrades
+  ansible.builtin.shell:
+    cmd: "apt-get --assume-no full-upgrade | grep -E '^After this operation' | cut -d ',' -f 2 | cut -d ' ' -f 2,3"
+  environment:
+    LANG: 'C'
+  register: apt_get_full_upgrade_no_action
+  ignore_errors: true
+
+- name: Check available disk space
+  ansible.builtin.command:
+    cmd: 'df -k --output=avail /'
+  register: diskfree_output
+
+- ansible.builtin.set_fact:
+    disk_space_available: "{{diskfree_output.stdout_lines[1] | ansible.builtin.human_to_bytes(default_unit='K')}}"
+    disk_space_required: "{{apt_get_full_upgrade_no_action.stdout_lines[0] | ansible.builtin.human_to_bytes}}"
+
+- ansible.builtin.debug:
+    msg:
+      - "Space required: {{disk_space_required}} bytes"
+      - "Space required with margin: {{disk_space_required|int * 2}}"
+      - "Space available: {{disk_space_available}} bytes"
+
+- name: Abort if insufficient space
+  when: (disk_space_required|int * 2) > disk_space_available|int
+  block:
+    - ansible.builtin.replace:
+        replace: "{{ansible_distribution_release}}"
+        regexp: "{{next_release}}"
+        path: /etc/apt/sources.list
+    - name: Replace release in apt sources.list.d
+      ansible.builtin.shell:
+        cmd: "sed -i 's/{{next_release}}/{{ansible_distribution_release}}/' /etc/apt/sources.list.d/*"
+      ignore_errors: true
+    - ansible.builtin.meta: end_host
+
 - name: Download packages
   ansible.builtin.command:
     cmd: 'apt-get -y -d upgrade {{apt_common_options}}'
