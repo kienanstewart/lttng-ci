@@ -22,6 +22,9 @@
       - focal
       - jammy
       - noble
+    incus_evacuate_node: ''
+    jenkins_node_regex: ''
+
 - name: Run any outstanding upgrades
   hosts: all
   tasks:
