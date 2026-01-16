@@ -16,9 +16,12 @@
       - buster
       - bullseye
       - bookworm
+      - trixie
+      - forky
     Ubuntu_releases:
       - focal
       - jammy
+      - noble
 - name: Run any outstanding upgrades
   hosts: all
   tasks:
