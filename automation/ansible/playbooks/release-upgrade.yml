@@ -48,15 +48,25 @@
     - name: Tag etc configuration
       when: etckeeper.rc == 0
       block:
-        - ansible.builtin.command:
+        - name: Remove etckeeper tag if it exists
+          ansible.builtin.command:
+            chdir: /etc
+            argv: ['git', 'tag', '-d', "pre-{{next_release}}"]
+          ignore_errors: true
+
+        - name: Add etckeeper tag
+          ansible.builtin.command:
             chdir: /etc
             argv:
               - git
               - tag
               - "pre-{{next_release}}"
-        - ansible.builtin.command:
+
+        - name: etckeeper Git GC
+          ansible.builtin.command:
             chdir: /etc
             cmd: 'git gc --prune'
+
     - name: Backup package state
       block:
         - ansible.builtin.shell:
