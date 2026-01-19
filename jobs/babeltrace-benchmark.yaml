@@ -51,6 +51,10 @@
           name: 'BENCHMARK_FORCE'
           default: false
           description: 'Force benchmarks to be re-run'
+      - bool:
+          name: 'BENCHMARK_TAGS_ONLY'
+          default: true
+          description: 'Limit benchmarked revisions to tags'
       - string:
           name: 'BENCHMARK_BATCH_SIZE'
           default: "100"

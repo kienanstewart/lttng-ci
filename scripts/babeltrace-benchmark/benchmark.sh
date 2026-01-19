@@ -33,12 +33,17 @@ if [[ "${BENCHMARK_FORCE}" == "true" ]]; then
     FORCE_ARG="--force-jobs"
 fi
 
+TAGS_ARG=''
+if [[ "${BENCHMARK_TAGS_ONLY}" == "true" ]]; then
+    TAGS_ARG="--tags-only"
+fi
+
 # Run the lava jobs
 python "$SCRIPT_PATH" \
     --generate-jobs \
     --bt-repo-path "$SRC_DIR" \
     --batch-size "${BENCHMARK_BATCH_SIZE}" \
-    $FORCE_ARG \
+    $FORCE_ARG $TAGS_ARG \
     --max-batches "${BENCHMARK_MAX_BATCHES}" \
     --ci-repo "${LTTNG_CI_REPO}" \
     --ci-branch "${LTTNG_CI_BRANCH}" \

@@ -5,6 +5,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 import tempfile
 from operator import add
@@ -129,9 +130,7 @@ def get_client():
     """
     Return minio client configured.
     """
-    return Minio(
-        S3_HOST, access_key=S3_ACCESS_KEY, secret_key=S3_SECRET_KEY
-    )
+    return Minio(S3_HOST, access_key=S3_ACCESS_KEY, secret_key=S3_SECRET_KEY)
 
 
 def get_file(client, prefix, file_name, workdir_name):
@@ -162,16 +161,26 @@ def delete_file(client, prefix, file_name):
         pass
 
 
-def get_git_log(bt_version, cutoff, bt_repo_path):
+def get_git_log(bt_version, cutoff, bt_repo_path, tags_only=False):
     """
     Return an ordered (older to newer) list of commits for the bt_version and
     cutoff. WARNING: This changes the git repo HEAD.
     """
     repo = git.Repo(bt_repo_path)
     repo.git.fetch()
-    return repo.git.log(
-        "{}..origin/{}".format(cutoff, bt_version), "--pretty=format:%H", "--reverse"
-    ).split("\n")
+    if tags_only:
+        if bt_version == "master":
+            return list()
+
+        major, minor = bt_version.split("-")[1].split(".")
+        regex = re.compile(r"v{}\.{}\..*".format(major, minor))
+        return [str(x.commit) for x in repo.tags if regex.match(str(x))]
+    else:
+        return repo.git.log(
+            "{}..origin/{}".format(cutoff, bt_version),
+            "--pretty=format:%H",
+            "--reverse",
+        ).split("\n")
 
 
 def parse_result(result_path):
@@ -449,6 +458,7 @@ def launch_jobs(
     ci_repo,
     ci_branch,
     nfs_root_url,
+    tags_only=False,
 ):
     """
     Lauch jobs for all missing results.
@@ -457,7 +467,9 @@ def launch_jobs(
     commits_to_test = set()
     for branch, cutoff in branches.items():
         commits = [
-            x for x in get_git_log(branch, cutoff, bt_repo_path) if x not in invalid_commits
+            x
+            for x in get_git_log(branch, cutoff, bt_repo_path, tags_only)
+            if x not in invalid_commits
         ]
         with tempfile.TemporaryDirectory() as workdir:
             for commit in commits:
@@ -510,6 +522,12 @@ def main():
         "--generate-jobs", action="store_true", help="Generate and send jobs"
     )
     parser.add_argument(
+        "--tags-only",
+        action="store_true",
+        default=False,
+        help="Limit revisions submitted to tags",
+    )
+    parser.add_argument(
         "-b",
         "--batch-size",
         type=int,
@@ -544,13 +562,15 @@ def main():
         "--debug", action="store_true", default=False, help="Do not send jobs to lava."
     )
     parser.add_argument(
-        "--bt-repo-path", help="The location of the babeltrace git repo to use.", required=True
+        "--bt-repo-path",
+        help="The location of the babeltrace git repo to use.",
+        required=True,
     )
     parser.add_argument(
         "--overwrite-branches-cutoff",
         help="A dictionary of the form {"
         "'branch_name': 'commit_hash_cutoff',...}. Allow custom graphing and"
-        "jobs generation.",
+        "jobs generation. Cutoff `commit_hash_cutoff` is ignored with `--tags-only`",
         required=False,
         type=json_type,
     )
@@ -595,6 +615,7 @@ def main():
             args.ci_repo,
             args.ci_branch,
             args.nfs_root_url,
+            args.tags_only,
         )
 
     if args.generate_report:
