@@ -9,12 +9,12 @@ function upload_artifact()
     local s3_key=$2
     local md5
 
-    md5="$(openssl md5 -binary coredump.tar.xz | openssl base64)"
+    md5="$(openssl md5 -binary $local_file | openssl base64)"
 
     # Fetch the S3 keys stored in secrets
     set +x
     # shellcheck disable=SC1091
-    . ../../../secrets
+    . "${BASE_DIR}/../../../secrets"
     echo "user = \"$S3_ACCESS_KEY:$S3_SECRET_KEY\"" > s3curlrc
     set -x
 
