@@ -332,6 +332,15 @@ def plot_ratio(branch, benchmark_type, x_data, y_data, labels, latest_values):
     if y_data:
         reference = y_data[0]
 
+    if reference == 0:
+        print(
+            "Reference for benchmark '{}' branch '{}' is 0, skipping ratio plot.".format(
+                benchmark_type, branch
+            ),
+            file=sys.stderr,
+        )
+        return
+
     # Transform y_data to a list of ratio for which the reference is the first
     # element.
     local_y_data = list(map(lambda y: ((y / reference) - 1.0) * 100, y_data))
