@@ -496,7 +496,7 @@ def launch_jobs(
     commits_to_test = list(commits_to_test)
     print("{} commits to run benchmarks for".format(len(commits_to_test)))
     if len(commits_to_test) == 0:
-        return
+        return (0, 0, 0)
 
     chunks = [commits_to_test]
     batches_run = 0
@@ -506,9 +506,13 @@ def launch_jobs(
             for i in range(0, len(commits_to_test), batch_size)
         ]
 
+    submitted_jobs = 0
+    failed_jobs = 0
+    passed_jobs = 0
     for index, commits in enumerate(chunks):
         print("Job {}/{}".format(index + 1, max(len(chunks), max_batches)))
-        lava_submit.submit(
+        submitted_jobs += 1
+        result = lava_submit.submit(
             commits,
             bt_repo,
             ci_repo,
@@ -518,15 +522,25 @@ def launch_jobs(
             wait_for_completion=wait_for_completion,
             debug=debug,
         )
+        if wait_for_completion:
+            job_state, job_health, has_failures = result
+            if job_state != "Finished" or job_health != "Complete" or has_failures:
+                failed_jobs += 1
+            else:
+                passed_jobs += 1
+
         batches_run += 1
         if max_batches > 0 and batches_run >= max_batches:
             break
+
+    return (submitted_jobs, passed_jobs, failed_jobs)
 
 
 def main():
     """
     Parse arguments and execute as needed.
     """
+    exit_code = 0
     bt_branches = {
         "master": "31976fe2d70a8b6b7f8b31b9e0b3bc004d415575",
         "stable-2.1": "e990b9f886667efe0a81f2011269c1bfc3694ac3",
@@ -625,7 +639,7 @@ def main():
         for branch, cutoff in bt_branches.items():
             print("\t Branch {} with cutoff {}".format(branch, cutoff))
 
-        launch_jobs(
+        submitted, passed, failed = launch_jobs(
             bt_branches,
             args.bt_repo_path,
             not args.do_not_wait_on_completion,
@@ -641,13 +655,19 @@ def main():
             args.tags_only,
         )
 
+        print(
+            "{} submitted jobs: {} passed, {} failed".format(submitted, passed, failed)
+        )
+        if failed != 0:
+            exit_code = 1
+
     if args.generate_report:
         print("Generating pdf report ({}) for:".format(args.report_name))
         for branch, cutoff in bt_branches.items():
             print("\t Branch {} with cutoff {}".format(branch, cutoff))
         generate_graph(bt_branches, args.report_name, args.bt_repo_path)
 
-    return 0
+    return exit_code
 
 
 def sanitize_dataset(dataset):

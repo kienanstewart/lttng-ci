@@ -39,6 +39,7 @@ if [[ "${BENCHMARK_TAGS_ONLY}" == "true" ]]; then
 fi
 
 # Run the lava jobs
+exit_code=0
 python "$SCRIPT_PATH" \
     --generate-jobs \
     --bt-repo-path "$SRC_DIR" \
@@ -48,7 +49,7 @@ python "$SCRIPT_PATH" \
     --ci-repo "${LTTNG_CI_REPO}" \
     --ci-branch "${LTTNG_CI_BRANCH}" \
     --nfs-root-url "${NFS_ROOT_URL}" \
-    --kernel-url "${S3_HTTP_BUCKET_URL}/system-tests/kernel/${KERNEL_COMMIT_ID}.baremetal.bzImage"
+    --kernel-url "${S3_HTTP_BUCKET_URL}/system-tests/kernel/${KERNEL_COMMIT_ID}.baremetal.bzImage" || exit_code=1
 
 # Generate the report pdf
 python "$SCRIPT_PATH" \
@@ -57,3 +58,4 @@ python "$SCRIPT_PATH" \
     --report-name "${RESULTS_DIR}/babeltrace-benchmark.pdf"
 
 rm -rf "$VENV"
+exit $exit_code

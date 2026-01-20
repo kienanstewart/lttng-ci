@@ -10,6 +10,7 @@ import time
 import xmlrpc.client
 
 from jinja2 import Environment, FileSystemLoader
+import yaml
 
 # 4.4.194
 DEFAULT_KERNEL_COMMIT = "a227f8436f2b21146fc024d84e6875907475ace2"
@@ -52,7 +53,21 @@ def wait_on(server, jobid):
         except xmlrpc.client.ProtocolError:
             print("Protocol error, retrying", flush=True)
             continue
-    print("Job ended with {} status.".format(jobstatus), flush=True)
+
+    jobhealth = server.scheduler.job_health(jobid)["job_health"]
+    has_failing_test_cases = False
+    for result in yaml.safe_load(server.results.get_testjob_results_yaml(jobid)):
+        if result["metadata"]["result"] != "pass":
+            has_failing_test_cases = True
+            break
+
+    print(
+        "Job ended with {} status (health: {}, has failed test cases: {}).".format(
+            jobstatus, jobhealth, has_failing_test_cases
+        ),
+        flush=True,
+    )
+    return (jobstatus, jobhealth, has_failing_test_cases)
 
 
 def submit(
@@ -141,7 +156,7 @@ def submit(
     if not wait_for_completion:
         return 0
 
-    wait_on(server, jobid)
+    return wait_on(server, jobid)
 
 
 if __name__ == "__main__":
