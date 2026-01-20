@@ -125,7 +125,7 @@ while read -d ' ' -r commit ; do
                 ARGS+=("-o" "dummy")
             fi
 
-            python3 "$BASE_DIR/scripts/babeltrace-benchmark/time.py" --output=result --command "$BT_BIN" "${ARGS[*]}" --iteration 5 --taskset 0
+            python3 "$BASE_DIR/scripts/babeltrace-benchmark/time.py" --output=result --command "$BT_BIN ${ARGS[*]}" --iteration 5 --taskset 0
 
             upload_artifact result "results/benchmarks/babeltrace/${sink}-${trace}/${commit}"
 
