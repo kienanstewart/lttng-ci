@@ -32,8 +32,12 @@ BENCHMARK_DIR="$TMPDIR/ram_disk"
 PREFIX="${BENCHMARK_DIR}/opt"
 
 # Set the cpu governor to performance
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
-echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+if [ -d /sys/devices/system/cpu/cpu0/cpufreq ]; then
+    cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors || find /sys/devices/system/cpu/cpu0/cpufreq/
+    echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+else
+    echo "Warning: /sys/devices/system/cpu/cpu0/cpufreq doesn't exist, can't set scaling_governor" >&2
+fi
 
 # Setup coredumps
 mkdir -p "$COREDUMP_DIR"
