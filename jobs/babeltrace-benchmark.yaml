@@ -35,10 +35,27 @@
       - timed: '@daily'
 
     builders:
+      - trigger-builds:
+          -
+            # This ensures that the kernel is built
+            project:
+              - system_tests_build_kernel_and_modules
+            current_parameters: false
+            block: true
+            # The LTTNG_MODULES_COMMIT_ID is to satisfy this job, and not
+            # used by this job (v2.14.3).
+            predefined-parameters: |
+              BUILD_DEVICE=baremetal
+              KERNEL_COMMIT_ID=$KERNEL_COMMIT_ID
+              LTTNG_MODULES_COMMIT_ID=0be94330d9e0bd2f6fffa4c54ece0677a9a64b59
       - shell:
           !include-raw-verbatim: scripts/babeltrace-benchmark/benchmark.sh
 
     parameters:
+      - string:
+          name: 'KERNEL_COMMIT_ID'
+          description: 'Commit ID of the linux kernel to use'
+          default: 'f6044d1fd846ed1ae457975738267214b538a222'  # v6.12.66
       - string:
           name: 'LTTNG_CI_REPO'
           default: 'https://github.com/lttng/lttng-ci.git'

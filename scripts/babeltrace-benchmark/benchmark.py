@@ -472,6 +472,7 @@ def launch_jobs(
     ci_repo,
     ci_branch,
     nfs_root_url,
+    kernel_url,
     tags_only=False,
 ):
     """
@@ -513,6 +514,7 @@ def launch_jobs(
             ci_repo,
             ci_branch,
             nfs_root_url,
+            kernel_url,
             wait_for_completion=wait_for_completion,
             debug=debug,
         )
@@ -599,6 +601,11 @@ def main():
     )
     parser.add_argument("--ci-branch", default="master")
     parser.add_argument("--nfs-root-url", default=os.getenv("NFS_ROOT_URL"))
+    parser.add_argument(
+        "--kernel-url",
+        default="",
+        help="URL to fetch kernel image from for lava jobs",
+    )
 
     args = parser.parse_args()
     if args.batch_size < 0:
@@ -630,6 +637,7 @@ def main():
             args.ci_repo,
             args.ci_branch,
             args.nfs_root_url,
+            args.kernel_url,
             args.tags_only,
         )
 

@@ -61,17 +61,10 @@ def submit(
     ci_repo,
     ci_branch,
     nfsrootfs,
+    kernel_url,
     debug=False,
-    kernel_commit=DEFAULT_KERNEL_COMMIT,
     wait_for_completion=True,
 ):
-    kernel_url = (
-        "{}/system-tests/kernel/{}.baremetal.bzImage".format(
-            S3_HTTP_BUCKET_URL,
-            kernel_commit
-        )
-    )
-
     # Get the S3 secret from the environment
     lava_api_key = None
     if not debug:
@@ -157,9 +150,14 @@ if __name__ == "__main__":
     )
     parser.add_argument("-c", "--commit", required=True, action="append")
     parser.add_argument(
-        "-k", "--kernel-commit", required=False, default=DEFAULT_KERNEL_COMMIT
+        "-k",
+        "--kernel-url",
+        required=False,
+        default="{}/system-tests/kernel/{}.baremetal.bzImage".format(
+            S3_HTTP_BUCKET_URL, DEFAULT_KERNEL_COMMIT
+        ),
     )
     parser.add_argument("-d", "--debug", required=False, action="store_true")
     args = parser.parse_args()
 
-    sys.exit(submit(args.commits, kernel_commit=args.kernel_commit, debug=args.debug))
+    sys.exit(submit(args.commits, kernel_url=args.kernel_url, debug=args.debug))

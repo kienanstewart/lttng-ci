@@ -47,7 +47,8 @@ python "$SCRIPT_PATH" \
     --max-batches "${BENCHMARK_MAX_BATCHES}" \
     --ci-repo "${LTTNG_CI_REPO}" \
     --ci-branch "${LTTNG_CI_BRANCH}" \
-    --nfs-root-url "${NFS_ROOT_URL}"
+    --nfs-root-url "${NFS_ROOT_URL}" \
+    --kernel-url "${S3_HTTP_BUCKET_URL}/system-tests/kernel/${KERNEL_COMMIT_ID}.baremetal.bzImage"
 
 # Generate the report pdf
 python "$SCRIPT_PATH" \
