@@ -148,8 +148,13 @@ def get_file(client, prefix, file_name, workdir_name):
     try:
         client.fget_object(S3_BUCKET, object_name, destination)
     except NoSuchKey:
-        return None
+        destination = None
 
+    print(
+        "Bucket '{}' object '{}' {}downloaded".format(
+            S3_BUCKET, object_name, "" if destination else "not "
+        )
+    )
     return destination
 
 
@@ -216,12 +221,21 @@ def get_benchmark_results(client, commit, workdir):
             """
             Benchmark is either corrupted or not complete.
             """
+            print(
+                "Result file for commit '{}' for benchmark type '{}' not found".format(
+                    commit, b_type
+                )
+            )
             return None, False
         results[b_type] = parse_result(result_file)
         if all(i == 0.0 for i in results[b_type]):
             benchmark_valid = False
             print("Invalid benchmark for {}/{}/{}".format(prefix, b_type, commit))
+
     # The dataset is valid return immediately.
+    print(
+        "Benchmarks for '{}' {}valid".format(commit, "" if benchmark_valid else "not ")
+    )
     return results, benchmark_valid
 
 
