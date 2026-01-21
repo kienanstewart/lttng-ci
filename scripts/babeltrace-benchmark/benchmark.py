@@ -556,13 +556,13 @@ def get_branch_results(client, branches, git_path, tags_only=False):
     return branch_results
 
 
-def generate_graph(branches, report_name, git_path):
+def generate_graph(branches, report_name, git_path, tags_only=False):
 
     # The PDF document
     pdf_pages = PdfPages(report_name)
 
     client = get_client()
-    branch_results = get_branch_results(client, branches, git_path)
+    branch_results = get_branch_results(client, branches, git_path, tags_only=tags_only)
 
     # Fetch the results for each branch.
     for b_type in BENCHMARK_TYPES:
@@ -845,7 +845,7 @@ def main():
         print("Generating pdf report ({}) for:".format(args.report_name))
         for branch, cutoff in bt_branches.items():
             print("\t Branch {} with cutoff {}".format(branch, cutoff))
-        generate_graph(bt_branches, args.report_name, args.bt_repo_path)
+        generate_graph(bt_branches, args.report_name, args.bt_repo_path, args.tags_only)
 
     if args.generate_asv_report:
         generate_asv_report(
