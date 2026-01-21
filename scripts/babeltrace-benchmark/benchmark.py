@@ -199,12 +199,15 @@ def parse_result(result_path):
     """
     with open(result_path) as result:
         parsed_result = json.load(result)
-        return list(
-            map(
-                add,
-                parsed_result["User time (seconds)"],
-                parsed_result["System time (seconds)"],
-            )
+        return (
+            list(
+                map(
+                    add,
+                    parsed_result["User time (seconds)"],
+                    parsed_result["System time (seconds)"],
+                )
+            ),
+            parsed_result["returncode"] if "returncode" in parsed_result else [1],
         )
 
 
@@ -218,19 +221,22 @@ def get_benchmark_results(client, commit, workdir):
         prefix = "/system-tests/results/benchmarks/babeltrace/{}".format(b_type)
         result_file = get_file(client, prefix, commit, workdir)
         if not result_file:
-            """
-            Benchmark is either corrupted or not complete.
-            """
+            # Benchmark is either corrupted or not complete.
             print(
                 "Result file for commit '{}' for benchmark type '{}' not found".format(
                     commit, b_type
                 )
             )
             return None, False
-        results[b_type] = parse_result(result_file)
-        if all(i == 0.0 for i in results[b_type]):
+
+        results[b_type], returncodes = parse_result(result_file)
+        if not all(i == 0 for i in returncodes):
+            print(
+                "Benchmark {} for commit {} contains non-zero return codes, marking as invalid".format(
+                    b_type, commit
+                )
+            )
             benchmark_valid = False
-            print("Invalid benchmark for {}/{}/{}".format(prefix, b_type, commit))
 
     # The dataset is valid return immediately.
     print(
