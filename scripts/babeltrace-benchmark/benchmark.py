@@ -5,6 +5,7 @@
 import argparse
 import json
 import os
+import pathlib
 import re
 import sys
 import tempfile
@@ -412,17 +413,93 @@ def plot_ratio(branch, benchmark_type, x_data, y_data, labels, latest_values):
     return
 
 
-def generate_graph(branches, report_name, git_path):
+def generate_asv_report(branches, report_path, git_path, tags_only=False):
+    import asv
 
-    # The PDF document
-    pdf_pages = PdfPages(report_name)
+    report_path = pathlib.Path(report_path).absolute()
+    if report_path.exists():
+        raise Exception("Output path '{}' exists already".format(str(report_path)))
 
-    client = get_client()
+    results_dir = tempfile.TemporaryDirectory()
+    conf = asv.config.Config()
+    conf.html_dir = report_path
+    conf.project = git_path
+    conf.project_url = "https://babeltrace.org/"
+    conf.branches = branches.keys()
+    conf.dvcs = "git"
+    conf.repo = git_path
+    conf.results_dir = results_dir.name
+
+    # Write machine.json
+    machine = asv.machine.Machine()
+    machine.machine = "lava"
+    machine.hardcoded_machine_name = "lava"
+    machine.os = "Linux"
+    machine.arch = "x86_64"
+    machine.cpu = "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz"
+    machine.num_cpu = "32"
+    machine.ram = "128GiB"
+    machine.save(conf.results_dir)
+
+    # Write benchmarks.json
+    benchmarks = {
+        x: {
+            "name": x,
+            "params": list(),
+            "param_names": list(),
+            "type": "time",
+            "unit": "seconds",
+            "version": 1,
+        }
+        for x in BENCHMARK_TYPES
+    }
+    benchmark_set = asv.benchmarks.Benchmarks(conf, benchmarks.values())
+    benchmark_set.save()
+
+    # Add results
+    results_by_branch = get_branch_results(
+        get_client(), branches, git_path, tags_only=tags_only
+    )
+    for _, branch_results in results_by_branch.items():
+        # Ultimately, asv doesn't care about branches only about commit hashes
+        for commit, result in branch_results:
+            # Results are saved by commit hash
+            asv_result = asv.results.Results(
+                {"machine": "lava"}, list(), commit, 0, "none", "lava", dict()
+            )
+            for benchmark_type, benchmark_results in result.items():
+                if benchmark_type not in BENCHMARK_TYPES:
+                    print(
+                        "Warning: benchmark type '{}' not in known benchmarks: {}".format(
+                            benchmark_type, BENCHMARK_TYPES
+                        )
+                    )
+
+                benchmark = benchmarks[benchmark_type]
+                runner_result = asv.runner.BenchmarkResult(
+                    [sum(benchmark_results) / len(benchmark_results)],
+                    [benchmark_results],
+                    [len(benchmark_results)],
+                    0,
+                    "",
+                    None,
+                )
+                asv_result.add_result(benchmark, runner_result, record_samples=True)
+
+            # Save
+            print("Saving result(s) for commit {}".format(commit))
+            asv_result.save(conf.results_dir)
+
+    # Update project name
+    conf.project = "Babeltrace"
+    publish = asv.commands.publish.Publish()
+    publish.run(conf, pull=False)
+
+
+def get_branch_results(client, branches, git_path, tags_only=False):
     branch_results = dict()
-
-    # Fetch the results for each branch.
     for branch, cutoff in branches.items():
-        commits = get_git_log(branch, cutoff, git_path)
+        commits = get_git_log(branch, cutoff, git_path, tags_only=tags_only)
         results = []
         with tempfile.TemporaryDirectory() as workdir:
             for commit in commits:
@@ -432,6 +509,18 @@ def generate_graph(branches, report_name, git_path):
                 results.append((commit, b_results))
         branch_results[branch] = results
 
+    return branch_results
+
+
+def generate_graph(branches, report_name, git_path):
+
+    # The PDF document
+    pdf_pages = PdfPages(report_name)
+
+    client = get_client()
+    branch_results = get_branch_results(client, branches, git_path)
+
+    # Fetch the results for each branch.
     for b_type in BENCHMARK_TYPES:
         latest_values = {}
         max_len = 0
@@ -655,6 +744,18 @@ def main():
         help="URL to fetch kernel image from for lava jobs",
     )
 
+    parser.add_argument(
+        "--generate-asv-report",
+        action="store_true",
+        default=False,
+        help="Generate ASV report",
+    )
+    parser.add_argument(
+        "--asv-output-dir",
+        help="The directory to store the ASV report in",
+        default="asv",
+    )
+
     args = parser.parse_args()
     if args.batch_size < 0:
         print("Batch size must be greater than or equal to 0")
@@ -701,6 +802,11 @@ def main():
         for branch, cutoff in bt_branches.items():
             print("\t Branch {} with cutoff {}".format(branch, cutoff))
         generate_graph(bt_branches, args.report_name, args.bt_repo_path)
+
+    if args.generate_asv_report:
+        generate_asv_report(
+            bt_branches, args.asv_output_dir, args.bt_repo_path, args.tags_only
+        )
 
     return exit_code
 
