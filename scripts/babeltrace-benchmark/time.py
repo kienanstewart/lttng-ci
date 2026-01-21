@@ -115,15 +115,19 @@ def run(command, iteration, output, stdout, stderr, taskset=""):
         time_stdout = tempfile.NamedTemporaryFile(delete=False)
         # We must delete this file later on.
         time_stdout.close()
+        returncode = None
         with open(stdout, "a+") as out, open(stderr, "a+") as err:
             cmd = "/usr/bin/time -v --output='{}' {}".format(time_stdout.name, command)
             if taskset:
                 cmd = "taskset -c {} {}".format(taskset, cmd)
             ret = subprocess.run(cmd, shell=True, stdout=out, stderr=err)
+            returncode = ret.returncode
             if ret.returncode != 0:
                 print("Iteration: {}, Command failed: {}".format(str(i), cmd))
                 subprocess.run(["cat", stderr])
+
         results = parse(time_stdout.name, results)
+        results["returncode"].append(returncode)
         os.remove(time_stdout.name)
     save(output, results)
 
@@ -155,6 +159,7 @@ def main():
         "Socket messages received": [],
         "Signals delivered": [],
         "Page size (bytes)": [],
+        "returncode": [],  # not provided by /usr/bin/time
       }
     }
     """
