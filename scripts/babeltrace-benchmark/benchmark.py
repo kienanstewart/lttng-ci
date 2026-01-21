@@ -488,6 +488,7 @@ def launch_jobs(
     nfs_root_url,
     kernel_url,
     tags_only=False,
+    dry_run=False,
 ):
     """
     Lauch jobs for all missing results.
@@ -524,24 +525,32 @@ def launch_jobs(
     failed_jobs = 0
     passed_jobs = 0
     for index, commits in enumerate(chunks):
-        print("Job {}/{}".format(index + 1, max(len(chunks), max_batches)))
-        submitted_jobs += 1
-        result = lava_submit.submit(
-            commits,
-            bt_repo,
-            ci_repo,
-            ci_branch,
-            nfs_root_url,
-            kernel_url,
-            wait_for_completion=wait_for_completion,
-            debug=debug,
+        print(
+            "Job {}/{}{}".format(
+                index + 1,
+                max(len(chunks), max_batches),
+                " (not submitted)" if dry_run else "",
+            )
         )
-        if wait_for_completion:
-            job_state, job_health, has_failures = result
-            if job_state != "Finished" or job_health != "Complete" or has_failures:
-                failed_jobs += 1
-            else:
-                passed_jobs += 1
+        if not dry_run:
+            submitted_jobs += 1
+            result = lava_submit.submit(
+                commits,
+                bt_repo,
+                ci_repo,
+                ci_branch,
+                nfs_root_url,
+                kernel_url,
+                wait_for_completion=wait_for_completion,
+                debug=debug,
+            )
+
+            if wait_for_completion:
+                job_state, job_health, has_failures = result
+                if job_state != "Finished" or job_health != "Complete" or has_failures:
+                    failed_jobs += 1
+                else:
+                    passed_jobs += 1
 
         batches_run += 1
         if max_batches > 0 and batches_run >= max_batches:
@@ -565,6 +574,12 @@ def main():
     parser = argparse.ArgumentParser(description="Babeltrace benchmark utility")
     parser.add_argument(
         "--generate-jobs", action="store_true", help="Generate and send jobs"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Do not actually submit jobs",
     )
     parser.add_argument(
         "--tags-only",
@@ -667,6 +682,7 @@ def main():
             args.nfs_root_url,
             args.kernel_url,
             args.tags_only,
+            args.dry_run,
         )
 
         print(
