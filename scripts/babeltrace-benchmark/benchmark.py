@@ -9,6 +9,8 @@ import pathlib
 import re
 import sys
 import tempfile
+import urllib.parse
+
 from operator import add
 from statistics import mean
 
@@ -415,6 +417,8 @@ def plot_ratio(branch, benchmark_type, x_data, y_data, labels, latest_values):
 
 def generate_asv_report(branches, report_path, git_path, tags_only=False):
     import asv
+    import bs4
+    import requests
 
     report_path = pathlib.Path(report_path).absolute()
     if report_path.exists():
@@ -494,6 +498,46 @@ def generate_asv_report(branches, report_path, git_path, tags_only=False):
     conf.project = "Babeltrace"
     publish = asv.commands.publish.Publish()
     publish.run(conf, pull=False)
+
+    # Load index.html and download scripts and CSS so that only local ones are
+    # used. This allows the publish reports in Jenkins to work without adjusting
+    # the CSP for the site.
+    soup = None
+    with open(os.path.join(conf.html_dir, "index.html"), "r") as f:
+        soup = bs4.BeautifulSoup(f, "html.parser")
+
+    for script in soup("script"):
+        if "src" not in script.attrs.keys():
+            continue
+
+        url = urllib.parse.urlparse(script["src"])
+        if url.netloc == "":
+            continue
+
+        request = requests.get(script["src"])
+        with open(os.path.join(conf.html_dir, os.path.basename(url.path)), "wb") as f:
+            f.write(request.content)
+
+        # Update src element
+        script["src"] = os.path.basename(url.path)
+
+    for link in soup("link"):
+        if "href" not in link.attrs.keys():
+            continue
+
+        url = urllib.parse.urlparse(link["href"])
+        if url.netloc == "":
+            continue
+
+        request = requests.get(link["href"])
+        with open(os.path.join(conf.html_dir, os.path.basename(url.path)), "wb") as f:
+            f.write(request.content)
+
+        link["href"] = os.path.basename(url.path)
+
+    # Write out updated HTML
+    with open(os.path.join(conf.html_dir, "index.html"), "w") as f:
+        f.write(str(soup))
 
 
 def get_branch_results(client, branches, git_path, tags_only=False):
