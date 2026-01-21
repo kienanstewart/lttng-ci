@@ -215,7 +215,7 @@ def get_benchmark_results(client, commit, workdir):
     results = {}
     benchmark_valid = True
     for b_type in BENCHMARK_TYPES:
-        prefix = "/results/benchmarks/babeltrace/{}".format(b_type)
+        prefix = "/system-tests/results/benchmarks/babeltrace/{}".format(b_type)
         result_file = get_file(client, prefix, commit, workdir)
         if not result_file:
             """
