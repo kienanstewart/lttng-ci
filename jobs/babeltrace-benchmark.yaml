@@ -69,6 +69,18 @@
           default: false
           description: 'Force benchmarks to be re-run'
       - bool:
+          name: 'BENCHMARK_SKIP_ASV_GENERATION'
+          default: false
+          description: 'Skip generating ASV output'
+      - bool:
+          name: 'BENCHMARK_SKIP_PDF_GENERATION'
+          default: false
+          description: 'Skip generating PDF output'
+      - bool:
+          name: 'BENCHMARK_SKIP_SUBMISSION'
+          default: false
+          description: 'Skip running benchmarks'
+      - bool:
           name: 'BENCHMARK_TAGS_ONLY'
           default: true
           description: 'Limit benchmarked revisions to tags'
@@ -118,7 +130,15 @@
       - archive:
           artifacts: 'results/**'
           follow-symlinks: true
-          allow-empty: false
+          allow-empty: true
+      - html-publisher:
+          name: 'Benchmarks (web)'
+          dir: 'asv/'
+          allow-missing: true
+          files: 'index.html'
+          # keep for past builds too
+          keep-all: true
+          link-to-last-build: true
       - workspace-cleanup:
           clean-if:
             - failure: false
