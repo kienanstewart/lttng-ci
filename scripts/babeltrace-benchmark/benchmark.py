@@ -643,7 +643,7 @@ def launch_jobs(
         with tempfile.TemporaryDirectory() as workdir:
             for commit in commits:
                 res, valid = get_benchmark_results(client, commit, workdir)
-                if force or res is not None:
+                if force or res is None:
                     commits_to_test.add(commit)
 
     commits_to_test = list(commits_to_test)
