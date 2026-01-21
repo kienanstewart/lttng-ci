@@ -509,10 +509,9 @@ def launch_jobs(
         ]
         with tempfile.TemporaryDirectory() as workdir:
             for commit in commits:
-                if get_benchmark_results(client, commit, workdir)[1] and not force:
-                    print("All benchmarks are valid for {}, skipping".format(commit))
-                    continue
-                commits_to_test.add(commit)
+                res, valid = get_benchmark_results(client, commit, workdir)
+                if force or res is not None:
+                    commits_to_test.add(commit)
 
     commits_to_test = list(commits_to_test)
     print("{} commits to run benchmarks for".format(len(commits_to_test)))
