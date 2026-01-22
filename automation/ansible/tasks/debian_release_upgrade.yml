@@ -123,6 +123,9 @@
   delegate_to: localhost
   ansible.builtin.command:
     argv: ['../scripts/manage_jenkins_node.py', 'enable', "{{jenkins_node_regex}}"]
+  # This can error out when the host is the one running jenkins, and we don't have
+  # a specific "wait-for-jenkins-online" type of check.
+  ignore_errors: true
 
 - name: Purge configuration of removed packages
   ansible.builtin.command:
