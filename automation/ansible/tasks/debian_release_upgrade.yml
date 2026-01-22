@@ -95,6 +95,12 @@
   ansible.builtin.command:
     argv: ['incus', 'cluster', 'evacuate', '--force', '--action', 'stop', "{{incus_evacuate_node}}"]
 
+- name: Stop libvirt guests
+  ansible.builtin.service:
+    name: libvirt-guests.service
+    state: stopped
+  ignore_errors: true
+
 # @TODO: reconfigure grub if installed
 # `dpkg-reconfigure grub-pc` on many systems, but not all
 # @TODO: Our instances often have an OS version identifier,
