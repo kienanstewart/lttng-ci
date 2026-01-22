@@ -14,6 +14,11 @@
   ansible.builtin.package:
     name:
       - jenkins
+- name: Install additional packages for Jenkins plugins
+  ansible.builtin.package:
+    name:
+      - libvirt-clients
+      - libvirt-clients-qemu
 - name: Add service override folder
   ansible.builtin.file:
     state: 'directory'
