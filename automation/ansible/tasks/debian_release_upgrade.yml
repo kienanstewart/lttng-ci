@@ -101,20 +101,8 @@
 # it would be handy to do a replace in /etc/hostname
 # before rebooting
 - name: Reboot
-  ansible.builtin.command: /usr/sbin/reboot
-  async: 0
-  poll: 0
-  ignore_errors: true
-  register: last_result
-
-- name: wait for the server to reboot
-  local_action: wait_for host={{ inventory_hostname }}
-               port=22
-               delay=1
-               timeout=300
-               state=started
-  when: last_result.changed
-  become: false
+  ansible.builtin.reboot:
+    reboot_timeout: 300
 
 - name: Restore incus node
   when: incus_evacuate_node|default(false)
