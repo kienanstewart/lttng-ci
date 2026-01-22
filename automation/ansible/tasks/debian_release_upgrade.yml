@@ -87,13 +87,13 @@
     argv: [
     '../scripts/manage_jenkins_node.py', 'disable', '--wait', '-1',
     '--reason', 'Ansible: debian_release_upgrade', '--force-abort',
-    jenkins_node_regex]
+    "{{jenkins_node_regex}}"]
   retries: 3
 
 - name: Evacuate incus node
   when: incus_evacuate_node|default(false)
   ansible.builtin.command:
-    argv: ['incus', 'cluster', 'evacuate', '--force', '--action', 'stop', incus_evacuate_node]
+    argv: ['incus', 'cluster', 'evacuate', '--force', '--action', 'stop', "{{incus_evacuate_node}}"]
 
 # @TODO: reconfigure grub if installed
 # `dpkg-reconfigure grub-pc` on many systems, but not all
@@ -119,13 +119,13 @@
 - name: Restore incus node
   when: incus_evacuate_node|default(false)
   ansible.builtin.command:
-    argv: ['incus', 'cluster', 'restore', '--force', incus_evacuate_node]
+    argv: ['incus', 'cluster', 'restore', '--force', "{{incus_evacuate_node}}"]
 
 - name: Online jenkins nodes
   when: jenkins_node_regex|default(false)
   delegate_to: localhost
   ansible.builtin.command:
-    argv: ['../scripts/manage_jenkins_node.py', 'enable', jenkins_node_regex]
+    argv: ['../scripts/manage_jenkins_node.py', 'enable', "{{jenkins_node_regex}}"]
 
 - name: Purge configuration of removed packages
   ansible.builtin.command:
