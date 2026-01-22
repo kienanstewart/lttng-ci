@@ -119,8 +119,8 @@ while read -d ' ' -r commit ; do
     # `-flto` isn't used since it appears to cause build failures on a number
     # of tags as it is an untested configuration in the CI.
     if ! ./configure \
-        CFLAGS='-O3 -g0' \
-        CXXFLAGS='-O3 -g0' \
+        CFLAGS='-O3 -g0 -Wno-error' \
+        CXXFLAGS='-O3 -g0 -Wno-error' \
         LDFLAGS='' \
         BABELTRACE_DEV_MODE=0 \
         BABELTRACE_DEBUG_MODE=0 \
