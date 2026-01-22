@@ -11,4 +11,4 @@ incus_container_defaults:
     alias: debian/trixie/cloud/amd64/ci-node/incus
   wait_for_container: true
 
-incus_core_pattern: '/tmp/core-%p'
+incus_core_pattern: '/tmp/core.%p'
