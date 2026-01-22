@@ -1,12 +1,12 @@
 ---
 
 - name: Install Jenkins keyring
-  ansible.builtin.get_url:
-    url: 'https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key'
-    dest: '/usr/share/keyrings/jenkins-keyring.asc'
+  ansible.builtin.copy:
+    src: jenkins.asc
+    dest: '/etc/apt/keyrings/jenkins.asc'
 - name: Add Jenkins stable apt repository
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian{{'-stable' if jenkins_lts else ''}} binary/"
+    repo: "deb [signed-by=/etc/apt/keyrings/jenkins.asc] https://pkg.jenkins.io/debian{{'-stable' if jenkins_lts else ''}} binary/"
 - name: Install Jenkins depencies
   ansible.builtin.package:
     name: "{{jenkins_dependencies}}"
