@@ -141,24 +141,22 @@ def get_client():
     return Minio(S3_HOST, access_key=S3_ACCESS_KEY, secret_key=S3_SECRET_KEY)
 
 
-def get_file(client, prefix, file_name, workdir_name):
+def get_file(client, object_path, destination_path):
     """
     Return the path of the downloaded file.
     Return None on error
     """
-    destination = os.path.join(workdir_name, file_name)
-    object_name = "{}/{}".format(prefix, file_name)
     try:
-        client.fget_object(S3_BUCKET, object_name, destination)
+        client.fget_object(S3_BUCKET, object_path, destination_path)
     except NoSuchKey:
-        destination = None
+        destination_path = None
 
     print(
         "Bucket '{}' object '{}' {}downloaded".format(
-            S3_BUCKET, object_name, "" if destination else "not "
+            S3_BUCKET, object_path, "" if destination_path else "not "
         )
     )
-    return destination
+    return destination_path
 
 
 def delete_file(client, prefix, file_name):
@@ -220,9 +218,22 @@ def get_benchmark_results(client, commit, workdir):
     """
     results = {}
     benchmark_valid = True
+
+    # Check if the commit was marked as failed
+    path = "/system-tests/results/benchmarks/babeltrace/{}/failed".format(commit)
+    fail_path = get_file(client, path, os.path.join(workdir, "failed"))
+    if fail_path is not None:
+        print("Commit {} has failed file")
+        os.unlink(os.path.join(workdir, "failed"))
+        return None, True
+
     for b_type in BENCHMARK_TYPES:
-        prefix = "/system-tests/results/benchmarks/babeltrace/{}".format(b_type)
-        result_file = get_file(client, prefix, commit, workdir)
+        path = "/system-tests/results/benchmarks/babeltrace/{}/{}".format(
+            commit, b_type
+        )
+        result_file = get_file(
+            client, path, os.path.join(workdir, "{}-{}".format(commit, b_type))
+        )
         if not result_file:
             # Benchmark is either corrupted or not complete.
             print(
@@ -643,7 +654,7 @@ def launch_jobs(
         with tempfile.TemporaryDirectory() as workdir:
             for commit in commits:
                 res, valid = get_benchmark_results(client, commit, workdir)
-                if force or res is None:
+                if force or (res is None and not valid):
                     commits_to_test.add(commit)
 
     commits_to_test = list(commits_to_test)
