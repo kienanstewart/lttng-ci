@@ -94,6 +94,9 @@
   when: incus_evacuate_node|default(false)
   ansible.builtin.command:
     argv: ['incus', 'cluster', 'evacuate', '--force', '--action', 'stop', "{{incus_evacuate_node}}"]
+  # The evacuation can "fail" if an instance is already offline, e.g.
+  # "Error: Failed to evacuate instances: Failed to stop instance "xxx": container is not running
+  ignore_errors: true
 
 - name: Stop libvirt guests
   ansible.builtin.service:
