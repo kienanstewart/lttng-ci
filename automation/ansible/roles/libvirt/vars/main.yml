@@ -13,8 +13,8 @@ vm_defaults:
   cpu_features: {}
 
 isos:
-  - url: https://releases.ubuntu.com/jammy/ubuntu-22.04.4-live-server-amd64.iso
-    checksum: "sha256:45f873de9f8cb637345d6e66a583762730bbea30277ef7b32c9c3bd6700a32b2"
+  - url: https://old-releases.ubuntu.com/releases/22.04.4/ubuntu-22.04-live-server-amd64.iso
+    checksum: "sha256:84aeaf7823c8c61baa0ae862d0a06b03409394800000b3235854a6b38eb4856f"
     dest: /var/lib/iso/ubuntu-22.04.4-live-server-amd64.iso
   - url: https://cdimage.debian.org/cdimage/archive/12.4.0/i386/iso-cd/debian-12.4.0-i386-netinst.iso
     checksum: "sha256:3b39026f0dc0c1c37e3ebe9373aba1fc0d270a9c189416726d705d7f7b273a7a"
