@@ -15,6 +15,8 @@ common_node_packages:
   - htop
   - java-17-openjdk-devel
   - java-17-openjdk-headless
+  - java-21-openjdk-devel
+  - java-21-openjdk-headless
   - jq
   - libtool
   - lzop
