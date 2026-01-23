@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
+import enum
 import json
 import os
 import pathlib
@@ -92,6 +93,13 @@ invalid_commits = {
     "8b130e7f1d6a41fb5c64a014c15246ba74b79470",
     "f4f8f79893b18199b38edc3330093a9403c4c737",
 }
+
+
+class BenchmarkState(enum.Enum):
+    BUILD_FAILURE = -1
+    COMPLETE = 0
+    CONTAINS_RUN_FAILURES = 1
+    MISSING_BENCHMARK_RESULTS = 2
 
 
 def json_type(string):
@@ -217,7 +225,7 @@ def get_benchmark_results(client, commit, workdir):
     Fetch the benchmark result from a certain commit across all benchmark type.
     """
     results = {}
-    benchmark_valid = True
+    state = BenchmarkState.COMPLETE
 
     # Check if the commit was marked as failed
     path = "/system-tests/results/benchmarks/babeltrace/{}/failed".format(commit)
@@ -225,7 +233,7 @@ def get_benchmark_results(client, commit, workdir):
     if fail_path is not None:
         print("Commit {} has failed file".format(commit))
         os.unlink(os.path.join(workdir, "failed"))
-        return None, True
+        return results, BenchmarkState.BUILD_FAILURE
 
     for b_type in BENCHMARK_TYPES:
         path = "/system-tests/results/benchmarks/babeltrace/{}/{}".format(
@@ -241,7 +249,8 @@ def get_benchmark_results(client, commit, workdir):
                     commit, b_type
                 )
             )
-            return None, False
+            state = BenchmarkState.MISSING_BENCHMARK_RESULTS
+            continue
 
         results[b_type], returncodes = parse_result(result_file)
         if not all(i == 0 for i in returncodes):
@@ -250,13 +259,12 @@ def get_benchmark_results(client, commit, workdir):
                     b_type, commit
                 )
             )
-            benchmark_valid = False
+            if state == BenchmarkState.COMPLETE:
+                # Don't override the MISSING_BENCHMARK_RESULTS state
+                state = BenchmarkState.CONTAINS_RUN_FAILURES
 
-    # The dataset is valid return immediately.
-    print(
-        "Benchmarks for '{}' {}valid".format(commit, "" if benchmark_valid else "not ")
-    )
-    return results, benchmark_valid
+    print("Benchmarks for '{}' state: {}".format(commit, state))
+    return results, state
 
 
 def plot_raw_value(branch, benchmark_type, x_data, y_data, labels, latest_values):
@@ -558,8 +566,8 @@ def get_branch_results(client, branches, git_path, tags_only=False):
         results = []
         with tempfile.TemporaryDirectory() as workdir:
             for commit in commits:
-                b_results, valid = get_benchmark_results(client, commit, workdir)
-                if not b_results or not valid:
+                b_results, state = get_benchmark_results(client, commit, workdir)
+                if not b_results or state != BenchmarkState.COMPLETE:
                     continue
                 results.append((commit, b_results))
         branch_results[branch] = results
@@ -653,8 +661,11 @@ def launch_jobs(
         ]
         with tempfile.TemporaryDirectory() as workdir:
             for commit in commits:
-                res, valid = get_benchmark_results(client, commit, workdir)
-                if force or (res is None and not valid):
+                res, state = get_benchmark_results(client, commit, workdir)
+                if force or state not in [
+                    BenchmarkState.COMPLETE,
+                    BenchmarkState.CONTAINS_RUN_FAILURES,
+                ]:
                     commits_to_test.add(commit)
 
     commits_to_test = list(commits_to_test)
