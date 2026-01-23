@@ -223,7 +223,7 @@ def get_benchmark_results(client, commit, workdir):
     path = "/system-tests/results/benchmarks/babeltrace/{}/failed".format(commit)
     fail_path = get_file(client, path, os.path.join(workdir, "failed"))
     if fail_path is not None:
-        print("Commit {} has failed file")
+        print("Commit {} has failed file".format(commit))
         os.unlink(os.path.join(workdir, "failed"))
         return None, True
 
