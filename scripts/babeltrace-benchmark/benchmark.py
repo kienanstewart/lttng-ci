@@ -5,6 +5,7 @@
 import argparse
 import enum
 import json
+import logging
 import os
 import pathlib
 import re
@@ -159,7 +160,7 @@ def get_file(client, object_path, destination_path):
     except NoSuchKey:
         destination_path = None
 
-    print(
+    logging.debug(
         "Bucket '{}' object '{}' {}downloaded".format(
             S3_BUCKET, object_path, "" if destination_path else "not "
         )
@@ -175,7 +176,7 @@ def delete_file(client, prefix, file_name):
     try:
         client.remove_object(S3_BUCKET, object_name)
     except ResponseError as err:
-        print(err)
+        logging.error(err)
     except NoSuchKey:
         pass
 
@@ -231,7 +232,7 @@ def get_benchmark_results(client, commit, workdir):
     path = "/system-tests/results/benchmarks/babeltrace/{}/failed".format(commit)
     fail_path = get_file(client, path, os.path.join(workdir, "failed"))
     if fail_path is not None:
-        print("Commit {} has failed file".format(commit))
+        logging.debug("Commit {} has failed file".format(commit))
         os.unlink(os.path.join(workdir, "failed"))
         return results, BenchmarkState.BUILD_FAILURE
 
@@ -244,7 +245,7 @@ def get_benchmark_results(client, commit, workdir):
         )
         if not result_file:
             # Benchmark is either corrupted or not complete.
-            print(
+            logging.debug(
                 "Result file for commit '{}' for benchmark type '{}' not found".format(
                     commit, b_type
                 )
@@ -254,7 +255,7 @@ def get_benchmark_results(client, commit, workdir):
 
         results[b_type], returncodes = parse_result(result_file)
         if not all(i == 0 for i in returncodes):
-            print(
+            logging.debug(
                 "Benchmark {} for commit {} contains non-zero return codes, marking as invalid".format(
                     b_type, commit
                 )
@@ -263,7 +264,7 @@ def get_benchmark_results(client, commit, workdir):
                 # Don't override the MISSING_BENCHMARK_RESULTS state
                 state = BenchmarkState.CONTAINS_RUN_FAILURES
 
-    print("Benchmarks for '{}' state: {}".format(commit, state))
+    logging.info("Benchmarks for '{}' state: {}".format(commit, state))
     return results, state
 
 
@@ -375,7 +376,7 @@ def plot_ratio(branch, benchmark_type, x_data, y_data, labels, latest_values):
         reference = y_data[0]
 
     if reference == 0:
-        print(
+        logging.info(
             "Reference for benchmark '{}' branch '{}' is 0, skipping ratio plot.".format(
                 benchmark_type, branch
             ),
@@ -394,7 +395,7 @@ def plot_ratio(branch, benchmark_type, x_data, y_data, labels, latest_values):
         if not l_result or l_branch == branch:
             continue
         ratio_l_result = ((l_result / reference) - 1.0) * 100.0
-        print(
+        logging.debug(
             "branch {} branch {} value {} l_result {} reference {}".format(
                 branch, l_branch, ratio_l_result, l_result, reference
             )
@@ -492,8 +493,8 @@ def generate_asv_report(branches, report_path, git_path, tags_only=False):
             )
             for benchmark_type, benchmark_results in result.items():
                 if benchmark_type not in BENCHMARK_TYPES:
-                    print(
-                        "Warning: benchmark type '{}' not in known benchmarks: {}".format(
+                    logging.warning(
+                        "benchmark type '{}' not in known benchmarks: {}".format(
                             benchmark_type, BENCHMARK_TYPES
                         )
                     )
@@ -510,7 +511,7 @@ def generate_asv_report(branches, report_path, git_path, tags_only=False):
                 asv_result.add_result(benchmark, runner_result, record_samples=True)
 
             # Save
-            print("Saving result(s) for commit {}".format(commit))
+            logging.info("Saving result(s) for commit {}".format(commit))
             asv_result.save(conf.results_dir)
 
     # Update project name
@@ -669,7 +670,7 @@ def launch_jobs(
                     commits_to_test.add(commit)
 
     commits_to_test = list(commits_to_test)
-    print("{} commits to run benchmarks for".format(len(commits_to_test)))
+    logging.info("{} commits to run benchmarks for".format(len(commits_to_test)))
     if len(commits_to_test) == 0:
         return (0, 0, 0)
 
@@ -685,7 +686,7 @@ def launch_jobs(
     failed_jobs = 0
     passed_jobs = 0
     for index, commits in enumerate(chunks):
-        print(
+        logging.info(
             "Job {}/{}{}".format(
                 index + 1,
                 max(len(chunks), max_batches),
@@ -723,6 +724,7 @@ def main():
     """
     Parse arguments and execute as needed.
     """
+    logging.basicConfig(level=logging.INFO)
     exit_code = 0
     bt_branches = {
         "master": "31976fe2d70a8b6b7f8b31b9e0b3bc004d415575",
@@ -732,6 +734,23 @@ def main():
     }
 
     parser = argparse.ArgumentParser(description="Babeltrace benchmark utility")
+    parser.add_argument(
+        "-s",
+        "--silent",
+        help="Only output errors",
+        dest="log_level",
+        action="store_const",
+        const=logging.WARNING,
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        help="Increase verbosity",
+        dest="log_level",
+        action="store_const",
+        const=logging.DEBUG,
+    )
+
     parser.add_argument(
         "--generate-jobs", action="store_true", help="Generate and send jobs"
     )
@@ -823,22 +842,27 @@ def main():
     )
 
     args = parser.parse_args()
+    if args.log_level:
+        logging.getLogger().setLevel(args.log_level)
+
     if args.batch_size < 0:
-        print("Batch size must be greater than or equal to 0")
+        logging.error("Batch size must be greater than or equal to 0")
         return 1
 
     if args.overwrite_branches_cutoff:
         bt_branches = args.overwrite_branches_cutoff
 
     if not os.path.exists(args.bt_repo_path):
-        print("Repository location does not exists.")
+        logging.error(
+            "Repository location '{}' does not exists.".format(args.bt_repo_path)
+        )
         return 1
 
     if args.generate_jobs:
-        print("Launching jobs for:")
+        logging.info("Launching jobs for:")
 
         for branch, cutoff in bt_branches.items():
-            print("\t Branch {} with cutoff {}".format(branch, cutoff))
+            logging.info("\t Branch {} with cutoff {}".format(branch, cutoff))
 
         submitted, passed, failed = launch_jobs(
             bt_branches,
@@ -857,16 +881,16 @@ def main():
             args.dry_run,
         )
 
-        print(
+        logging.info(
             "{} submitted jobs: {} passed, {} failed".format(submitted, passed, failed)
         )
         if failed != 0:
             exit_code = 1
 
     if args.generate_report:
-        print("Generating pdf report ({}) for:".format(args.report_name))
+        logging.info("Generating pdf report ({}) for:".format(args.report_name))
         for branch, cutoff in bt_branches.items():
-            print("\t Branch {} with cutoff {}".format(branch, cutoff))
+            logging.info("\t Branch {} with cutoff {}".format(branch, cutoff))
         generate_graph(bt_branches, args.report_name, args.bt_repo_path, args.tags_only)
 
     if args.generate_asv_report:
