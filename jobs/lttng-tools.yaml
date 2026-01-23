@@ -1376,7 +1376,7 @@
           java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_yoctobuild
           buildtype: yoctobuild
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto50-ppc64]
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
@@ -1524,7 +1524,7 @@
           java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_yoctobuild
           buildtype: yoctobuild
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto50-ppc64]
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
@@ -1671,7 +1671,8 @@
           platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_yoctobuild
           buildtype: yoctobuild
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto50-ppc64]
+          urcuversions: !!python/tuple [stable-0.15, master]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_yoctobuild_extended
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild

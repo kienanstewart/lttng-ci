@@ -173,7 +173,7 @@
           platforms: !!python/tuple [deb13-amd64]
       - 'barectf_{version}_{buildtype}':
           buildtype: yoctobuild
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto50-ppc64]
           # It can take a long time to run pip install
           timeout: 60
 

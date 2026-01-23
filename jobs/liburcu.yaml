@@ -432,7 +432,7 @@
             - stable-0.13
       - '{job_prefix}liburcu_{version}_{buildtype}':
           buildtype: yoctobuild
-          platforms: !!python/tuple [yocto40-powerpc, yocto40-ppc64]
+          platforms: !!python/tuple [yocto40-powerpc, yocto50-ppc64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           touchstone: '(build == "std")'
