@@ -1,0 +1,82 @@
+---
+
+- name: Gather package facts
+  ansible.builtin.package_facts: {}
+
+- when: not 'anubis' in ansible_facts.packages
+  block:
+    - name: Install with Debian package
+      when: ansible_distribution == 'Debian'
+      block:
+        - name: Install sqv
+          ansible.builtin.package:
+            name: sqv
+
+        - name: Create tmp file for .deb
+          ansible.builtin.tempfile:
+            state: file
+          register: tmpfile_deb
+
+        - name: Create tmp file for .asc
+          ansible.builtin.tempfile:
+            state: file
+          register: tmpfile_deb_asc
+
+        - name: Create tmp file for techaro package signing key
+          ansible.builtin.tempfile:
+            state: file
+          register: tmpfile_signing_key
+
+        - name: Copy signing key
+          ansible.builtin.copy:
+            dest: "{{tmpfile_signing_key.path}}"
+            src: "techaro-pkgs.asc"
+            force: true
+
+        - name: Download .deb
+          ansible.builtin.get_url:
+            url: "https://github.com/TecharoHQ/anubis/releases/download/v{{anubis_install_version}}/anubis_{{anubis_install_version}}_{{anubis_debian_arch_map[ansible_architecture]}}.deb"
+            dest: "{{tmpfile_deb.path}}"
+            force: true
+
+        - name: Download .asc
+          ansible.builtin.get_url:
+            url: "https://github.com/TecharoHQ/anubis/releases/download/v{{anubis_install_version}}/anubis_{{anubis_install_version}}_{{anubis_debian_arch_map[ansible_architecture]}}.deb.asc"
+            dest: "{{tmpfile_deb_asc.path}}"
+            force: true
+
+        - name: Verify signature
+          ansible.builtin.command:
+            argv: ['sqv', '--keyring', "{{tmpfile_signing_key.path}}", '--signature-file', "{{tmpfile_deb_asc.path}}", "{{tmpfile_deb.path}}"]
+
+        - name: Install anubis
+          ansible.builtin.apt:
+            deb: "{{tmpfile_deb.path}}"
+
+      always:
+        - name: Delete tempfiles
+          when: item|default(false)
+          ansible.builtin.file:
+            path: "{{item}}"
+            state: absent
+          loop:
+            - "{{tmpfile_deb.path}}"
+            - "{{tmpfile_deb_asc.path}}"
+            - "{{tmpfile_signing_key.path}}"
+          ignore_errors: true
+
+- name: Create configuration directory
+  ansible.builtin.file:
+    path: /etc/anubis
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create service override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/anubis@.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'

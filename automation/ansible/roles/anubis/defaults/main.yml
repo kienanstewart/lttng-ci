@@ -1,0 +1,12 @@
+---
+
+anubis_install_version: '1.24.0'
+anubis_debian_arch_map:
+  'x86_64': 'amd64'
+
+anubis_env_defaults:
+  BIND: ':9080'
+  METRICS_BIND: ':9090'
+  DIFFICULTY: '2'
+  OG_PASSTHROUGH: 'false'
+  POLICY_FNAME: '/usr/share/doc/anubis/botPolicies.yaml'

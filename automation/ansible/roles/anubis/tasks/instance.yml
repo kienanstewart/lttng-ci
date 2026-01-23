@@ -1,0 +1,38 @@
+---
+
+# Use as follows:
+#
+#   ansible.builtin.include_role:
+#     name: anubis
+#     tasks_from: instance.yml
+#   vars:
+#     anubis_instance: "instance-id"
+#     # Defaults from anubis_env_defaults
+#     anubis_env: {}
+#
+
+- name: Copy default bot policy
+  ansible.builtin.copy:
+    src: /usr/share/doc/anubis/botPolicies.yaml
+    remote_src: true
+    dest: "/etc/anubis/{{anubis_instance}}.botPolicies.yaml"
+
+- name: Create instance environment configuration
+  ansible.builtin.template:
+    dest: "/etc/anubis/{{anubis_instance}}.env"
+    src: env.j2
+  vars:
+    anubis_instance_env: "{{anubis_env_defaults|combine(anubis_env|default(dict()))}}"
+  register: anubis_config
+
+- name: Ensure anubis service
+  ansible.builtin.service:
+    name: "anubis@{{anubis_instance}}.service"
+    state: "{{anubis_instance_state|default('started')}}"
+    enabled: true
+
+- name: Restart anubis
+  when: anubis_config.changed
+  ansible.builtin.service:
+    name: "anubis@{{anubis_instance}}.service"
+    state: restarted
