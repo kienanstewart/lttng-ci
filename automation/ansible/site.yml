@@ -23,6 +23,7 @@
 - hosts: jenkins
   roles:
     - common
+    - anubis
     - jenkins
 - hosts: ci_node:developer
   roles:

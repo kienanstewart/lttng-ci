@@ -42,6 +42,16 @@
     name: jenkins
     enabled: true
     state: started
+
+- name: Configure Jenkins anubis instance
+  when: jenkins_anubis
+  ansible.builtin.include_role:
+    name: anubis
+    tasks_from: instance.yml
+  vars:
+    anubis_instance: 'jenkins'
+    anubis_env: "{{jenkins_anubis_env}}"
+
 - name: Jenkins plugin
   community.general.jenkins_plugin:
     name: "{{item}}"

@@ -1,5 +1,11 @@
 ---
 
+jenkins_anubis: true
+jenkins_anubis_env:
+  POLICY_FNAME: "/etc/anubis/jenkins.botPolicies.yaml"
+  COOKIE_DOMAIN: "{{ansible_fqdn}}"
+  TARGET: 'http://[::1]:8080'
+
 jenkins_lts: true
 jenkins_dependencies:
   - fontconfig
