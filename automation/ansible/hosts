@@ -144,4 +144,4 @@ ansible_python_interpreter=python3
 git-mirror02
 
 [misc]
-epycamd
+ripper

@@ -112,7 +112,7 @@
             - fission
             - fission-dwp
       - 'binutils-gdb_{version}_multitarget_{buildtype}_{cctype}':
-          platform: epycamd
+          platform: ripper
           target_boards: []
           targets:
             - aarch64

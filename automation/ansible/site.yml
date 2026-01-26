@@ -43,7 +43,7 @@
   roles:
     - developer
     - docker
-- hosts: epycamd
+- hosts: ripper
   tasks:
     - include_role:
         name: common
