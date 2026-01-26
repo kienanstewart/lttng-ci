@@ -232,8 +232,10 @@ def get_benchmark_results(client, commit, workdir):
     path = "/system-tests/results/benchmarks/babeltrace/{}/failed".format(commit)
     fail_path = get_file(client, path, os.path.join(workdir, "failed"))
     if fail_path is not None:
-        logging.debug("Commit {} has failed file".format(commit))
         os.unlink(os.path.join(workdir, "failed"))
+        logging.info(
+            "Benchmarks for '{}' state: {}".format(commit, BenchmarkState.BUILD_FAILURE)
+        )
         return results, BenchmarkState.BUILD_FAILURE
 
     for b_type in BENCHMARK_TYPES:
@@ -666,6 +668,7 @@ def launch_jobs(
                 if force or state not in [
                     BenchmarkState.COMPLETE,
                     BenchmarkState.CONTAINS_RUN_FAILURES,
+                    BenchmarkState.BUILD_FAILURE,
                 ]:
                     commits_to_test.add(commit)
 
