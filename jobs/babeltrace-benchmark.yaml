@@ -1,7 +1,6 @@
-- job:
+- defaults:
     name: babeltrace_benchmark
     project-type: freestyle
-    defaults: global
     description: |
       This job is responsible for triggering benchmark jobs in lava and generate the report
 
@@ -30,26 +29,6 @@
               credential-id: s3_obj_lava_key
               username: S3_ACCESS_KEY
               password: S3_SECRET_KEY
-
-    triggers:
-      - timed: '@daily'
-
-    builders:
-      - trigger-builds:
-          -
-            # This ensures that the kernel is built
-            project:
-              - system_tests_build_kernel_and_modules
-            current_parameters: false
-            block: true
-            # The LTTNG_MODULES_COMMIT_ID is to satisfy this job, and not
-            # used by this job (v2.14.3).
-            predefined-parameters: |
-              BUILD_DEVICE=baremetal
-              KERNEL_COMMIT_ID=$KERNEL_COMMIT_ID
-              LTTNG_MODULES_COMMIT_ID=0be94330d9e0bd2f6fffa4c54ece0677a9a64b59
-      - shell:
-          !include-raw-verbatim: scripts/babeltrace-benchmark/benchmark.sh
 
     parameters:
       - string:
@@ -126,6 +105,37 @@
           description: 'Base url to access the s3 bucket over unauthenticated HTTP'
           default: 'https://obj-lava.internal.efficios.com'
 
+    scm:
+      - git:
+          url: https://github.com/efficios/babeltrace.git
+          browser: githubweb
+          browser-url: https://github.com/efficios/babeltrace
+          basedir: src/babeltrace
+          skip-tag: true
+
+- job:
+    name: babeltrace_benchmark
+    defaults: babeltrace_benchmark
+    triggers:
+      - timed: '@daily'
+
+    builders:
+      - trigger-builds:
+          -
+            # This ensures that the kernel is built
+            project:
+              - system_tests_build_kernel_and_modules
+            current_parameters: false
+            block: true
+            # The LTTNG_MODULES_COMMIT_ID is to satisfy this job, and not
+            # used by this job (v2.14.3).
+            predefined-parameters: |
+              BUILD_DEVICE=baremetal
+              KERNEL_COMMIT_ID=$KERNEL_COMMIT_ID
+              LTTNG_MODULES_COMMIT_ID=0be94330d9e0bd2f6fffa4c54ece0677a9a64b59
+      - shell:
+          !include-raw-verbatim: scripts/babeltrace-benchmark/benchmark.sh
+
     publishers:
       - archive:
           artifacts: 'results/**'
@@ -142,11 +152,3 @@
       - workspace-cleanup:
           clean-if:
             - failure: false
-
-    scm:
-      - git:
-          url: https://github.com/efficios/babeltrace.git
-          browser: githubweb
-          browser-url: https://github.com/efficios/babeltrace
-          basedir: src/babeltrace
-          skip-tag: true
