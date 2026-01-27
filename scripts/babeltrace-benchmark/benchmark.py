@@ -39,8 +39,8 @@ BENCHMARK_TYPES = [
 # Get S3 config from environment
 S3_HOST = os.getenv("S3_HOST")
 S3_BUCKET = os.getenv("S3_BUCKET")
-S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY")
-S3_SECRET_KEY = os.getenv("S3_SECRET_KEY")
+S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", os.getenv("S3_KEY_USR"))
+S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", os.getenv("S3_KEY_PSW"))
 
 invalid_commits = {
     "ec9a9794af488a9accce7708a8b0d8188b498789",  # Does not build

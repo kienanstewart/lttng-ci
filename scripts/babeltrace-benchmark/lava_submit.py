@@ -19,8 +19,8 @@ LAVA_USERNAME = os.environ.get("LAVA_USERNAME")
 LAVA_HOST = os.environ.get("LAVA_HOST")
 LAVA_PROTO = os.environ.get("LAVA_PROTO")
 
-S3_ACCESS_KEY = os.environ.get("S3_ACCESS_KEY")
-S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
+S3_ACCESS_KEY = os.environ.get("S3_ACCESS_KEY", os.environ.get("S3_KEY_USR"))
+S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY", os.environ.get("S3_KEY_PSW"))
 
 S3_HOST = os.environ.get("S3_HOST")
 S3_BUCKET = os.environ.get("S3_BUCKET")
