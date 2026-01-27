@@ -65,7 +65,7 @@
           description: 'Limit benchmarked revisions to tags'
       - string:
           name: 'BENCHMARK_BATCH_SIZE'
-          default: "100"
+          default: "10"
           description: "How many commits to test per lava run. 0 to test in a single run"
       - string:
           name: 'BENCHMARK_MAX_BATCHES'
