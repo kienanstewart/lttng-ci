@@ -8,3 +8,4 @@ pyyaml
 numpy
 requests
 s3cmd
+scipy
