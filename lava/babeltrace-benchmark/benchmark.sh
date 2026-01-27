@@ -202,4 +202,6 @@ while read -d ' ' -r commit ; do
     # Remove the failed file if one exists
     delete_artifact "${RESULTS_DIR_PREFIX}/${commit}/failed" || true
     rm -rf "$PREFIX"
-done <<< "${BT_COMMITS}"
+
+# The trailing space is important for the loop
+done <<< "${BT_COMMITS} "
