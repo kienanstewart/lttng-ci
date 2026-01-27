@@ -635,25 +635,171 @@ def generate_graph(branches, report_name, git_path, tags_only=False):
     pdf_pages.close()
 
 
-def launch_jobs(
-    branches,
-    bt_repo_path,
-    wait_for_completion,
-    debug,
-    force,
-    batch_size,
-    max_batches,
-    bt_repo,
-    ci_repo,
-    ci_branch,
-    nfs_root_url,
-    kernel_url,
-    tags_only=False,
-    dry_run=False,
+def evaluate_benchmark_regression(
+    current_commit, other_commits, significance_level=0.05, failure_threshold=0.01
 ):
     """
-    Lauch jobs for all missing results.
+    Return True if there's been a regression
     """
+
+    import scipy
+
+    client = get_client()
+    commits = other_commits + [current_commit]
+    results = dict()
+    with tempfile.TemporaryDirectory() as workdir:
+        for commit in commits:
+            r, state = get_benchmark_results(client, commit, workdir)
+            if not r or state != BenchmarkState.COMPLETE:
+                continue
+
+            results[commit] = r
+
+    # If there's no results for the current commit, give up
+    if current_commit not in results.keys():
+        logging.error("No results for current commit '{}'".format(commit))
+        return True
+
+    data = dict()
+    # { 'commit':
+    #   'benchmark_name': {
+    #     'mean',
+    #     'median',
+    #     'stddev',
+    #     'samples': [...],
+    #   }, ...
+    # }
+    #
+    # Pass 1: data
+    for commit, result in results.items():
+        # For each benchmark type compute mean, median, stddev
+        data[commit] = dict()
+        for b_type in BENCHMARK_TYPES:
+            data[commit][b_type] = dict()
+            data[commit][b_type]["samples"] = result[b_type]
+            data[commit][b_type]["cv"] = scipy.stats.variation(result[b_type])
+            data[commit][b_type]["mean"] = numpy.mean(result[b_type])
+            data[commit][b_type]["median"] = numpy.median(result[b_type])
+            data[commit][b_type]["stddev"] = numpy.std(result[b_type])
+
+    # Pass 2: Compare the current commit to the others
+    regression_detected = list()
+    others = [x for x in data.keys() if x != current_commit]
+    if len(others) < 1:
+        logging.warning("No other results to compare to")
+        return regression_detected
+
+    evaluation = {
+        "meta": {
+            "current_commit": current_commit,
+        },
+        "data": data,
+        "comparison_to": dict(),
+    }
+    for b_type in BENCHMARK_TYPES:
+        print(b_type)
+        for other in others:
+            U1, p = scipy.stats.mannwhitneyu(
+                data[current_commit][b_type]["samples"],
+                data[other][b_type]["samples"],
+            )
+            if other not in evaluation["comparison_to"].keys():
+                evaluation["comparison_to"][other] = dict()
+
+            reject_null = False
+            if p < significance_level:
+                # Reject null hypothesis with small p-value
+                reject_null = True
+
+            evaluation["comparison_to"][other][b_type] = {
+                "U": U1,
+                "p-value": p,
+                "significance_level": significance_level,
+                "reject_null_hypothesis": reject_null,
+            }
+
+            delta_mean = (
+                data[current_commit][b_type]["mean"] - data[other][b_type]["mean"]
+            )
+            delta_mean_pct = delta_mean / data[other][b_type]["mean"]
+
+            delta_median = (
+                data[current_commit][b_type]["median"] - data[other][b_type]["median"]
+            )
+            delta_median_pct = delta_median / data[other][b_type]["median"]
+
+            if (
+                reject_null
+                and (delta_mean > 0.0 or delta_median > 0.0)
+                and (
+                    delta_mean_pct > failure_threshold
+                    or delta_median_pct > failure_threshold
+                )
+            ):
+                logging.info("Regression detected in benchmark {}".format(b_type))
+                regression_detected.append(b_type)
+
+            print(
+                "[{} vs {}] U={}, p={}, reject_null_hypothesis={}".format(
+                    current_commit, other, U1, p, reject_null
+                )
+            )
+            print(
+                "Mean: {}, {}, d={}, d%={}%".format(
+                    data[current_commit][b_type]["mean"],
+                    data[other][b_type]["mean"],
+                    delta_mean,
+                    delta_mean_pct * 100.0,
+                )
+            )
+            print(
+                "Median: {}, {}, d={}, d%={}%".format(
+                    data[current_commit][b_type]["median"],
+                    data[other][b_type]["median"],
+                    delta_median,
+                    delta_median_pct * 100.0,
+                )
+            )
+            print()
+        print()
+
+    return regression_detected
+
+
+def get_regression_commits(bt_repo_path):
+    commits = set()
+    # HEAD, HEAD~1, and last tag
+    repo = git.Repo(bt_repo_path)
+    repo.git.fetch()
+    commits.add(str(repo.head.commit))
+    for parent in repo.head.commit.parents:
+        commits.add(str(parent))
+
+    tag = repo.git().describe(abbrev=0)
+    if tag:
+        commits.add(str(repo.tag(tag).commit))
+
+    return list(commits)
+
+
+def get_regression_commits_to_test(bt_repo_path, force=False):
+    client = get_client()
+    commits_to_test = set()
+    commits = get_regression_commits(bt_repo_path)
+    with tempfile.TemporaryDirectory() as workdir:
+        for commit in commits:
+            res, state = get_benchmark_results(client, commit, workdir)
+            if force or state not in [
+                BenchmarkState.COMPLETE,
+                BenchmarkState.CONTAINS_RUN_FAILURES,
+                BenchmarkState.BUILD_FAILURE,
+            ]:
+                commits_to_test.add(commit)
+
+    return list(commits_to_test)
+
+
+def get_commits_to_test(branches, bt_repo_path, force=False, tags_only=False):
     client = get_client()
     commits_to_test = set()
     for branch, cutoff in branches.items():
@@ -672,11 +818,29 @@ def launch_jobs(
                 ]:
                     commits_to_test.add(commit)
 
-    commits_to_test = list(commits_to_test)
-    logging.info("{} commits to run benchmarks for".format(len(commits_to_test)))
+    return list(commits_to_test)
+
+
+def launch_jobs(
+    commits_to_test,
+    wait_for_completion,
+    debug,
+    batch_size,
+    max_batches,
+    bt_repo,
+    ci_repo,
+    ci_branch,
+    nfs_root_url,
+    kernel_url,
+    dry_run=False,
+):
+    """
+    Lauch jobs for all missing results.
+    """
     if len(commits_to_test) == 0:
         return (0, 0, 0)
 
+    logging.info("{} commits to run benchmarks for".format(len(commits_to_test)))
     chunks = [commits_to_test]
     batches_run = 0
     if batch_size > 0:
@@ -793,6 +957,38 @@ def main():
         "for the ci. Otherwise we could end up spaming the lava instance.",
     )
     parser.add_argument(
+        "--generate-regression-jobs",
+        action="store_true",
+        help="Generate jobs for benchmark regression",
+    )
+    parser.add_argument(
+        "--check-regression-results",
+        action="store_true",
+        help="Evaluate if there have been regressions in the current commit",
+    )
+    parser.add_argument(
+        "--current-commit",
+        default="",
+        help="The current commit for ther regression evaluation",
+    )
+    parser.add_argument(
+        "--other-commits",
+        default=list(),
+        help="Comma-separated commit(s) to use as a baseline for regression evaluation",
+    )
+    parser.add_argument(
+        "--significance-level",
+        default=0.05,
+        type=float,
+        help="The significance level for rejecting the null hypothesis of the Mann-Whitney U test",
+    )
+    parser.add_argument(
+        "--failure-threshold",
+        default=0.01,
+        type=float,
+        help="The minimum percent difference in benchmarks to signal when the null hypothesis is rejected",
+    )
+    parser.add_argument(
         "--generate-report",
         action="store_true",
         help="Generate graphs and save them to pdf",
@@ -867,12 +1063,16 @@ def main():
         for branch, cutoff in bt_branches.items():
             logging.info("\t Branch {} with cutoff {}".format(branch, cutoff))
 
-        submitted, passed, failed = launch_jobs(
+        commits_to_test = get_commits_to_test(
             bt_branches,
             args.bt_repo_path,
+            force=args.force_jobs,
+            tags_only=args.tags_only,
+        )
+        submitted, passed, failed = launch_jobs(
+            commits_to_test,
             not args.do_not_wait_on_completion,
             args.debug,
-            args.force_jobs,
             args.batch_size,
             args.max_batches,
             args.bt_repo,
@@ -880,7 +1080,6 @@ def main():
             args.ci_branch,
             args.nfs_root_url,
             args.kernel_url,
-            args.tags_only,
             args.dry_run,
         )
 
@@ -888,6 +1087,54 @@ def main():
             "{} submitted jobs: {} passed, {} failed".format(submitted, passed, failed)
         )
         if failed != 0:
+            exit_code = 1
+
+    if args.generate_regression_jobs:
+        logging.info("Launch regression job(s)")
+        commits_to_test = get_regression_commits_to_test(
+            args.bt_repo_path, args.force_jobs
+        )
+        submitted, passed, failed = launch_jobs(
+            commits_to_test,
+            not args.do_not_wait_on_completion,
+            args.debug,
+            args.batch_size,
+            args.max_batches,
+            args.bt_repo,
+            args.ci_repo,
+            args.ci_branch,
+            args.nfs_root_url,
+            args.kernel_url,
+            args.dry_run,
+        )
+        logging.info(
+            "{} submitted jobs: {} passed, {} failed".format(submitted, passed, failed)
+        )
+        if failed != 0:
+            exit_code = 1
+
+    if args.check_regression_results:
+        repo = git.Repo(args.bt_repo_path)
+        current_commit = (
+            args.current_commit if args.current_commit else str(repo.head.commit)
+        )
+        other_commits = (
+            args.other_commits.split(",")
+            if args.other_commits
+            else get_regression_commits(args.bt_repo_path)
+        )
+        regressions = evaluate_benchmark_regression(
+            current_commit,
+            other_commits,
+            args.significance_level,
+            args.failure_threshold,
+        )
+        if len(regressions) > 0:
+            logging.error(
+                "Regression(s) detected in the following benchmark(s): {}".format(
+                    regressions
+                )
+            )
             exit_code = 1
 
     if args.generate_report:
