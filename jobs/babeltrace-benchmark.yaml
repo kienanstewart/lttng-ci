@@ -112,6 +112,25 @@
           browser-url: https://github.com/efficios/babeltrace
           basedir: src/babeltrace
           skip-tag: true
+          branches:
+            - origin/{version}
+
+    # Job variables
+    version: 'master'
+
+- job-template:
+    # The goal of this job is to run the benchmarks for the most recent
+    # commit and compare to COMMIT~1 and the last tag (if any). The
+    # job should warn or fail if there's a regression in any of the
+    # benchmarks.
+    name: 'babeltrace_{version}_benchmark_regression'
+    defaults: babeltrace_benchmark
+    project-type: pipeline
+    sandbox: true
+    dsl: !include-jinja2: pipelines/babeltrace/benchmark_regression.groovy.j2
+    triggers:
+      - pollscm:
+          cron: "@hourly"
 
 - job:
     name: babeltrace_benchmark
@@ -152,3 +171,12 @@
       - workspace-cleanup:
           clean-if:
             - failure: false
+
+- project:
+    name: babeltrace-benchmark-regression
+    version:
+      - stable-2.0
+      - stable-2.1
+      - master
+    jobs:
+      - 'babeltrace_{version}_benchmark_regression': {}
