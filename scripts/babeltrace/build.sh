@@ -333,7 +333,7 @@ prod)
 doc)
     print_header "Conf: Documentation"
 
-    CONF_OPTS+=($PY_BINDINGS_OPT "--enable-python-bindings-doc" $PY_PLUGINS_OPT "--enable-api-doc")
+    CONF_OPTS+=($PY_BINDINGS_OPT "--enable-python-bindings-doc" $PY_PLUGINS_OPT "--enable-api-doc" "--enable-internal-doc")
     ;;
 
 asan)
