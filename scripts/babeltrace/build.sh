@@ -299,13 +299,9 @@ static)
     ;;
 
 python-bindings)
+    # For Babeltrace 1.5 only
     print_header "Conf: Python bindings"
-
     CONF_OPTS+=("--enable-python-bindings")
-
-    if vergte "$PACKAGE_VERSION" "2.0"; then
-        CONF_OPTS+=("--enable-python-bindings-doc" "--enable-python-plugins")
-    fi
     ;;
 
 prod)
