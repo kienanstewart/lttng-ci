@@ -276,6 +276,13 @@ export BABELTRACE_MINIMAL_LOG_LEVEL=TRACE
 # configuration.
 CONF_OPTS=("--prefix=$PREFIX" "--libdir=$PREFIX/$LIBDIR_ARCH" "--disable-maintainer-mode")
 
+# With Babeltrace 2.2+, `--enable-python-bindings` is the default
+PY_BINDINGS_OPT=
+
+if verlt "$PACKAGE_VERSION" "2.2"; then
+    PY_BINDINGS_OPT=--enable-python-bindings
+fi
+
 # -Werror is enabled by default in stable-2.0 but won't be in 2.1
 # Explicitly disable it for consistency.
 if vergte "$PACKAGE_VERSION" "2.0"; then
@@ -313,13 +320,13 @@ prod)
     unset BABELTRACE_MINIMAL_LOG_LEVEL
 
     # Enable the python bindings
-    CONF_OPTS+=("--enable-python-bindings" "--enable-python-plugins")
+    CONF_OPTS+=($PY_BINDINGS_OPT "--enable-python-plugins")
     ;;
 
 doc)
     print_header "Conf: Documentation"
 
-    CONF_OPTS+=("--enable-python-bindings" "--enable-python-bindings-doc" "--enable-python-plugins" "--enable-api-doc")
+    CONF_OPTS+=($PY_BINDINGS_OPT "--enable-python-bindings-doc" "--enable-python-plugins" "--enable-api-doc")
     ;;
 
 asan)
@@ -327,7 +334,7 @@ asan)
 
     # --enable-asan was introduced after 2.0 but don't check the version, we
     # want this configuration to fail if ASAN is unavailable.
-    CONF_OPTS+=("--enable-asan" "--enable-python-bindings" "--enable-python-plugins")
+    CONF_OPTS+=("--enable-asan" $PY_BINDINGS_OPT "--enable-python-plugins")
     ;;
 
 min)
@@ -340,7 +347,7 @@ min)
     # Enable the python bindings / plugins by default with babeltrace2,
     # the test suite is mostly useless without it.
     if vergte "$PACKAGE_VERSION" "2.0"; then
-        CONF_OPTS+=("--enable-python-bindings" "--enable-python-plugins")
+        CONF_OPTS+=($PY_BINDINGS_OPT "--enable-python-plugins")
     fi
 
     # Something is broken in docbook-xml on yocto
