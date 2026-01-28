@@ -286,10 +286,15 @@ case "$conf" in
 static)
     print_header "Conf: Static lib only"
 
-    CONF_OPTS+=("--enable-static" "--disable-shared")
+    CONF_OPTS+=("--enable-static")
 
     if vergte "$PACKAGE_VERSION" "2.0"; then
         CONF_OPTS+=("--enable-built-in-plugins")
+
+        if verlt "$PACKAGE_VERSION" "2.2"; then
+            # `--disable-shared` not required with Babeltrace 2.2+
+            CONF_OPTS+=("--disable-shared")
+        fi
     fi
     ;;
 
