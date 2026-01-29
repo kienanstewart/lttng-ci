@@ -1,0 +1,102 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+
+pipeline {
+  agent {
+    label 'deb13-amd64'
+  }
+
+  options {
+    ansiColor('xterm')
+    timestamps()
+  }
+
+  environment {
+    S3_HOST = "${params.S3_HOST}"
+    S3_BUCKET = "${params.S3_BUCKET}"
+    S3_BASE_DIR = "${params.S3_BASE_DIR}"
+    S3_HTTP_BUCKET_URL = "${params.S3_HTTP_BUCKET_URL}"
+  }
+
+  stages {
+    stage('Setup') {
+      steps {
+        cleanWs()
+        dir('src/lttng-ust') {
+          checkout([$class: 'GitSCM', userRemoteConfigs: [[url: "${params.LTTNG_UST_REPO}"]]])
+        }
+        dir('src/lttng-ci') {
+          checkout([$class: 'GitSCM', branches: [[name: "${params.LTTNG_CI_BRANCH}"]], userRemoteConfigs: [[url: "${params.LTTNG_CI_REPO}"]]])
+
+          sh(
+            label: "prepare venv",
+            script: """#!/usr/bin/bash -x
+python3 -m virtualenv venv/
+source venv/bin/activate
+pip3 install -r scripts/lttng-ust-benchmarks/requirements.txt
+""",
+          )
+        }
+      }
+    }
+
+    stage('Run benchmarks') {
+      when {
+        expression {
+          env.BENCHMARK_SKIP_SUBMISSION != "true"
+        }
+      }
+
+      environment {
+        LAVA2_JENKINS_TOKEN = credentials('jenkins_lava2_key')
+        S3_KEY = credentials('s3_obj_lava_key')
+      }
+
+      steps {
+        dir('src/lttng-ci') {
+          sh(
+            label: "launch",
+            script: """#!/usr/bin/bash -x
+source venv/bin/activate
+ARGS=(
+  --repo-path=\$WORKSPACE/src/lttng-ust
+  generate-jobs
+  --batch-size \$BENCHMARK_BATCH_SIZE \
+  --max-batches \$BENCHMARK_MAX_BATCHES
+)
+if [[ "\$BENCHMARK_FORCE" == "true" ]]; then
+  ARGS+=(--force-jobs)
+fi
+
+if [[ "\$BENCHMARK_TAGS_ONLY" == "true" ]]; then
+  ARGS+=(--tags-only)
+fi
+./scripts/lttng-ust-benchmarks/benchmark.py "\${ARGS[@]}"
+""",
+          )
+        }
+      }
+    }
+
+    stage('Generate reports') {
+      when {
+        expression {
+          env.BENCHMARK.SKIP_ASV_SUBMISSION != "true"
+        }
+      }
+
+      steps {
+        echo("TODO")
+      }
+    }
+  }
+
+  post {
+    always {
+      dir('src/lttng-ci') {
+        sh('rm -rf venv/')
+      }
+    }
+  }
+}
