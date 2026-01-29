@@ -13,4 +13,4 @@ metadata:
 
 run:
   steps:
-    - lava/babeltrace-benchmark/setup-base.sh || lava-test-raise "setup-base"
+    - lava/benchmarks/common/setup-base.sh || lava-test-raise "setup-base"

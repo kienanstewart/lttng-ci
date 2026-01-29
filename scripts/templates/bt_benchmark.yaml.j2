@@ -85,11 +85,11 @@ actions:
             - repository: {{ci_repo}}
               revision: {{ci_branch}}
               from: git
-              path: lava/babeltrace-benchmark/setup-base.yml
+              path: lava/benchmarks/common/setup-base.yml
               name: setup-base
 
             - repository: {{ci_repo}}
               revision: {{ci_branch}}
               from: git
-              path: lava/babeltrace-benchmark/benchmark.yml
+              path: lava/benchmarks/babeltrace/benchmark.yml
               name: benchmark

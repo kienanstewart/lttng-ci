@@ -5,4 +5,4 @@ metadata:
 
 run:
   steps:
-    - lava/babeltrace-benchmark/benchmark.sh
+    - lava/benchmarks/babeltrace/benchmark.sh
