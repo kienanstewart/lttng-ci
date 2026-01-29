@@ -1,0 +1,8 @@
+metadta:
+  format: Lava-Test Test Definitino 1.0
+  name: lttng-ust benchmark
+  description: "Run benchmark(s) for LTTng-UST"
+
+run:
+  steps:
+    - lava/benchmarks/lttng-ust/benchmark.sh

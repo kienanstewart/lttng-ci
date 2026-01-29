@@ -1,0 +1,8 @@
+metadata:
+  format: Lava-Test Test Definition 1.0
+  name: lttng-ust benchmark
+  description: "Run benchmark(s) for lttng-ust"
+
+run:
+  steps:
+    - lava/benchmarks/lttng-ust/benchmark.sh
