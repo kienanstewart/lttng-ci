@@ -6,6 +6,7 @@ import argparse
 import enum
 import json
 import logging
+import math
 import os
 import pathlib
 import re
@@ -17,13 +18,15 @@ from operator import add
 from statistics import mean
 
 import git
-import lava_submit
 import matplotlib.pyplot as plt
 import numpy
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.ticker import PercentFormatter
 from minio import Minio
 from minio.error import NoSuchKey, ResponseError
+
+sys.path.insert(0, str((pathlib.Path(__file__).parents[1] / "common").absolute()))
+import lava_submit
 
 BENCHMARK_TYPES = [
     "dummy-default",
@@ -41,6 +44,11 @@ S3_HOST = os.getenv("S3_HOST")
 S3_BUCKET = os.getenv("S3_BUCKET")
 S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", os.getenv("S3_KEY_USR"))
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", os.getenv("S3_KEY_PSW"))
+S3_HTTP_BUCKET_URL = os.environ.get("S3_HTTP_BUCKET_URL")
+
+TRACE_DEFAULT_LOCATION = "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace.tar.gz".format(S3_HTTP_BUCKET_URL)
+TRACE_TOOLS_2_10_LOCATION = "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.10.tar.gz".format(S3_HTTP_BUCKET_URL)
+TRACE_TOOLS_2_14_LOCATION = "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.14.tar.gz".format(S3_HTTP_BUCKET_URL)
 
 invalid_commits = {
     "ec9a9794af488a9accce7708a8b0d8188b498789",  # Does not build
@@ -869,6 +877,19 @@ def launch_jobs(
                 ci_branch,
                 nfs_root_url,
                 kernel_url,
+                template_file="bt_benchmark.yaml.j2",
+                extra_context = {
+                    'kernel_url': kernel_url,
+                    'nfsrootfs_url': nfsrootfs,
+                    'commit_hashes': " ".join(commits),
+                    'ci_repo': ci_repo,
+                    'ci_branch': ci_branch,
+                    'bt_repo': bt_repo,
+                    'job_timeout_hours' = max(3, math.ceil(len(commits) * 1.5)),
+                    'trace_default_location': TRACE_DEFAULT_LOCATION,
+                    'trace_tools_2_10_location': TRACE_TOOLS_2_10_LOCATION,
+                    'trace_tools_2_14_location': TRACE_TOOLS_2_14_LOCATION,
+                },
                 wait_for_completion=wait_for_completion,
                 debug=debug,
             )

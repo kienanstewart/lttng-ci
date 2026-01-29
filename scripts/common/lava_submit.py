@@ -3,34 +3,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
-import math
 import os
+import pathlib
 import sys
 import time
 import xmlrpc.client
 
-from jinja2 import Environment, FileSystemLoader
+import jinja2
 import yaml
 
 # 4.4.194
 DEFAULT_KERNEL_COMMIT = "a227f8436f2b21146fc024d84e6875907475ace2"
-
 LAVA_USERNAME = os.environ.get("LAVA_USERNAME")
 LAVA_HOST = os.environ.get("LAVA_HOST")
 LAVA_PROTO = os.environ.get("LAVA_PROTO")
-
-S3_ACCESS_KEY = os.environ.get("S3_ACCESS_KEY", os.environ.get("S3_KEY_USR"))
-S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY", os.environ.get("S3_KEY_PSW"))
-
-S3_HOST = os.environ.get("S3_HOST")
-S3_BUCKET = os.environ.get("S3_BUCKET")
-S3_BASE_DIR = os.environ.get("S3_BASE_DIR")
-
 S3_HTTP_BUCKET_URL = os.environ.get("S3_HTTP_BUCKET_URL")
-
-TRACE_DEFAULT_LOCATION = "https://obj-lava.internal.efficios.com/traces/benchmark/babeltrace/babeltrace_benchmark_trace.tar.gz"
-TRACE_TOOLS_2_10_LOCATION = "https://obj-lava.internal.efficios.com/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.10.tar.gz"
-TRACE_TOOLS_2_14_LOCATION = "https://obj-lava.internal.efficios.com/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.14.tar.gz"
 
 
 def wait_on(server, jobid):
@@ -70,15 +57,29 @@ def wait_on(server, jobid):
     return (jobstatus, jobhealth, has_failing_test_cases)
 
 
+def get_default_context():
+    context = dict()
+
+    context["s3_access_key"] = os.environ.get(
+        "S3_ACCESS_KEY", os.environ.get("S3_KEY_USR")
+    )
+    context["s3_secret_key"] = os.environ.get(
+        "S3_SECRET_KEY", os.environ.get("S3_KEY_PSW")
+    )
+    context["s3_host"] = os.environ.get("S3_HOST")
+    context["s3_bucket"] = os.environ.get("S3_BUCKET")
+    context["s3_base_dir"] = os.environ.get("S3_BASE_DIR")
+    context["job_timeout_hours"] = 2
+
+    return context
+
+
 def submit(
-    commits,
-    bt_repo,
-    ci_repo,
-    ci_branch,
-    nfsrootfs,
-    kernel_url,
+    template_file,
+    extra_context=dict(),
     debug=False,
     wait_for_completion=True,
+    attempts=10,
 ):
     # Get the S3 secret from the environment
     lava_api_key = None
@@ -93,38 +94,22 @@ def submit(
             return -1
 
     # Context for the lava job template
-    context = dict()
-    context["kernel_url"] = kernel_url
-    context["nfsrootfs_url"] = nfsrootfs
-    context["commit_hashes"] = " ".join(commits)
-
-    context["ci_repo"] = ci_repo
-    context["ci_branch"] = ci_branch
-
-    context["job_timeout_hours"] = max(3, math.ceil(len(commits) * 1.5))
-    context["bt_repo"] = bt_repo
-
-    context["trace_default_location"] = TRACE_DEFAULT_LOCATION
-    context["trace_tools_2_10_location"] = TRACE_TOOLS_2_10_LOCATION
-    context["trace_tools_2_14_location"] = TRACE_TOOLS_2_14_LOCATION
-
-    context["s3_access_key"] = S3_ACCESS_KEY
-    context["s3_secret_key"] = S3_SECRET_KEY
-
-    context["s3_host"] = S3_HOST
-    context["s3_bucket"] = S3_BUCKET
-    context["s3_base_dir"] = S3_BASE_DIR
+    context = get_default_context()
+    # Merge, prioritising user-supplied context fields.
+    context = extra_context | context
 
     # Render the lava job template
-    jinja_loader = FileSystemLoader(os.path.dirname(os.path.realpath(__file__)))
-    jinja_env = Environment(loader=jinja_loader, trim_blocks=True, lstrip_blocks=True)
-    jinja_template = jinja_env.get_template("template_lava_job_bt_benchmark.yml.jinja2")
+    jinja_loader = jinja2.FileSystemLoader(
+        str((pathlib.Path(__file__).parents[1] / "templates").absolute())
+    )
+    jinja_env = jinja2.Environment(
+        loader=jinja_loader, trim_blocks=True, lstrip_blocks=True
+    )
+    jinja_template = jinja_env.get_template(template_file)
     render = jinja_template.render(context)
 
     print("Job to be submitted:", flush=True)
-
     print(render, flush=True)
-
     if debug:
         return 0
 
@@ -132,7 +117,7 @@ def submit(
         "%s://%s:%s@%s/RPC2" % (LAVA_PROTO, LAVA_USERNAME, lava_api_key, LAVA_HOST)
     )
 
-    for attempt in range(10):
+    for attempt in range(attempts):
         try:
             jobid = server.scheduler.submit_job(render)
         except xmlrpc.client.ProtocolError as error:
@@ -147,7 +132,7 @@ def submit(
         else:
             break
 
-    print("Lava jobid:{}".format(jobid), flush=True)
+    print("Lava job id:{}".format(jobid), flush=True)
     print(
         "Lava job URL: https://{}/scheduler/job/{}".format(LAVA_HOST, jobid),
         flush=True,
@@ -175,4 +160,21 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--debug", required=False, action="store_true")
     args = parser.parse_args()
 
-    sys.exit(submit(args.commits, kernel_url=args.kernel_url, debug=args.debug))
+    context = {
+        "commit_hashes": " ".join(args.commit),
+        "kernel_url": args.kernel_url,
+        "nfsrootfs_url": "https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2025-09-25.tar.xz",
+        "ci_repo": "https://github.com/lttng/lttng-ci.git",
+        "ci_branch": "master",
+        "bt_repo": "https://github.com/efficios/babeltrace.git",
+        "trace_default_location": "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace.tar.gz".format(
+            S3_HTTP_BUCKET_URL
+        ),
+        "trace_tools_2_10_location": "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.10.tar.gz".format(
+            S3_HTTP_BUCKET_URL
+        ),
+        "trace_tools_2_14_location": "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.14.tar.gz".format(
+            S3_HTTP_BUCKET_URL
+        ),
+    }
+    sys.exit(submit("bt_benchmark.yaml.j2", extra_context=context, debug=args.debug))
