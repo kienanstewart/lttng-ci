@@ -3,73 +3,16 @@
 set -exu
 set -o pipefail
 
-function upload_artifact()
-{
-    set +x
-    local local_file=$1
-    local s3_key=$2
-    local md5
+source lava/benchmarks/common/utils.sh
 
-    md5="$(openssl md5 -binary $local_file | openssl base64)"
-
-    # Fetch the S3 keys stored in secrets
-    # shellcheck disable=SC1091
-    . "${BASE_DIR}/../../../secrets"
-    echo "user = \"$S3_ACCESS_KEY:$S3_SECRET_KEY\"" > s3curlrc
-    if ! curl -v -s -f -T "$local_file" \
-        --config s3curlrc \
-        --aws-sigv4 "aws:amz:us-east-1:s3" \
-        -H "Content-MD5: $md5" \
-        "https://${S3_HOST}/${S3_BUCKET}/${S3_BASE_DIR}/$s3_key" 2> err.log ; then
-        echo "Upload of '${local_file}' failed" >&2
-        cat err.log
-    fi
-
-    rm -f s3curlrc err.log
-    set -x
-}
-
-function delete_artifact()
-{
-    set +x
-    local s3_key=$1
-
-    # Fetch the S3 keys stored in secrets
-    # shellcheck disable=SC1091
-    . "${BASE_DIR}/../../../secrets"
-    echo "user = \"$S3_ACCESS_KEY:$S3_SECRET_KEY\"" > s3curlrc
-    if ! curl -v -s -f \
-        -X DELETE \
-        --config s3curlrc \
-        --aws-sigv4 "aws:amz:us-east-1:s3" \
-        "https://${S3_HOST}/${S3_BUCKET}/${S3_BASE_DIR}/$s3_key" 2> err.log ; then
-        echo "Deletion of of '${S3_BUCKET}/${S3_BASE_DIR}/${s3_key}' failed" >&2
-        cat err.log
-    fi
-
-    rm -f s3curlrc err.log
-    set -x
-}
+enable_performance_cpu_governor || true
+enable_coredumps || true
 
 BASE_DIR="$(pwd)"
 BT_SRCDIR="$SCRATCH_DIR/babeltrace"
-COREDUMP_DIR="$SCRATCH_DIR/coredump"
 BENCHMARK_DIR="$TMPDIR/ram_disk"
 PREFIX="${BENCHMARK_DIR}/opt"
 RESULTS_DIR_PREFIX="results/benchmarks/babeltrace"
-
-# Set the cpu governor to performance
-if [ -d /sys/devices/system/cpu/cpu0/cpufreq ]; then
-    cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors || find /sys/devices/system/cpu/cpu0/cpufreq/
-    echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
-else
-    echo "Warning: /sys/devices/system/cpu/cpu0/cpufreq doesn't exist, can't set scaling_governor" >&2
-fi
-
-# Setup coredumps
-mkdir -p "$COREDUMP_DIR"
-echo "$COREDUMP_DIR/core.%e.%p.%h.%t" > /proc/sys/kernel/core_pattern
-ulimit -c unlimited
 
 # Create a 10GB ramdisk for the benchmark
 mkdir "$BENCHMARK_DIR"
