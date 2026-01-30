@@ -15,8 +15,8 @@ import yaml
 # 4.4.194
 DEFAULT_KERNEL_COMMIT = "a227f8436f2b21146fc024d84e6875907475ace2"
 LAVA_USERNAME = os.environ.get("LAVA_USERNAME")
-LAVA_HOST = os.environ.get("LAVA_HOST")
-LAVA_PROTO = os.environ.get("LAVA_PROTO")
+LAVA_HOST = os.environ.get("LAVA_HOST", "lava-master-03.internal.efficios.com")
+LAVA_PROTO = os.environ.get("LAVA_PROTO", "https")
 S3_HTTP_BUCKET_URL = os.environ.get("S3_HTTP_BUCKET_URL")
 
 
