@@ -29,6 +29,13 @@ git clone --quiet "${LTTNG_MODULES_REPO}" "${MODULES_SRC_DIR}"
 git clone --quiet "${LTTNG_TOOLS_REPO}" "${TOOLS_SRC_DIR}"
 git clone --quiet "${LTTNG_UST_REPO}" "${UST_SRC_DIR}"
 git clone --quiet "${LTTNG_UST_BENCHMARKS_REPO}" "${UST_BENCHMARKS_SRC_DIR}"
+if [[ "${LTTNG_UST_BENCHMARKS_BRANCH}" =~ ^refs/ ]]; then
+    git -C "${UST_BENCHMARKS_SRC_DIR}" fetch --quiet origin "${LTTNG_UST_BENCHMARKS_BRANCH}"
+    git -C "${UST_BENCHMARKS_SRC_DIR}" checkout FETCH_HEAD
+else
+    git -C "${UST_BENCHMARKS_SRC_DIR}" checkout "${LTTNG_UST_BENCHMARKS_BRANCH}"
+fi
+
 git clone --quiet "${URCU_REPO}" "${URCU_SRC_DIR}"
 
 function set_commits_from_ust_commit()
@@ -37,7 +44,7 @@ function set_commits_from_ust_commit()
 
     # The first heuristic is the nearest tag. This is _not_ very good on
     # the master branch, but otherwise it's probably "ok".
-    tag="$(git -C "${UST_SRC_DIR}" describe --abbrev=0)"
+    tag="$(git -C "${UST_SRC_DIR}" describe --abbrev=0 "${commit}")"
     vmajor_minor="$(echo $tag | cut -d '.' -f 1-2)"
 
     # Use the .0 release of the major.minor
@@ -69,6 +76,7 @@ function build_urcu()
 
     LOGS_DIR="$(mktemp -d)"
     if ! (
+            set -e
             cd "${URCU_SRC_DIR}"
             git clean -dxf >/dev/null
             git checkout "${commit}"
@@ -108,6 +116,7 @@ function build_babeltrace()
 
     LOG_DIR="$(mktemp -d)"
     if ! (
+            set -e
             cd "${BABELTRACE_SRC_DIR}"
             git clean -dxf >/dev/null
             git checkout "${commit}"
@@ -150,6 +159,7 @@ function build_modules()
 
     LOG_DIR="$(mktemp -d)"
     if ! (
+            set -e
             cd "${MODULES_SRC_DIR}"
             git clean -dxf >/dev/null
             git checkout "${commit}"
@@ -184,6 +194,7 @@ function build_ust()
 
     LOG_DIR="$(mktemp -d)"
     if ! (
+            set -e
             cd "${UST_SRC_DIR}"
             ./bootstrap > "${LOG_DIR}/bootstrap.log" 2>&1
             ./configure \
@@ -223,9 +234,10 @@ function build_tools()
         fi
     fi
 
-    LOG_DIRS="$(mktemp -d)"
+    LOG_DIR="$(mktemp -d)"
     if ! (
-            cd "${UST_SRC_DIR}"
+            set -e
+            cd "${TOOLS_SRC_DIR}"
             ./bootstrap > "${LOG_DIR}/bootstrap.log" 2>&1
             ./configure \
                 --disable-doxygen-doc \
@@ -253,26 +265,31 @@ function build_tools()
 
 function build_ust_benchmarks()
 {
-    make -C "${UST_BENCHMARKS_SRC_DIR}" clean
+    make -C "${UST_BENCHMARKS_SRC_DIR}" clean \
+                EXTRA_CFLAGS="${DEFAULT_CFLAGS}" \
+                EXTRA_CPPFLAGS="${DEFAULT_CPPFLAGS}" \
+                EXTRA_LDFLAGS="${DEFAULT_LDFLAGS}" \
+                LTTNG_MODULES_DIR="${MODULES_SRC_DIR}"
     make -C "${UST_BENCHMARKS_SRC_DIR}" -j$(nproc) \
-                CFLAGS="${DEFAULT_CFLAGS}" \
-                CPPFLAGS="${DEFAULT_CPPFLAGS}" \
-                CXXFLAGS="${DEFAULT_CXXFLAGS}" \
-                LDFLAGS="${DEFAULT_LDFLAGS}"
+                EXTRA_CFLAGS="${DEFAULT_CFLAGS}" \
+                EXTRA_CPPFLAGS="${DEFAULT_CPPFLAGS}" \
+                EXTRA_LDFLAGS="${DEFAULT_LDFLAGS}" \
+                LTTNG_MODULES_DIR="${MODULES_SRC_DIR}"
 }
 
 PREFIX="${BENCHMARK_DIR}/opt"
 DEFAULT_CFLAGS='-O3 -g0 -Wno-error'
 DEFAULT_CXXFLAGS='-O3 -g0 -Wno-error'
-DEFAULT_CPPFLAGS="-I${PREFIX}/usr/include"
-DEFAULT_LDFLAGS="-L${PREFIX}/usr/lib"
+DEFAULT_CPPFLAGS="-I${PREFIX}/include"
+DEFAULT_LDFLAGS="-L${PREFIX}/lib"
 REBUILD_UST=1
 REBUILD_TOOLS=1
 
-# @TODO: PYTHONPATH
-export PATH="${PREFIX}/usr/bin:${PATH}"
-export LD_LIBRARY_PATH="${PREFIX}/usr/lib:"
-export PKG_CONFIG_PATH="${PREFIX}/usr/lib/pkgconfig:"
+python_version="$(python3 --version | cut -d ' ' -f2 | cut -d '.' -f1-2)"
+export PYTHONPATH="${PREFIX}/lib/python${python_version}/site-packages"
+export PATH="${PREFIX}/bin:${PATH}"
+export LD_LIBRARY_PATH="${PREFIX}/lib:"
+export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig:"
 
 while read -d ' ' -r commit; do
     if [[ -z "${commit}" ]]; then
@@ -311,7 +328,7 @@ while read -d ' ' -r commit; do
     fi
 
     # Fetch and build lttng-ust
-    if build_ust "${commit}"; then
+    if ! build_ust "${UST_COMMIT}"; then
         mark_commit_failure "ust build failed"
         continue
     fi
@@ -331,6 +348,7 @@ while read -d ' ' -r commit; do
     # Run benchmarks
     BENCHMARK_LOG=$(mktemp)
     if ! (
+            set -e
             cd "${UST_BENCHMARKS_SRC_DIR}"
             ./benchmarks.py \
                 --lttng-modules-commit "${modules_commit}" \
@@ -342,7 +360,7 @@ while read -d ' ' -r commit; do
         cat "${BENCHMARK_LOG}"
     else
         # Save results
-        upload_artifact "${UST_BENCHMARKS_SRC_DIR}/benchmarks.json" "${RESULT_DIR}/benchmarks.json"
+        upload_artifact "${UST_BENCHMARKS_SRC_DIR}/benchmarks.json" "${RESULTS_DIR}/benchmarks.json"
         delete_artifact "${RESULTS_DIR}/failed" || true
         delete_artifact "${RESULTS_DIR}/logs.tgz" || true
     fi
