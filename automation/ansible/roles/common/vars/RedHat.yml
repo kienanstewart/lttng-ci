@@ -9,6 +9,7 @@ common_packages:
   - psmisc
   - python3-virtualenv
   - python3.12  # For ansible interpreter
+  - python3.12-packaging  # For ansible
   - rsync
   - sudo
   - tree
