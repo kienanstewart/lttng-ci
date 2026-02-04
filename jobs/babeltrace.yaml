@@ -45,6 +45,7 @@
           properties-content: |
             PROJECT_NAME=babeltrace
             PYTHON={python}
+            TEST_REPORT_TYPE={test_report_type}
       - build-discarder:
           num-to-keep: 10
           artifact-num-to-keep: 2
@@ -55,6 +56,7 @@
     filter: ''
     python: ''
     touchstone: ''
+    test_report_type: tap
 
 
 ## Anchors
@@ -366,6 +368,7 @@
             PROJECT_NAME=babeltrace
             BABELTRACE_GIT_UNTRACKED=yes
             PYTHON={python}
+            TEST_REPORT_TYPE={test_report_type}
       - build-discarder:
           days-to-keep: 1
       - throttle:
@@ -401,6 +404,7 @@
           properties-content: |
             PROJECT_NAME=babeltrace
             PYTHON={python}
+            TEST_REPORT_TYPE={test_report_type}
       - build-discarder:
           days-to-keep: 1
 
@@ -444,6 +448,7 @@
             BABELTRACE_RUN_TESTS=no
             BABELTRACE_GIT_UNTRACKED=yes
             PYTHON={python}
+            TEST_REPORT_TYPE={test_report_type}
       - build-discarder:
           days-to-keep: 1
 
@@ -475,6 +480,7 @@
           properties-content: |
             PROJECT_NAME=babeltrace
             PYTHON={python}
+            TEST_REPORT_TYPE={test_report_type}
       - build-discarder:
           days-to-keep: 1
 
@@ -625,7 +631,8 @@
     version:
       - stable-2.0
       - stable-2.1
-      - master
+      - master:
+          test_report_type: junit
     jobs:
       - '{job_prefix}babeltrace_{version}_{buildtype}':
           buildtype: linuxbuild
@@ -650,7 +657,8 @@
           version:
             - stable-2.0
             - stable-2.1
-            - master
+            - master:
+                test_report_type: junit
       - '{job_prefix}babeltrace_{version}_{buildtype}':
           buildtype: elbuild
           platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
@@ -665,7 +673,8 @@
             - stable-1.5
             - stable-2.0
             - stable-2.1
-            - master
+            - master:
+                test_report_type: junit
       - '{job_prefix}babeltrace_{version}_{buildtype}':
           buildtype: macosbuild
           platforms: !!python/tuple [macos-arm64]
@@ -697,8 +706,10 @@
       - 'babeltrace_{version}_lint'
       - 'babeltrace_{version}_coverity':
           version: master
+          test_report_type: junit
       - '{job_prefix}babeltrace_{version}_glib-2.28.6':
           version: master
+          test_report_type: junit
 
 - project:
     name: review-babeltrace
@@ -719,6 +730,7 @@
           builds: !!python/tuple [std, oot, dist, oot-dist]
           confs: !!python/tuple [std, static, prod, min]
           warnings_status: FAILED
+          test_report_type: junit
       - 'dev_review_babeltrace_{version}_{buildtype}':
           version: master
           buildtype: portbuild
@@ -726,6 +738,7 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           warnings_status: FAILED
+          test_report_type: junit
       - 'dev_review_babeltrace_{version}_{buildtype}':
           version: master
           buildtype: macosbuild
@@ -733,6 +746,7 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [std, prod]
           warnings_status: FAILED
+          test_report_type: junit
           git_tool: jgit
       - 'dev_review_babeltrace_{version}_{buildtype}':
           version: master
@@ -741,6 +755,7 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           warnings_status: FAILED
+          test_report_type: junit
       - 'dev_review_babeltrace_{version}_{buildtype}':
           version: master
           buildtype: winbuild
@@ -748,6 +763,7 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           warnings_status: FAILED
+          test_report_type: junit
 
       ## Stable 2.1 ##
       - 'dev_review_babeltrace_{version}_{buildtype}':

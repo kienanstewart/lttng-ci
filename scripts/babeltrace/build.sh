@@ -149,6 +149,8 @@ BABELTRACE_GEN_COMPILE_COMMANDS="${BABELTRACE_GEN_COMPILE_COMMANDS:-no}"
 BABELTRACE_GIT_UNTRACKED="${BABELTRACE_GIT_UNTRACKED:-no}"
 BABELTRACE_RUN_TESTS="${BABELTRACE_RUN_TESTS:-yes}"
 BABELTRACE_CLANG_TIDY="${BABELTRACE_CLANG_TIDY:-no}"
+TEST_REPORT_TYPE="${TEST_REPORT_TYPE:-tap}"
+WITH_VENDOR_PYTEST="${WITH_VENDOR_PYTEST:-auto}"
 
 SRCDIR="$WORKSPACE/src/babeltrace"
 PREFIX="${PREFIX:-/build}"
@@ -304,6 +306,23 @@ fi
 # Explicitly disable it for consistency.
 if vergte "$PACKAGE_VERSION" "2.0"; then
     CONF_OPTS+=("--disable-Werror")
+fi
+
+# Use an in-tree pytest for EL8 to test this feature with Python 3.6,
+# which means selecting pytest 6.1.2. This in turn tests the shims for
+# pytest hooks and classes in `tests/utils/python/bt_tests_utils.py`.
+#
+# `--enable-vendor-pytest` is only available with Babeltrace 2.2+.
+if [[ $WITH_VENDOR_PYTEST = auto ]]; then
+    if [[ $platform = el8* ]] && vergte "$PACKAGE_VERSION" "2.2"; then
+        WITH_VENDOR_PYTEST=1
+    else
+        WITH_VENDOR_PYTEST=0
+    fi
+fi
+
+if [[ $WITH_VENDOR_PYTEST = 1 ]]; then
+    CONF_OPTS+=("--enable-vendor-pytest")
 fi
 
 case "$conf" in
@@ -507,14 +526,50 @@ fi
 if [ "$BABELTRACE_RUN_TESTS" = "yes" ]; then
     print_header "Run test suite"
 
-    # Run tests, don't fail now, we want to run the archiving steps
-    $MAKE --keep-going check || exit_status=1
+    case "$TEST_REPORT_TYPE" in
+    tap)
+        # Run tests, don't fail now, we want to run the archiving steps
+        $MAKE --keep-going check || exit_status=1
 
-    # Copy tap logs for the jenkins tap parser before cleaning the build dir
-    rsync -a --exclude 'test-suite.log' --include '*/' --include '*.log' --exclude='*' tests/ "$WORKSPACE/tap"
+        # Copy tap logs for the jenkins tap parser before cleaning the build dir
+        rsync -a --exclude 'test-suite.log' --include '*/' --include '*.log' --exclude='*' tests/ "$WORKSPACE/tap"
 
-    # Copy the test suites top-level log which includes all tests failures
-    rsync -a --include 'test-suite.log' --include '*/' --exclude='*' tests/ "$WORKSPACE/log"
+        # Copy the test suites top-level log which includes all tests failures
+        rsync -a --include 'test-suite.log' --include '*/' --exclude='*' tests/ "$WORKSPACE/log"
+        ;;
+    junit)
+        (
+            # Source generated `env.sh` to access the `bt-pytest` function
+            # shellcheck disable=SC1091
+            source ./tests/utils/env.sh
+
+            # Back to source directory where all tests reside
+            cd "$SRCDIR/tests"
+
+            # Build pytest options
+            pytest_opts=(
+                -vv -rA --capture=tee-sys --tb=long --log-cli-level=INFO
+                --junit-xml="${WORKSPACE}/results.xml" -o junit_logging=all -o junit_family=xunit2
+            )
+
+            # The in-tree pytest doesn't include pytest-xdist
+            if [[ $WITH_VENDOR_PYTEST != 1 ]]; then
+                pytest_opts+=(-n auto)
+            fi
+
+            # Run all tests
+            pytest_exit_status=0
+            bt-pytest "${pytest_opts[@]}" || pytest_exit_status=1
+
+            # We're done
+            exit $pytest_exit_status
+        ) || exit_status=1
+        ;;
+    *)
+        echo "Error: Unexpected \`TEST_REPORT_TYPE\` value: \`$TEST_REPORT_TYPE\`"
+        exit 1
+        ;;
+    esac
 fi
 
 if [ "$BABELTRACE_GIT_UNTRACKED" = "yes" ]; then
