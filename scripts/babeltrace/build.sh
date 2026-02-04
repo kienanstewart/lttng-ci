@@ -151,7 +151,6 @@ BABELTRACE_RUN_TESTS="${BABELTRACE_RUN_TESTS:-yes}"
 BABELTRACE_CLANG_TIDY="${BABELTRACE_CLANG_TIDY:-no}"
 
 SRCDIR="$WORKSPACE/src/babeltrace"
-TMPDIR="$WORKSPACE/tmp"
 PREFIX="${PREFIX:-/build}"
 LIBDIR="lib"
 LIBDIR_ARCH="$LIBDIR"
@@ -173,11 +172,22 @@ if [ "$BABELTRACE_GEN_COMPILE_COMMANDS" = "yes" ]; then
     BEAR="bear"
 fi
 
-# Create tmp directory
-rm -rf "$TMPDIR"
-mkdir -p "$TMPDIR"
+# Create workspace temporary directory as `$WORKSPACE/tmp` and create a
+# short symlink path in `/tmp` pointing to it.
+#
+# This keeps temporary paths short to avoid issues with long paths,
+# especially on Windows where path length limits can cause
+# test failures.
+#
+# Temporary directory functions and commands will consider the `TMPDIR`
+# and `TEMP` environment variables as the base directory.
+rm -rf "$WORKSPACE/tmp"
+mkdir -p "$WORKSPACE/tmp"
+TMPDIR=$(mktemp -d -p /tmp)/t
+ln -s "$WORKSPACE/tmp" "$TMPDIR"
 
 export TMPDIR
+export TEMP=$TMPDIR
 export CFLAGS="-g -O2"
 export CXXFLAGS="-g -O2"
 
