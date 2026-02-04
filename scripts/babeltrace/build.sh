@@ -327,12 +327,14 @@ prod)
     unset BABELTRACE_MINIMAL_LOG_LEVEL
 
     # Enable the python bindings
+    # shellcheck disable=SC2206
     CONF_OPTS+=($PY_BINDINGS_OPT $PY_PLUGINS_OPT)
     ;;
 
 doc)
     print_header "Conf: Documentation"
 
+    # shellcheck disable=SC2206
     CONF_OPTS+=($PY_BINDINGS_OPT "--enable-python-bindings-doc" $PY_PLUGINS_OPT "--enable-api-doc" "--enable-internal-doc")
     ;;
 
@@ -341,6 +343,7 @@ asan)
 
     # --enable-asan was introduced after 2.0 but don't check the version, we
     # want this configuration to fail if ASAN is unavailable.
+    # shellcheck disable=SC2206
     CONF_OPTS+=("--enable-asan" $PY_BINDINGS_OPT $PY_PLUGINS_OPT)
     ;;
 
@@ -354,6 +357,7 @@ min)
     # Enable the python bindings / plugins by default with babeltrace2,
     # the test suite is mostly useless without it.
     if vergte "$PACKAGE_VERSION" "2.0"; then
+        # shellcheck disable=SC2206
         CONF_OPTS+=($PY_BINDINGS_OPT $PY_PLUGINS_OPT)
     fi
 
