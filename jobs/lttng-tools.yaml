@@ -1321,6 +1321,7 @@
     name: 'LTTng-tools'
     view-type: categorized
     regex: 'lttng-(docs|ivc|tools)[-_].*'
+    regex_to_ignore_on_color_computing: '.*(coverity|coverage).*'
     categorization_criteria:
       - group_regex: 'lttng-tools[_-]master.*'
         naming_rule: 'Master'
