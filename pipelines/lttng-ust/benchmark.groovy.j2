@@ -72,7 +72,8 @@ fi
 if [[ "\$BENCHMARK_TAGS_ONLY" == "true" ]]; then
   ARGS+=(--tags-only)
 fi
-./scripts/lttng-ust-benchmarks/benchmark.py "\${ARGS[@]}"
+
+python3 ./scripts/lttng-ust-benchmarks/benchmark.py "\${ARGS[@]}"
 """,
           )
         }
@@ -82,12 +83,39 @@ fi
     stage('Generate reports') {
       when {
         expression {
-          env.BENCHMARK.SKIP_ASV_SUBMISSION != "true"
+          env.BENCHMARK_SKIP_ASV_SUBMISSION != "true"
         }
       }
 
       steps {
-        echo("TODO")
+        dir('src/lttng-ci') {
+          sh(
+            label: "generate report",
+            script: """#!/usr/bin/bash -x
+source venv/bin/activate
+ARGS=(
+  --repo-path=\$WORKSPACE/src/lttng-ust
+  generate-asv
+)
+if [[ "\$BENCHMARK_TAGS_ONLY" == "true" ]]; then
+  ARGS+=(--tags-only)
+fi
+
+python3 ./scripts/lttng-ust-benchmarks/benchmark.py "\${ARGS[@]}"
+""",
+          )
+
+          publishHTML(
+            target: [
+              reportName: 'Benchmarks (web)',
+              allowMissing: true,
+              alwaysLinkToLastBuild: true,
+              keepAll: true,
+              reportDir: 'output/',
+              reportFiles: 'index.html'
+            ]
+          )
+        }
       }
     }
   }

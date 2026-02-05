@@ -5,10 +5,13 @@
 
 import argparse
 import enum
+import json
 import logging
 import os
 import pathlib
 import sys
+import tempfile
+import urllib
 
 import git
 import requests
@@ -18,8 +21,10 @@ import lava_submit
 
 # Get S3 config from environment
 S3_HOST = os.getenv("S3_HOST")
-S3_BUCKET = os.getenv("S3_BUCKET")
-S3_ANONYMOUS_URL = os.getenv("S3_HTTP_BUCKET_URL")
+S3_BUCKET = os.getenv("S3_BUCKET", "lava")
+S3_ANONYMOUS_URL = os.getenv(
+    "S3_HTTP_BUCKET_URL", "https://obj-lava.internal.efficios.com"
+)
 S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", os.getenv("S3_KEY_USR"))
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", os.getenv("S3_KEY_PSW"))
 S3_STORAGE_PATH = "/system-tests/results/benchmarks/lttng-ust"
@@ -158,6 +163,16 @@ def get_benchmark_state(commit):
     return BenchmarkState.COMPLETE
 
 
+def get_benchmark_results(commit):
+    path = os.path.join(S3_STORAGE_PATH, commit)
+    result_path = os.path.join(path, "benchmarks.json")
+    response = requests.get("{}/{}".format(S3_ANONYMOUS_URL, result_path))
+    if response.status_code != 200:
+        raise Exception("No data available for '{}'".format(result_path))
+
+    return json.loads(response.content)
+
+
 def launch_jobs(commits, batch_size=0, max_batches=0, wait=True, dry_run=False):
     """
     Return a tuple (nJobs, nPassed, nFailed)
@@ -204,6 +219,159 @@ def launch_jobs(commits, batch_size=0, max_batches=0, wait=True, dry_run=False):
             break
 
     return (submitted, passed, failed)
+
+
+def cmd_generate_asv(args):
+    if not args.repo_path.is_dir():
+        raise Exception(
+            "repo-path `{}` is not a directory".format(args.lttng_ust_repo_path),
+        )
+
+    if args.output.exists():
+        raise Exception("Output directory `{}` already exists".format(args.output))
+
+    benchmark_data = list()
+    if len(args.input_files) == 0:
+        repo = git.Repo(args.repo_path)
+        commits = get_commit_list(
+            repo,
+            args.branches,
+            current_commit=args.commits[0] if len(args.commits) > 0 else None,
+            other_commits=args.commits[1:],
+            regression=args.regression,
+            tags_only=args.tags_only,
+        )
+        for commit in commits:
+            if get_benchmark_state(commit) == BenchmarkState.COMPLETE:
+                benchmark_data.append(get_benchmark_results(commit))
+            else:
+                logging.warning("Results for commit '{}' not available".format(commit))
+
+    else:
+        for f in args.input_files:
+            if not f.exists():
+                raise Exception("Input file '{}' does not exist".format(f))
+
+            with open(f, "r") as fp:
+                benchmark_data.append(json.load(fp))
+
+    generate_asv_report(args.repo_path, args.branches, benchmark_data, args.output)
+
+
+def generate_asv_report(repo_path, branches, benchmark_data, output):
+    import asv
+    import bs4
+
+    results_dir = tempfile.TemporaryDirectory()
+    conf = asv.config.Config()
+    conf.html_dir = str(output)
+    conf.project = str(repo_path)
+    conf.project_url = "https://lttng.org/"
+    # conf.branches = branches.keys()
+    conf.dvcs = "git"
+    conf.repo = str(repo_path)
+    conf.results_dir = results_dir.name
+    conf.branches = ["origin/{}".format(x) for x in branches.keys()]
+
+    # Write machine.json
+    machine = asv.machine.Machine()
+    machine.machine = "lava"
+    machine.hardcoded_machine_name = "lava"
+    machine.os = "Linux"
+    machine.arch = "x86_64"
+    machine.cpu = "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz"
+    machine.num_cpu = "32"
+    machine.ram = "128GiB"
+    machine.save(conf.results_dir)
+
+    # Benchmarks
+    benchmark_names = set()
+    benchmark_params = set()
+    for datum in benchmark_data:
+        benchmark_params.update(datum["average"].keys())
+        for key in datum["average"].keys():
+            benchmark_names.update(datum["average"][key].keys())
+
+    benchmarks = {
+        x: {
+            "name": x,
+            "params": list(),
+            "param_names": list(),
+            "type": "track" if "_pct" in x else "time",
+            "unit": (
+                "percent"
+                if "_pct" in x
+                else ("nanoseconds" if "ns_" in x else "seconds")
+            ),
+            "version": 1,
+        }
+        for x in benchmark_names
+    }
+    benchmark_set = asv.benchmarks.Benchmarks(conf, benchmarks.values())
+    benchmark_set.save()
+
+    # Fill in the data
+    for benchmark_datum in benchmark_data:
+        commit = benchmark_datum["metadata"]["lttng-ust_commit"]
+        asv_result = asv.results.Results(
+            {"machine": "lava"}, list(), commit, 0, "none", "lava", dict()
+        )
+        # Use the average stored average for the moment
+        for param in benchmark_datum["average"].keys():
+            for key, value in benchmark_datum["average"][param].items():
+                benchmark = benchmarks[key]
+                runner_result = asv.runner.BenchmarkResult(
+                    [value], [], [1], 0, "", None
+                )
+                asv_result.add_result(benchmark, runner_result, record_samples=False)
+
+        logging.info("Saving result(s) for commit {}".format(commit))
+        asv_result.save(conf.results_dir)
+
+    # Update
+    conf.project = "LTTng-UST"
+    publish = asv.commands.publish.Publish()
+    publish.run(conf, pull=False)
+
+    # Load index.html and download scripts and CSS so that only local ones are
+    # used. This allows the publish reports in Jenkins to work without adjusting
+    # the CSP for the site.
+    soup = None
+    with open(os.path.join(conf.html_dir, "index.html"), "r") as f:
+        soup = bs4.BeautifulSoup(f, "html.parser")
+
+    for script in soup("script"):
+        if "src" not in script.attrs.keys():
+            continue
+
+        url = urllib.parse.urlparse(script["src"])
+        if url.netloc == "":
+            continue
+
+        request = requests.get(script["src"])
+        with open(os.path.join(conf.html_dir, os.path.basename(url.path)), "wb") as f:
+            f.write(request.content)
+
+        # Update src element
+        script["src"] = os.path.basename(url.path)
+
+    for link in soup("link"):
+        if "href" not in link.attrs.keys():
+            continue
+
+        url = urllib.parse.urlparse(link["href"])
+        if url.netloc == "":
+            continue
+
+        request = requests.get(link["href"])
+        with open(os.path.join(conf.html_dir, os.path.basename(url.path)), "wb") as f:
+            f.write(request.content)
+
+        link["href"] = os.path.basename(url.path)
+
+    # Write out updated HTML
+    with open(os.path.join(conf.html_dir, "index.html"), "w") as f:
+        f.write(str(soup))
 
 
 def cmd_generate_jobs(args):
@@ -289,7 +457,54 @@ def _get_parser():
         help="A comma-separated list of branches in the format NAME[:CUTOFF] to check",
     )
 
+    commits_args = (
+        ["--commits"],
+        {
+            "default": "",
+            "help": "A comma-separated list of commits to generate jobs before. If `--regression` is picked, the first of the list is considered the 'current' commit for determining any other commits to be also be submitted",
+        },
+    )
+    regression_args = (
+        ["--regression"],
+        {
+            "action": "store_true",
+            "default": False,
+            "help": "Choose commits to test based on the current commit, previous, and last tag relative to the commit",
+        },
+    )
+    tags_only_args = (
+        ["--tags-only"],
+        {
+            "action": "store_true",
+            "default": False,
+            "help": "Limit generated jobs to tagged commits",
+        },
+    )
+
     subparsers = parser.add_subparsers()
+    gen_asv_parser = subparsers.add_parser(
+        "generate-asv", help="Generate output as an ASV static HTML folder"
+    )
+    gen_asv_parser.add_argument(
+        "-o",
+        "--output",
+        type=pathlib.Path,
+        default=pathlib.Path(os.getcwd()) / "output",
+        help="The output folder",
+    )
+    gen_asv_parser.add_argument(
+        "-i",
+        "--input-files",
+        type=pathlib.Path,
+        default=list(),
+        action="append",
+        help="Input benchmark JSON results files to use, instead of downloading from object storage",
+    )
+    gen_asv_parser.add_argument(*commits_args[0], **commits_args[1])
+    gen_asv_parser.add_argument(*regression_args[0], **regression_args[1])
+    gen_asv_parser.add_argument(*tags_only_args[0], **tags_only_args[1])
+    gen_asv_parser.set_defaults(func=cmd_generate_asv)
+
     gen_jobs_parser = subparsers.add_parser("generate-jobs", help="Generate jobs")
     gen_jobs_parser.add_argument(
         "--dry-run",
@@ -297,12 +512,9 @@ def _get_parser():
         default=False,
         help="Do all work except submitting the jobs to LAVA",
     )
-    gen_jobs_parser.add_argument(
-        "--tags-only",
-        action="store_true",
-        default=False,
-        help="Limit generated jobs to tagged commits",
-    )
+    gen_jobs_parser.add_argument(*commits_args[0], **commits_args[1])
+    gen_jobs_parser.add_argument(*regression_args[0], **regression_args[1])
+    gen_jobs_parser.add_argument(*tags_only_args[0], **tags_only_args[1])
     gen_jobs_parser.add_argument(
         "--batch-size",
         default=10,
@@ -323,17 +535,6 @@ def _get_parser():
         action="store_true",
         default=False,
         help="Do not wait for LAVA jobs to complete before returning",
-    )
-    gen_jobs_parser.add_argument(
-        "--regression",
-        action="store_true",
-        default=False,
-        help="Choose commits to test based on the current commit, previous, and last tag relative to the commit",
-    )
-    gen_jobs_parser.add_argument(
-        "--commits",
-        default="",
-        help="A comma-separated list of commits to generate jobs before. If `--regression` is picked, the first of the list is considered the 'current' commit for determining any other commits to be also be submitted",
     )
     gen_jobs_parser.set_defaults(func=cmd_generate_jobs)
 
@@ -360,5 +561,8 @@ if __name__ == "__main__":
             if len(split) == 2:
                 cutoff = split[1]
             args.branches[split[0]] = cutoff
+
+    if "func" not in args:
+        parser.error("No sub-command specified")
 
     sys.exit(args.func(args))

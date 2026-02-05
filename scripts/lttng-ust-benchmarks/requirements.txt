@@ -1,3 +1,5 @@
+asv
+bs4
 GitPython
 jinja2
 pyyaml
