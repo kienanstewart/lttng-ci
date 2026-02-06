@@ -20,6 +20,19 @@ pipeline {
   }
 
   stages {
+    stage('Build kernel') {
+      steps {
+        build(
+          job: 'system_tests_build_kernel_and_modules',
+          parameters: [
+            string(name: 'BUILD_DEVICE', value: 'baremetal'),
+            string(name: 'KERNEL_COMMIT_ID', value: "${params.KERNEL_COMMIT_ID}"),
+            string(name: 'LTTNG_MODULES_COMMIT_ID', value: '0be94330d9e0bd2f6fffa4c54ece0677a9a64b59'),
+          ]
+        )
+      }
+    }
+
     stage('Setup') {
       steps {
         cleanWs()
