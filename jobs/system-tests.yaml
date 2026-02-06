@@ -178,11 +178,6 @@
     sandbox: true
     dsl: !include-jinja2: pipelines/system-tests/pipeline.groovy.j2
 
-    properties:
-      - build-discarder:
-          num-to-keep: 10
-          artifact-num-to-keep: 2
-
     triggers:
       - timed: '@weekly'
 
