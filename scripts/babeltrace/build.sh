@@ -458,7 +458,7 @@ esac
 
 # BUILD!
 print_header "BUILD!"
-$BEAR ${BEAR:+--} $MAKE -j "$($NPROC)" V=1
+$BEAR ${BEAR:+--} $MAKE -j $((("$($NPROC)" + 1) / 2)) V=1
 
 # Install in the workspace if enabled
 if [ "$BABELTRACE_MAKE_INSTALL" = "yes" ]; then
