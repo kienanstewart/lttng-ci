@@ -152,7 +152,7 @@ def get_benchmark_state(commit):
     # Check if the benchmark failed
     resp = requests.head("{}/{}".format(S3_ANONYMOUS_URL, fail_path))
     if resp.status_code == 200:
-        return BenchmarkState.FAILED
+        return BenchmarkState.BUILD_FAILURE
 
     # Check if the results are there
     resp = requests.head("{}/{}".format(S3_ANONYMOUS_URL, result_path))
