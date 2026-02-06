@@ -879,16 +879,10 @@ def launch_jobs(
         if not dry_run:
             submitted_jobs += 1
             result = lava_submit.submit(
-                commits,
-                bt_repo,
-                ci_repo,
-                ci_branch,
-                nfs_root_url,
-                kernel_url,
-                template_file="bt_benchmark.yaml.j2",
+                "bt_benchmark.yaml.j2",
                 extra_context={
                     "kernel_url": kernel_url,
-                    "nfsrootfs_url": nfsrootfs,
+                    "nfsrootfs_url": nfs_root_url,
                     "commit_hashes": " ".join(commits),
                     "ci_repo": ci_repo,
                     "ci_branch": ci_branch,
