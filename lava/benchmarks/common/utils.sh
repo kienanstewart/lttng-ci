@@ -36,7 +36,7 @@ function upload_artifact()
     # the current context.
     (
         # shellcheck disable=SC1091
-        source ../../../secrets
+        source "/lava-${LAVA_JOB_ID}/secrets"
         echo "user = \"$S3_ACCESS_KEY:$S3_SECRET_KEY\""
     ) > "${CURL_RC}"
     if ! curl -v -s -f -T "$local_file" \
@@ -63,7 +63,7 @@ function delete_artifact()
     # the current context.
     (
         # shellcheck disable=SC1091
-        source ../../../secrets
+        source "/lava-${LAVA_JOB_ID}/secrets"
         echo "user = \"$S3_ACCESS_KEY:$S3_SECRET_KEY\""
     ) > "${CURL_RC}"
     if ! curl -v -s -f \
