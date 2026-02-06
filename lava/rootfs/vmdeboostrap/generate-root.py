@@ -190,7 +190,7 @@ def main():
 if __name__ == "__main__":
     if os.getuid() != 0:
         print(
-            "This script should be run as root: this is required by deboostrap",
+            "This script should be run as root: this is required by debootstrap",
             file=sys.stderr,
         )
         sys.exit(1)
