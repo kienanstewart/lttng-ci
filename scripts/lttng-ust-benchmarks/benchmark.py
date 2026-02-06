@@ -4,6 +4,7 @@
 #
 
 import argparse
+import collections
 import enum
 import json
 import logging
@@ -224,7 +225,7 @@ def launch_jobs(commits, batch_size=0, max_batches=0, wait=True, dry_run=False):
 def cmd_generate_asv(args):
     if not args.repo_path.is_dir():
         raise Exception(
-            "repo-path `{}` is not a directory".format(args.lttng_ust_repo_path),
+            "repo-path `{}` is not a directory".format(args.repo_path),
         )
 
     if args.output.exists():
@@ -380,7 +381,7 @@ def cmd_generate_jobs(args):
     """
     if not args.repo_path.is_dir():
         raise Exception(
-            "repo-path `{}` is not a directory".format(args.lttng_ust_repo_path),
+            "repo-path `{}` is not a directory".format(args.repo_path),
         )
 
     repo = git.Repo(args.repo_path)
@@ -417,6 +418,270 @@ def cmd_generate_jobs(args):
         return 1
 
     return 0
+
+
+def cmd_regression_check(args):
+    benchmark_data = list()
+    if len(args.input_files) == 0:
+        # Fetch from storage
+        repo = git.Repo(args.repo_path)
+        commits = get_commit_list(
+            repo,
+            args.branches,
+            current_commit=args.commits[0] if len(args.commits) > 0 else None,
+            other_commits=args.commits[1:],
+            regression=True,
+            tags_only=False,
+        )
+        for commit in commits:
+            if get_benchmark_state(commit) == BenchmarkState.COMPLETE:
+                benchmark_data.append(get_benchmark_results(commit))
+            else:
+                logging.warning("Results for commit '{}' not available".format(commit))
+    else:
+        for f in args.input_files:
+            if not f.exists():
+                raise Exception("Input file '{}' does not exist".format(f))
+
+            with open(f, "r") as fp:
+                benchmark_data.append(json.load(fp))
+
+    if len(benchmark_data) < 2:
+        raise Exception(
+            "Not enough data to compare, only {} results available".format(
+                len(benchmark_data)
+            )
+        )
+
+    benchmark_filter = args.benchmarks.split(",")
+    regressions = regression_check(
+        benchmark_data[0],
+        benchmark_data[1:],
+        args.significance_level,
+        args.failure_threshold,
+        (
+            None
+            if len(benchmark_filter) == 0 or "all" in benchmark_filter
+            else benchmark_filter
+        ),
+    )
+    return 1 if len(regressions) > 0 else 0
+
+
+def regression_check(
+    current_commit_data,
+    other_commit_data,
+    significance_level=0.05,
+    failure_threshold=0.01,
+    benchmark_filter=None,
+    print_results=True,
+):
+    import numpy
+    import scipy
+
+    if len(other_commit_data) < 1:
+        raise Exception("No other data to check current commit data against")
+
+    # A lot of massaging of the benchmark data is done here
+    regressions = list()
+    evaluation_data = {
+        "metadata": {
+            "current_commit": current_commit_data["metadata"]["lttng-ust_commit"],
+            "significance_level": significance_level,
+            "failure_threshold": failure_threshold,
+        },
+        "data": {
+            x: {"samples": y}
+            for x, y in get_benchmark_data_samples(
+                current_commit_data, benchmark_filter
+            ).items()
+        },
+        "comparison_to": dict(),
+    }
+    for benchmark in evaluation_data["data"].keys():
+        values = evaluation_data["data"][benchmark]["samples"]
+        evaluation_data["data"][benchmark] |= {
+            "cv": scipy.stats.variation(values),
+            "mean": numpy.mean(values),
+            "median": numpy.median(values),
+            "stddev": numpy.std(values),
+        }
+
+    for b in other_commit_data:
+        # commit_hash: { 'benchmarkX': { 'samples': [N0, N1, ...], 'U': U1, 'p-value': P, 'reject_null_hypothesis': False}
+        commit = b["metadata"]["lttng-ust_commit"]
+        evaluation_data["comparison_to"][commit] = dict()
+        for key, values in get_benchmark_data_samples(b, benchmark_filter).items():
+            U1 = None
+            p = None
+            reject_null = False
+            if key not in evaluation_data["data"]:
+                logger.warning(
+                    "Cannot compare '{}' from commit {} to current commit {}: no such data in current commit".format(
+                        key, commit, evaluation_data["current_commit"]
+                    )
+                )
+            else:
+                U1, p = scipy.stats.mannwhitneyu(
+                    evaluation_data["data"][key]["samples"], values
+                )
+                if p < significance_level:
+                    reject_null = True
+
+            comparison_result = {
+                "samples": values,
+                "U": U1,
+                "p-value": p,
+                "reject_null_hypothesis": reject_null,
+                "cv": scipy.stats.variation(values),
+                "mean": numpy.mean(values),
+                "median": numpy.median(values),
+                "stddev": numpy.std(values),
+                "has_regression": True,
+            }
+            delta_mean = (
+                evaluation_data["data"][key]["mean"] - comparison_result["mean"]
+            )
+            delta_mean_pct = delta_mean / comparison_result["mean"]
+
+            delta_median = (
+                evaluation_data["data"][key]["median"] - comparison_result["median"]
+            )
+            delta_median_pct = delta_median / comparison_result["median"]
+            comparison_result |= {
+                "delta_mean": delta_mean,
+                "delta_mean_pct": delta_mean_pct,
+                "delta_median": delta_median,
+                "delta_median_pct": delta_median_pct,
+            }
+
+            if reject_null and (
+                (delta_mean > 0.0 and delta_mean_pct > failure_threshold)
+                or (delta_median > 0.0 and delta_median_pct > failure_threshold)
+            ):
+                logging.debug(
+                    "delta_mean: {} ({}%), delta_median: {} ({}%)".format(
+                        delta_mean,
+                        delta_mean_pct * 100.0,
+                        delta_median,
+                        delta_median_pct * 100.0,
+                    )
+                )
+                logging.info(
+                    "Regression detect in commit {} relative to commit {} in benchmark {}".format(
+                        evaluation_data["metadata"]["current_commit"], commit, key
+                    )
+                )
+                comparison_result["has_regression"] = True
+                regressions.append("{}:{}".format(commit, key))
+
+            evaluation_data["comparison_to"][commit][key] = comparison_result
+
+    if print_results:
+        current_commit = evaluation_data["metadata"]["current_commit"]
+        other_commits = list(evaluation_data["comparison_to"].keys())
+        benchmarks = list(evaluation_data["data"].keys())
+        for benchmark in benchmarks:
+            print("Benchmark: {}".format(benchmark))
+            for commit in other_commits:
+                if benchmark not in evaluation_data["comparison_to"][commit]:
+                    logging.warning(
+                        "No comparison from current commit {} to commit {} with benchmark {}".format(
+                            current_commit, commit, benchmark
+                        )
+                    )
+                    continue
+
+                print(
+                    "[{} vs {}] U={}, p={}, reject_null_hypothesis={}".format(
+                        current_commit,
+                        commit,
+                        evaluation_data["comparison_to"][commit][benchmark]["U"],
+                        evaluation_data["comparison_to"][commit][benchmark]["p-value"],
+                        evaluation_data["comparison_to"][commit][benchmark][
+                            "reject_null_hypothesis"
+                        ],
+                    )
+                )
+                print(
+                    "Mean: {} vs {}, Δ={}, Δ%={}%".format(
+                        evaluation_data["data"][benchmark]["mean"],
+                        evaluation_data["comparison_to"][commit][benchmark]["mean"],
+                        evaluation_data["comparison_to"][commit][benchmark][
+                            "delta_mean"
+                        ],
+                        evaluation_data["comparison_to"][commit][benchmark][
+                            "delta_mean_pct"
+                        ]
+                        * 100.0,
+                    )
+                )
+                print(
+                    "Median: {} vs {}, Δ={}, Δ%={}%".format(
+                        evaluation_data["data"][benchmark]["median"],
+                        evaluation_data["comparison_to"][commit][benchmark]["median"],
+                        evaluation_data["comparison_to"][commit][benchmark][
+                            "delta_median"
+                        ],
+                        evaluation_data["comparison_to"][commit][benchmark][
+                            "delta_median_pct"
+                        ]
+                        * 100.0,
+                    )
+                )
+                print()
+            print()
+    return regressions
+
+
+def get_benchmark_data_samples(benchmark_data, benchmark_filter=None):
+    if len(benchmark_data["data"].keys()) != 1:
+        raise Exception(
+            "Cannot handle benchmark data with multiple parameters, commit={}".format(
+                benchmark_data["metadata"]["lttng-ust_commit"]
+            )
+        )
+
+    key = list(benchmark_data["data"].keys())[0]
+    samples = dict()
+    for entry in benchmark_data["data"][key]:
+        # '{'basic': {'baseline': {'run_time': N, ...}, ...}, }'
+        for benchmark_name, value in flatten_dict(entry).items():
+            if benchmark_filter and benchmark_name not in benchmark_filter:
+                continue
+
+            if ".args." in benchmark_name:
+                continue
+
+            if benchmark_name not in samples:
+                samples[benchmark_name] = list()
+
+            samples[benchmark_name].append(value)
+
+    return samples
+
+
+def flatten_dict_internal(prefix, data, dst):
+    if issubclass(data.__class__, str):
+        dst[prefix] = data
+    elif issubclass(data.__class__, collections.abc.Mapping):
+        for key in data.keys():
+            fullprefix = prefix + "." + key if len(prefix) > 0 else key
+            flatten_dict_internal(fullprefix, data[key], dst)
+    elif issubclass(data.__class__, collections.abc.Iterable):
+        i = 0
+        for value in data:
+            fullprefix = prefix + "." + str(i)
+            flatten_dict_internal(fullprefix, value, dst)
+            i += 1
+    elif data is not None:
+        dst[prefix] = data
+
+
+def flatten_dict(data):
+    dst = dict()
+    flatten_dict_internal("", data, dst)
+    return dst
 
 
 def _get_parser():
@@ -537,6 +802,39 @@ def _get_parser():
         help="Do not wait for LAVA jobs to complete before returning",
     )
     gen_jobs_parser.set_defaults(func=cmd_generate_jobs)
+
+    regression_parser = subparsers.add_parser(
+        "regression",
+        help="Check current commit for regressions against previous commits",
+    )
+    regression_parser.add_argument(*commits_args[0], **commits_args[1])
+    regression_parser.set_defaults(func=cmd_regression_check)
+    regression_parser.add_argument(
+        "-i",
+        "--input-files",
+        type=pathlib.Path,
+        default=list(),
+        action="append",
+        help="Input benchmark JSON results files to use, instead of downloading from object storage. The first file is considered the 'current commit' when checking for regressions. This argument may be specified multiple times.",
+    )
+    regression_parser.add_argument(
+        "--significance-level",
+        default=0.05,
+        type=float,
+        help="The significance level for rejecting the null hypothesis of the Mann-Whitney U test",
+    )
+    regression_parser.add_argument(
+        "--failure-threshold",
+        default=0.01,
+        type=float,
+        help="The minimum percent difference in benchmarks to signal when the null hypothesis is rejected",
+    )
+    regression_parser.add_argument(
+        "-b",
+        "--benchmarks",
+        default="all",
+        help="A comma-separated list of benchmarks to check. Use `all` to check each available benchmark. Example: `gen-tp.tracing_enabled.ns_per_event`",
+    )
 
     return parser
 
