@@ -55,7 +55,7 @@ def get_environment_context():
         ),
         "nfsrootfs_url": os.getenv(
             "NFS_ROOT_URL",
-            "{}/rootfs/rootfs_amd64_trixie_2025-09-25.tar.xz".format(S3_ANONYMOUS_URL),
+            "{}/rootfs/rootfs_amd64_trixie_2026-02-06.tar.xz".format(S3_ANONYMOUS_URL),
         ),
         "lttng_modules_repo": os.getenv(
             "LTTNG_MODULES_REPO", "https://github.com/lttng/lttng-modules.git"

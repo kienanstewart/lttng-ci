@@ -126,7 +126,7 @@
           default: 'master'
       - string:
           name: 'NFS_ROOT_URL'
-          default: 'https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2025-09-25.tar.xz'
+          default: 'https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2026-02-06.tar.xz'
       - string:
           name: 'S3_BASE_DIR'
           description: 'Base directory for the s3 object storage'

@@ -163,7 +163,7 @@ if __name__ == "__main__":
     context = {
         "commit_hashes": " ".join(args.commit),
         "kernel_url": args.kernel_url,
-        "nfsrootfs_url": "https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2025-09-25.tar.xz",
+        "nfsrootfs_url": "https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2026-02-06.tar.xz",
         "ci_repo": "https://github.com/lttng/lttng-ci.git",
         "ci_branch": "master",
         "bt_repo": "https://github.com/efficios/babeltrace.git",
