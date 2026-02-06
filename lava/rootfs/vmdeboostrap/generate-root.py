@@ -69,6 +69,8 @@ packages = [
     "python3-numpy",
     "python3-pandas",
     "python3-pip",
+    "python3-pytest",
+    "python3-pytest-xdist",
     "python3-setuptools",
     "python3-sphinx",
     "python3-venv",
