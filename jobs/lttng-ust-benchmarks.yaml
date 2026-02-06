@@ -51,7 +51,7 @@
     triggers:
       - timed: '@daily'
 
-    parameters:
+    parameters: &lttng-ust-benchmarks-parameters
       - string:
           name: 'BABELTRACE_REPO'
           default: "https://github.com/efficios/babeltrace.git"
@@ -151,6 +151,22 @@
 
 ## Templates
 - job-template:
+    # The goal of this job is to run the benchmarks for the most recent
+    # commit and compare to COMMIT~1 and the last tag (if any). The
+    # job should warn or fail if there's a regression in any of the
+    # benchmarks.
+    name: 'lttng-ust_{version}_benchmark_regression'
+    defaults: lttng-ust-benchmarks
+    project-type: pipeline
+    sandbox: true
+    dsl: !include-jinja2: pipelines/lttng-ust/benchmark_regression.groovy.j2
+    triggers:
+      - pollscm:
+          cron: "@hourly"
+
+    parameters: *lttng-ust-benchmarks-parameters
+
+- job-template:
     name: lttng-ust-benchmarks_{version}_{buildtype}
     defaults: lttng-ust-benchmarks
 
@@ -242,4 +258,9 @@
       - 'lttng-ust-benchmarks_{version}_{buildtype}':
           buildtype: linuxbuild
           babeltrace_version: stable-2.1
-
+      - 'lttng-ust_{version}_benchmark_regression':
+          version:
+            - stable-2.13
+            - stable-2.14
+            - stable-2.15
+            - master
