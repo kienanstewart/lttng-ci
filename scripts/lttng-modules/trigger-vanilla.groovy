@@ -27,11 +27,11 @@ def ondiskpath = build.getEnvironment(listener).get('WORKSPACE') + "/ondisk-refs
 
 def trigger_jobs = [
   'lttng-modules_master_build-vanilla',
+  'lttng-modules_stable-2.14_build-vanilla',
   'lttng-modules_stable-2.13_build-vanilla',
-  'lttng-modules_stable-2.12_build-vanilla',
   'lttng-modules_master_crossbuild-vanilla',
+  'lttng-modules_stable-2.14_crossbuild-vanilla',
   'lttng-modules_stable-2.13_crossbuild-vanilla',
-  'lttng-modules_stable-2.12_crossbuild-vanilla',
 ]
 
 def previous_tags = []
@@ -80,7 +80,7 @@ current_tags.removeAll(previous_tags)
 
 // If there are new tags, trigger the builds
 if (current_tags.size() > 0) {
-  println("Found " + current_tags.size() + "new tags:")
+  println("Found " + current_tags.size() + " new tags:")
   for (tag in current_tags) {
     println(" - ${tag}")
   }
