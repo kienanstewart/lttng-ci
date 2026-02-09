@@ -85,7 +85,6 @@ ARGS=(
   --batch-size \$BENCHMARK_BATCH_SIZE
   --max-batches \$BENCHMARK_MAX_BATCHES
   --regression
-  --benchmarks \$BENCHMARK_FILTER
 )
 
 if [[ \$BENCHMARK_FORCE == "true" ]]; then
@@ -113,7 +112,8 @@ python3 ./scripts/lttng-ust-benchmarks/benchmark.py "\${ARGS[@]}"
 source venv/bin/activate
 python3 scripts/lttng-ust-benchmarks/benchmark.py \
   --repo-path=\$WORKSPACE/src/lttng-ust \
-  regression
+  regression \
+  --benchmarks \$BENCHMARK_FILTER
 """,
           )
         }
