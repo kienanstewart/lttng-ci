@@ -161,16 +161,26 @@
            - scripts/common/print.sh
            - scripts/babeltrace/build.sh
 
+- _anchors:
+    - tap: &babeltrace_publisher_tap_defaults
+        results: 'tap/**/*.log'
+        fail-if-no-results: true
+        failed-tests-mark-build-as-failure: true
+        include-comment-diagnostics: true
+        output-tap-to-console: false
+        todo-is-failure: false
+    - junit: &babeltrace_publisher_junit_defaults
+        results: 'results.xml'
+
 - job-template: &babeltrace_publishers_defaults
     name: 'babeltrace_publishers_defaults'
     publishers:
-      - tap: &babeltrace_publisher_tap_defaults
-          results: 'tap/**/*.log'
-          fail-if-no-results: true
-          failed-tests-mark-build-as-failure: true
-          include-comment-diagnostics: true
-          output-tap-to-console: false
-          todo-is-failure: false
+      - !j2-yaml: |
+        {% if test_report_type == "tap" %}
+        tap: *babeltrace_publisher_tap_defaults
+        {% else %}
+        junit: *babeltrace_publisher_junit_defaults
+        {% endif %}
       - raw: &babeltrace_publisher_warnings-ng_defaults
           xml: |
             <io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng">
@@ -248,7 +258,12 @@
 - job-template: &babeltrace_publishers_review
     name: 'babeltrace_publishers_review'
     publishers:
-      - tap: *babeltrace_publisher_tap_defaults
+      - !j2-yaml: |
+        {% if test_report_type == "tap" %}
+        tap: *babeltrace_publisher_tap_defaults
+        {% else %}
+        junit: *babeltrace_publisher_junit_defaults
+        {% endif %}
       # Fail job on any compiler warnings
       - raw:
           xml: |
