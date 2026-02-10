@@ -4,6 +4,7 @@ binutils_gdb_packages:
   - dejagnu
   - elfutils
   - fpc
+  - libgnat-14-dbgsym
   - gfortran
   - gnat
   - guile-2.2-dev

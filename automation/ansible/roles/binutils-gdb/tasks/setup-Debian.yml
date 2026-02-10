@@ -1,4 +1,10 @@
 ---
+
+- name: Enable debug archive
+  ansible.builtin.apt_repository:
+    filename: main_debug
+    repo: "deb https://deb.debian.org/debian-debug/ {{ansible_distribution_release}}-debug main"
+
 - name: Update apt cache.
   apt: update_cache=yes cache_valid_time=86400
 
