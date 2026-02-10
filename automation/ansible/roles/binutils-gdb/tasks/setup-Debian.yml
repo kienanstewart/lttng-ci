@@ -6,7 +6,10 @@
     repo: "deb https://deb.debian.org/debian-debug/ {{ansible_distribution_release}}-debug main"
 
 - name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 86400
 
 - name: Ensure binutils_gdb build dependencies are installed.
-  apt: "name={{ binutils_gdb_packages }} state=present"
+  ansible.builtin.apt:
+    name: "{{binutils_gdb_packages}}"
