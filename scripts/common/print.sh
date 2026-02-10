@@ -141,6 +141,13 @@ print_tooling() {
     if command -v "${PYTHON3:-python3}" >/dev/null 2>&1; then
         print_blue "python3 version"
         ${PYTHON3:-python3} --version
+
+        local pytest_version
+
+        if pytest_version=$(${PYTHON3:-python3} -m pytest --version --version 2>&1); then
+            print_blue "pytest version"
+            echo "$pytest_version"
+        fi
     fi
 
     print_blue "java version"
