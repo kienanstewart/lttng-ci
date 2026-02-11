@@ -41,9 +41,12 @@ for (job in matchedJobs) {
       Change change = build.getCause(GerritCause.class).getEvent().getChange()
 
       if (changes.contains(change)) {
-        println("  Is not the latest for change " + change.getId() + ", delete it.");
-        build.delete()
-        continue
+        println("  Is not the latest for change " + change.getId());
+        if (build.result == "SUCCESS") {
+          println("    Result is 'SUCCESS', deleting it");
+          build.delete()
+          continue
+        }
       } else {
         changes.add(change)
       }
