@@ -136,7 +136,6 @@ def graph_get_color(branch):
     Get the color matching the branch.
     """
     color = {
-        "stable-1.5": "#ff0041",
         "stable-2.0": "#00ffbe",
         "stable-2.1": "#c1ff00",
         "master": "#3f00ff",
@@ -920,7 +919,6 @@ def main():
         "master": "31976fe2d70a8b6b7f8b31b9e0b3bc004d415575",
         "stable-2.1": "e990b9f886667efe0a81f2011269c1bfc3694ac3",
         "stable-2.0": "07f585356018b4ddfbd0e09c49a14e38977c6973",
-        "stable-1.5": "49e98b837a5667130e0d1e062a6bd7985c7c4582",
     }
 
     parser = argparse.ArgumentParser(description="Babeltrace benchmark utility")
