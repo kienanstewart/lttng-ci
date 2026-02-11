@@ -241,9 +241,6 @@ freebsd*)
     export LDFLAGS="-L/usr/local/lib"
     export PYTHON="${PYTHON:-python3}"
     export PYTHON_CONFIG="${PYTHON:-python3}-config"
-
-    # For bt 1.5
-    export YACC="bison -y"
     ;;
 
 *)
@@ -339,12 +336,6 @@ static)
             CONF_OPTS+=("--disable-shared")
         fi
     fi
-    ;;
-
-python-bindings)
-    # For Babeltrace 1.5 only
-    print_header "Conf: Python bindings"
-    CONF_OPTS+=("--enable-python-bindings")
     ;;
 
 prod)
