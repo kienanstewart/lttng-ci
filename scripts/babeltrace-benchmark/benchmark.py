@@ -887,7 +887,7 @@ def launch_jobs(
                     "ci_repo": ci_repo,
                     "ci_branch": ci_branch,
                     "bt_repo": bt_repo,
-                    "job_timeout_hours": max(3, math.ceil(len(commits) * 1.5)),
+                    "job_timeout_hours": max(6, math.ceil(len(commits) * 2)),
                     "trace_default_location": TRACE_DEFAULT_LOCATION,
                     "trace_tools_2_10_location": TRACE_TOOLS_2_10_LOCATION,
                     "trace_tools_2_14_location": TRACE_TOOLS_2_14_LOCATION,
