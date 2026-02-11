@@ -96,7 +96,7 @@ def submit(
     # Context for the lava job template
     context = get_default_context()
     # Merge, prioritising user-supplied context fields.
-    context = extra_context | context
+    context = context | extra_context
 
     # Render the lava job template
     jinja_loader = jinja2.FileSystemLoader(
