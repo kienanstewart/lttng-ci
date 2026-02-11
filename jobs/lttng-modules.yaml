@@ -690,6 +690,13 @@
           <<: *lttng-modules_build_parameter_gerrit_name
       - string:
           <<: *lttng-modules_build_parameter_gerrit_project
+    properties:
+      - build-discarder:
+          days-to-keep: 1
+      - throttle:
+          option: 'category'
+          categories:
+            - 'gerrit-build'
 
 - job-template:
     name: lttng-modules_{mversion}_fullbuild-{uversion}
