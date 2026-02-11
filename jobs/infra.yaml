@@ -26,7 +26,7 @@
           sandbox: true
 
     triggers:
-      - timed: "H * * * *"
+      - timed: "H */2 * * *"
 
 - view:
     name: 'Infra'
