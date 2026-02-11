@@ -1,0 +1,34 @@
+---
+
+- defaults:
+    name: infra
+    concurrent: false
+    description: |
+      Job is managed by Jenkins Job Builder
+    project-type: pipeline
+    sandbox: true
+    properties:
+      - build-discarder:
+          num-to-keep: 10
+    wrappers:
+      - workspace-cleanup
+      - timestamps
+      - ansicolor
+
+- job:
+    name: 'infra_system_clean'
+    defaults: infra
+    project-type: freestyle
+    node: 'master'
+    builders:
+      - system-groovy:
+          command: !include-raw-verbatim: pipelines/infra/system_clean.groovy
+          sandbox: true
+
+    triggers:
+      - timed: "H * * * *"
+
+- view:
+    name: 'Infra'
+    view-type: list
+    regex: '(infra|meta)[-_].*'
