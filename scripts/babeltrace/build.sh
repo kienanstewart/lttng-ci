@@ -554,7 +554,10 @@ if [ "$BABELTRACE_RUN_TESTS" = "yes" ]; then
 
             # The in-tree pytest doesn't include pytest-xdist
             if [[ $WITH_VENDOR_PYTEST != 1 ]]; then
-                pytest_opts+=(-n auto)
+                # `-n auto` may invoke psutil.cpu_count(logical=False) when that module is present
+                # which doesn't always return the expected value. E.g., on a sles15sp5 container it
+                # will return 84 and lead to OOMs as too many workers are spawned.
+                pytest_opts+=(-n logical)
             fi
 
             # Run all tests
