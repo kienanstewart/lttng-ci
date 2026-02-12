@@ -539,8 +539,12 @@ if [ "$BABELTRACE_RUN_TESTS" = "yes" ]; then
 
             # Build pytest options
             pytest_opts=(
-                -vv -rA --capture=tee-sys --tb=long --log-cli-level=INFO
-                --junit-xml="${WORKSPACE}/results.xml" -o junit_logging=all -o junit_family=xunit2
+                -vv -rA --capture=tee-sys --tb=long --color=no
+                --log-cli-level=INFO -o log_level=INFO
+                --junit-xml="${WORKSPACE}/results.xml"
+                -o junit_logging=all
+                -o junit_log_passing_tests=true
+                -o junit_family=xunit2
             )
 
             # The in-tree pytest doesn't include pytest-xdist
