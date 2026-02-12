@@ -28,6 +28,16 @@
     triggers:
       - timed: "H */2 * * *"
 
+    parameters:
+      - string:
+          name: 'HOURS_TO_KEEP_SUCCESSFUL_BUILDS'
+          default: '24'
+          description: 'The number of hours to keep successful builds. A value less than 0 will not delete successful builds.'
+      - string:
+          name: 'JOB_PATTERN'
+          default: 'dev_review_.*'
+          description: 'The pattern to use to find jobs that should be cleaned'
+
 - view:
     name: 'Infra'
     view-type: list

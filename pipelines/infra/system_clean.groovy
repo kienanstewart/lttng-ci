@@ -12,15 +12,23 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change;
 //
 // We then clean it by removing the useless array action.buildsByBranchName
 //
+def cleaned_build = 0;
+def cleaned_run = 0;
+def hoursToKeepSuccessfulBuilds = build.getEnvironment(listener).get('HOURS_TO_KEEP_SUCCESSFUL_BUILDS');
+def jobPattern = build.getEnvironment(listener).get('JOB_PATTERN');
 
-def jobPattern = "dev_review_.*"
+if (hoursToKeepSuccessfulBuilds != null && hoursToKeepSuccessfulBuilds.isInteger()) {
+  hoursToKeepSuccessfulBuilds = hoursToKeepSuccessfulBuilds as Integer;
+} else {
+  hoursToKeepSuccessfulBuilds = -1;
+}
 
+println("Hours to keep successful builds: ${hoursToKeepSuccessfulBuilds}");
+println("Job pattern: ${jobPattern}");
 def matchedJobs = Jenkins.instance.items.findAll { job ->
     job.name =~ /$jobPattern/
 }
 
-def cleaned_build = 0;
-def cleaned_run = 0;
 for (job in matchedJobs) {
   println("job: " + job.name);
 
@@ -54,21 +62,26 @@ for (job in matchedJobs) {
       }
     }
 
-    def hourstokeep = 2
     def cutoff = Calendar.instance
-    cutoff.add(Calendar.HOUR_OF_DAY, -hourstokeep)
+    cutoff.add(Calendar.HOUR_OF_DAY, -hoursToKeepSuccessfulBuilds)
 
     // Delete successful builds
-    //if (build.result.toString() == 'SUCCESS') {
-    //  if (build.getTimestamp().before(cutoff)) {
-    //    println("  Is " + build.result.toString() + " and older than " + hourstokeep + " hours, DELETE it.");
-    //    build.delete()
-    //  } else {
-    //    println("  Is " + build.result.toString() + " but newer than " + hourstokeep + " hours.");
-    //  }
-    //  continue
-    //}
-
+    if (build.result.toString() == 'SUCCESS' && hoursToKeepSuccessfulBuilds >= 0) {
+      if (build.getDuration() > Integer.MAX_VALUE) {
+        println("  Has a duration > Integer.MAX_VALUE, will not attempt to remove based on age");
+      }
+      else {
+        def endTimestamp = build.getTimestamp();
+        endTimestamp.add(Calendar.MILLISECOND, build.getDuration() as Integer);
+        if (endTimestamp.before(cutoff)) {
+          println("  Is " + build.result.toString() + " and older than " + hoursToKeepSuccessfulBuilds + " hours, DELETE it.");
+          build.delete()
+          continue
+        } else {
+          println("  Is " + build.result.toString() + " but newer than " + hoursToKeepSuccessfulBuilds + " hours.");
+        }
+      }
+    }
 
     // It is possible for a build to have multiple BuildData actions
     // since we can use the Mulitple SCM plugin.
