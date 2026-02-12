@@ -285,17 +285,13 @@ export BABELTRACE_MINIMAL_LOG_LEVEL=TRACE
 # configuration.
 CONF_OPTS=("--prefix=$PREFIX" "--libdir=$PREFIX/$LIBDIR_ARCH" "--disable-maintainer-mode")
 
-# With Babeltrace 2.2+, `--enable-python-bindings` is the default
+# With Babeltrace 2.2+, `--enable-python-bindings` and
+# `--enable-python-plugins` are the default.
 PY_BINDINGS_OPT=
-
-if verlt "$PACKAGE_VERSION" "2.2"; then
-    PY_BINDINGS_OPT=--enable-python-bindings
-fi
-
-# With Babeltrace 2.2+, `--enable-python-plugins` is the default
 PY_PLUGINS_OPT=
 
 if verlt "$PACKAGE_VERSION" "2.2"; then
+    PY_BINDINGS_OPT=--enable-python-bindings
     PY_PLUGINS_OPT=--enable-python-plugins
 fi
 
