@@ -1,1 +1,1 @@
-days-to-keep: 1
+days-to-keep: 3
