@@ -19,6 +19,8 @@ def matchedJobs = Jenkins.instance.items.findAll { job ->
     job.name =~ /$jobPattern/
 }
 
+def cleaned_build = 0;
+def cleaned_run = 0;
 for (job in matchedJobs) {
   println("job: " + job.name);
 
@@ -70,6 +72,7 @@ for (job in matchedJobs) {
 
     // It is possible for a build to have multiple BuildData actions
     // since we can use the Mulitple SCM plugin.
+    def buildModified = false;
     def gitActions = build.getActions(hudson.plugins.git.util.BuildData.class)
     if (gitActions != null) {
       for (action in gitActions) {
@@ -86,14 +89,20 @@ for (job in matchedJobs) {
         }
         build.actions.remove(action);
         build.actions.add(action);
-        build.save();
+        build_modified = true;
       }
+    }
+
+    if (buildModified) {
+      build.save();
+      cleaned_build += 1;
     }
 
     if (job instanceof MatrixProject) {
       for (run in build.getRuns()) {
         println("    run: " + run);
 
+        runModified = false;
         gitActions = run.getActions(hudson.plugins.git.util.BuildData.class)
         if (gitActions != null) {
           for (action in gitActions) {
@@ -110,10 +119,17 @@ for (job in matchedJobs) {
             }
             run.actions.remove(action);
             run.actions.add(action);
-            run.save();
+            runModified = true;
           }
+        }
+
+        if (runModified) {
+          run.save();
+          cleaned_run += 1;
         }
       }
     }
   }
 }
+
+println("Cleaned git action buildsByBranchName for ${cleaned_build} builds, ${cleaned_run} runs");
