@@ -73,6 +73,10 @@ for (job in matchedJobs) {
     def gitActions = build.getActions(hudson.plugins.git.util.BuildData.class)
     if (gitActions != null) {
       for (action in gitActions) {
+        if (action.buildsByBranchName.size() < 2) {
+          continue;
+        }
+
         action.buildsByBranchName = new HashMap<String, Build>();
         hudson.plugins.git.Revision r = action.getLastBuiltRevision();
         if (r != null) {
@@ -93,6 +97,10 @@ for (job in matchedJobs) {
         gitActions = run.getActions(hudson.plugins.git.util.BuildData.class)
         if (gitActions != null) {
           for (action in gitActions) {
+            if (action.buildsByBranchName.size() < 2) {
+              continue;
+            }
+
             action.buildsByBranchName = new HashMap<String, Build>();
             hudson.plugins.git.Revision r = action.getLastBuiltRevision();
             if (r != null) {
