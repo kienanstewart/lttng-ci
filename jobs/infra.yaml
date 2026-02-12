@@ -22,7 +22,7 @@
     node: 'master'
     builders:
       - system-groovy:
-          command: !include-raw-verbatim: pipelines/infra/system_clean.groovy
+          command: !include-raw-verbatim: scripts/infra/system_clean.groovy
           sandbox: true
 
     triggers:
