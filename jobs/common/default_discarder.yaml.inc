@@ -1,2 +1,2 @@
-num-to-keep: 20
+num-to-keep: 10
 artifact-num-to-keep: 2
