@@ -23,7 +23,7 @@
         naming_rule: 'liburcu'
       - group_regex: 'dev_review_lttng-modules_.*'
         naming_rule: 'LTTng-Modules'
-      - group_regex: 'dev_review_lttng-(docs|tools)_.*'
+      - group_regex: 'dev_review_lttng-(ivc|docs|tools)[-_].*'
         naming_rule: 'LTTng-Tools'
       - group_regex: 'dev_review_lttng-ust[-_].*'
         naming_rule: 'LTTng-UST'
