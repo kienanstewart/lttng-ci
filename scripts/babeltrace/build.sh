@@ -293,6 +293,10 @@ PY_PLUGINS_OPT=
 if verlt "$PACKAGE_VERSION" "2.2"; then
     PY_BINDINGS_OPT=--enable-python-bindings
     PY_PLUGINS_OPT=--enable-python-plugins
+
+    # Always use the in-tree Catch2 v3 and {fmt} libraries because
+    # they're not easily available on all systems.
+    CONF_OPTS+=(--enable-vendor-catch2 --enable-vendor-fmt)
 fi
 
 # -Werror is enabled by default in stable-2.0 but won't be in 2.1
