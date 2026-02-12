@@ -86,9 +86,8 @@
             {% for item in job_properties %}
             {{item.name}}={{item.value}}
             {% endfor %}
-      - build-discarder: &lttng-tools_property_build-discarder_defaults
-          num-to-keep: 20
-          artifact-num-to-keep: 2
+      - build-discarder:
+          !include: common/default_discarder.yaml.inc
       - github: &lttng-tools_property_github_defaults
           url: https://github.com/{github_user}/lttng-tools
 
@@ -945,7 +944,7 @@
     properties: &lttng-tools_properties_review_defaults
       - inject: *lttng-tools_property_inject_defaults
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
       - throttle:
           option: 'category'
           categories:
@@ -1015,7 +1014,7 @@
             LTTNG_TOOLS_GEN_COMPILE_COMMANDS=yes
             LTTNG_TOOLS_CLANG_TIDY=yes
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
 
     <<: *lttng-tools_matrix_axes_defaults
     <<: *lttng-tools_builders_review
@@ -1074,7 +1073,7 @@
     properties:
       - inject: *lttng-tools_property_inject_defaults
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
       - throttle:
           option: 'category'
           categories:
@@ -1120,7 +1119,7 @@
     properties:
       - inject: *lttng-tools_property_inject_defaults
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
       - throttle:
           option: 'category'
           categories:
@@ -1180,7 +1179,7 @@
     properties:
       - inject: *lttng-tools_property_inject_defaults
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
 
     publishers:
       - archive:

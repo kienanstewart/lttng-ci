@@ -26,8 +26,7 @@
           properties-content: |
             PROJECT_NAME=lttng-ust-benchmarks
       - build-discarder:
-          num-to-keep: 10
-          artifact-num-to-keep: 2
+          !include: common/default_discarder.yaml.inc
       - github:
           url: https://github.com/{github_user}/{github_name}
 

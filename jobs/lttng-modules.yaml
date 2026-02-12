@@ -34,8 +34,7 @@
 
     properties:
       - build-discarder:
-          num-to-keep: 10
-          artifact-num-to-keep: 2
+          !include: common/default_discarder.yaml.inc
       - github:
           url: https://github.com/{github_user}/{github_name}
 
@@ -453,7 +452,7 @@
 
     properties:
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
       - throttle:
           option: 'category'
           categories:
@@ -502,7 +501,7 @@
 
     properties:
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
       - throttle:
           option: 'category'
           categories:
@@ -548,7 +547,7 @@
 
     properties:
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
       - throttle:
           option: 'category'
           categories:
@@ -692,7 +691,7 @@
           <<: *lttng-modules_build_parameter_gerrit_project
     properties:
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
       - throttle:
           option: 'category'
           categories:

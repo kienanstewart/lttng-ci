@@ -107,7 +107,7 @@
     name: 'images_properties_defaults'
     properties:
       - build-discarder:
-          num-to-keep: 20
+          !include: common/default_discarder.yaml.inc
       - throttle:
           option: project
           max-total: 4

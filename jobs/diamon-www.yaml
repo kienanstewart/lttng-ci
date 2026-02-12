@@ -7,7 +7,7 @@
     sandbox: true
     properties:
       - build-discarder:
-          num-to-keep: 5
+          !include: common/default_discarder.yaml.inc
     scm:
       - git:
           url: https://git.internal.efficios.com/efficios/diamon-www.git
@@ -43,7 +43,7 @@
     target_env: 'dev'
     properties:
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
     scm:
       - git:
           url: ssh://jenkins@review.lttng.org:29418/diamon-www.git

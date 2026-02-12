@@ -29,7 +29,7 @@
           properties-content: |
             PROJECT_NAME=gdb
       - build-discarder:
-          num-to-keep: 10
+          !include: common/default_discarder.yaml.inc
     publishers:
       - workspace-cleanup
     # Job variables

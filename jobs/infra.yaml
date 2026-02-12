@@ -9,7 +9,7 @@
     sandbox: true
     properties:
       - build-discarder:
-          num-to-keep: 10
+          !include: common/default_discarder.yaml.inc
     wrappers:
       - workspace-cleanup
       - timestamps

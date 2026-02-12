@@ -34,8 +34,7 @@
 
     properties:
       - build-discarder:
-          num-to-keep: 10
-          artifact-num-to-keep: 2
+          !include: common/default_discarder.yaml.inc
       - github:
           url: https://github.com/{github_user}/{github_name}
 
@@ -72,6 +71,11 @@
       - string:
           name: 'GERRIT_PROJECT'
           default: 'lttng-ivc'
+    properties:
+      - build-discarder:
+          !include: common/review_discarder.yaml.inc
+      - github:
+          url: https://github.com/{github_user}/{github_name}
     scm:
       - git: &lttng-tools_scm_git_review
           url: https://review.lttng.org/lttng-ivc

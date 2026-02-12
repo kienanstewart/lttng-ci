@@ -14,7 +14,7 @@
 
     properties:
       - build-discarder:
-          num-to-keep: 5
+          !include: common/default_discarder.yaml.inc
     scm:
       - git:
           url: git@git.efficios.com:efficios-www.git
@@ -46,7 +46,7 @@
 
     properties:
       - build-discarder:
-          days-to-keep: 1
+          !include: common/review_discarder.yaml.inc
       - throttle:
           option: 'category'
           categories:

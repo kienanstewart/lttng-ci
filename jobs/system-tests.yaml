@@ -145,8 +145,7 @@
 
     properties:
       - build-discarder:
-          num-to-keep: 10
-          artifact-num-to-keep: 2
+          !include: common/default_discarder.yaml.inc
 
     wrappers:
       - workspace-cleanup
