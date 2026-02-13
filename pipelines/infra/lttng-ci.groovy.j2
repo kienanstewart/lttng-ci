@@ -1,0 +1,171 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+
+pipeline {
+  agent {
+    label 'deb13-amd64'
+  }
+
+  environment {
+    PROJECT_NAME = 'lttng-ci'
+  }
+
+  options {
+    ansiColor('xterm')
+    skipDefaultCheckout()
+    preserveStashes()
+    timestamps()
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        cleanWs()
+        dir('src/lttng-ci') {
+          checkout([$class: 'GitSCM', branches: [[name: "${params.GIT_BRANCH}"]], userRemoteConfigs: [[url: "${params.GIT_URL}"]]])
+        }
+      }
+    }
+
+    stage('Fetch gerrit') {
+      when {
+        expression {
+          env.GERRIT_PROJECT == "lttng-ci"
+        }
+      }
+
+      steps {
+        dir('src/lttng-ci') {
+          sh(
+            label: 'fetch gerrit changeset',
+            script: '''#!/usr/bin/bash -x
+git fetch "https://${GERRIT_HOST}/${GERRIT_PROJECT}" "${GERRIT_PATCHSET_REVISION}"
+git checkout FETCH_HEAD
+''',
+          )
+        }
+      }
+    }
+
+    stage('Install python requirements') {
+      steps {
+        dir('src/lttng-ci') {
+          sh(
+            label: 'poetry',
+            script: '''#!/usr/bin/bash -x
+python3 -m virtualenv ../venv/
+source ../venv/bin/activate
+pip3 install poetry
+poetry install
+''',
+          )
+        }
+      }
+    }
+
+    stage('Shellcheck') {
+      steps {
+        dir('src/lttng-ci') {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh(
+              label: 'shellcheck',
+              script: '''#!/usr/bin/bash -x
+ret=0
+while read -r line ; do
+  if ! shellcheck "$line" ; then
+    ret=1
+  fi
+done < <(find . -iname '*.sh')
+exit $ret
+''',
+            )
+          }
+        }
+      }
+    }
+
+    stage('Job YAML lint') {
+      steps {
+        dir('src/lttng-ci') {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh(
+              label: 'YAML lint',
+              script: '''#!/usr/bin/bash -x
+ret=0
+source ../venv/bin/activate
+while read -r line ; do
+  if ! poetry run yamllint $line ; then
+    ret=1
+  fi
+done < <(find . -iregex '.*\\.y[a]?ml' -o -iregex '.*\\.y[a]?ml\\.inc')
+exit $ret
+''',
+            )
+          }
+        }
+      }
+    }
+
+    stage('Job rendering test') {
+      steps {
+        dir('src/lttng-ci') {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh(
+              label: 'JJB test',
+              script: '''#!/usr/bin/bash -x
+mkdir -p ../output
+source ../venv/bin/activate
+poetry env activate
+PYTHONPATH=. jenkins-jobs --conf etc/jenkins_jobs.ini-sample test jobs/ -o ../output
+''',
+            )
+          }
+        }
+      }
+    }
+
+    stage('Ansible lint') {
+      steps {
+        dir('src/lttng-ci') {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh(
+              label: 'Ansible lint',
+              script: '''#!/usr/bin/bash -x
+source ../venv/bin/activate
+poetry run ansible-lint automation/ansible
+''',
+            )
+          }
+        }
+      }
+    }
+
+    stage('Python lint') {
+      steps {
+        dir('src/lttng-ci') {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh(
+              label: 'black',
+              script: '''#!/usr/bin/bash -x
+source ../venv/bin/activate
+poetry run black --check --diff .
+''',
+            )
+          }
+
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh(
+              label: 'isort',
+              script: '''#!/usr/bin/bash -x
+source ../venv/bin/activate
+poetry run python3 -m isort --check --diff .
+''',
+            )
+          }
+        }
+      }
+    }
+
+  }
+}

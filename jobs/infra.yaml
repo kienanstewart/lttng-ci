@@ -15,6 +15,63 @@
       - timestamps
       - ansicolor
 
+- job-template:
+    name: '{prefix}infra_lttng-ci_{version}'
+    defaults: infra
+    concurrent: true
+    dsl: !include-jinja2: pipelines/infra/lttng-ci.groovy.j2
+    parameters: !j2-yaml: |
+      - string:
+          name: 'GIT_URL'
+          default: 'https://github.com/lttng/lttng-ci'
+      - string:
+          name: 'GIT_BRANCH'
+          default: '{version}'
+      {% if review %}
+      {% include 'common/review_parameters.yaml.inc' %}
+      {% endif %}
+
+    scm:
+      - git:
+          url: 'https://github.com/lttng/lttng-ci.git'
+          branches:
+            - origin/{version}
+          basedir: src/lttng-ci
+          skip-tag: true
+    properties:
+      !j2-yaml: |
+            {% if review %}
+            - build-discarder:
+                !include: common/review_discarder.yaml.inc
+            {% else %}
+            - build-discarder:
+                !include: common/default_discarder.yaml.inc
+            {% endif %}
+    triggers:
+      - !j2-yaml: |
+        {% if review %}
+        gerrit:
+          trigger-on:
+            - comment-added-event:
+                approval-category: 'CI-Build'
+                approval-value: 1
+          projects:
+            - project-compare-type: 'PLAIN'
+              project-pattern: 'lttng-ci'
+              branches:
+                - branch-compare-type: 'ANT'
+                  branch-pattern: '{version}'
+        {% else %}
+        pollscm:
+          cron: '@hourly'
+        {% endif %}
+
+    # job variables
+    version:
+      - master
+    prefix: ''
+    review: false
+
 - job:
     name: 'infra_system_clean'
     defaults: infra
@@ -37,6 +94,14 @@
           name: 'JOB_PATTERN'
           default: 'dev_review_.*'
           description: 'The pattern to use to find jobs that should be cleaned'
+
+- project:
+    name: infra
+    jobs:
+      - '{prefix}infra_lttng-ci_{version}': {}
+      - '{prefix}infra_lttng-ci_{version}':
+          prefix: 'dev_review_'
+          review: true
 
 - view:
     name: 'Infra'

@@ -17,6 +17,8 @@
         naming_rule: 'Binutils'
       - group_regex: 'dev_review_glibc.*'
         naming_rule: 'glibc'
+      - group_regex: 'dev_review_infra.*'
+        naming_rule: 'Infra'
       - group_regex: 'dev_review_librseq_.*'
         naming_rule: 'librseq'
       - group_regex: 'dev_review_liburcu_.*'
