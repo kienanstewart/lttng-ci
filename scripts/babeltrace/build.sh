@@ -284,6 +284,7 @@ export BABELTRACE_MINIMAL_LOG_LEVEL=TRACE
 # Set configure options and environment variables for each build
 # configuration.
 CONF_OPTS=("--prefix=$PREFIX" "--libdir=$PREFIX/$LIBDIR_ARCH" "--disable-maintainer-mode")
+MANDATORY_VENDOR_CONF_OPTS=(--enable-vendor-catch2 --enable-vendor-fmt)
 
 # With Babeltrace 2.2+, `--enable-python-bindings` and
 # `--enable-python-plugins` are the default.
@@ -296,7 +297,7 @@ if verlt "$PACKAGE_VERSION" "2.2"; then
 else
     # Always use the in-tree Catch2 v3 and {fmt} libraries because
     # they're not easily available on all systems.
-    CONF_OPTS+=(--enable-vendor-catch2 --enable-vendor-fmt)
+    CONF_OPTS+=("${MANDATORY_VENDOR_CONF_OPTS[@]}")
 fi
 
 # -Werror is enabled by default in stable-2.0 but won't be in 2.1
@@ -416,7 +417,7 @@ dist)
 
     # Run configure and generate the tar file
     # in the source directory
-    ./configure || failed_configure
+    ./configure "${MANDATORY_VENDOR_CONF_OPTS[@]}" || failed_configure
     $MAKE dist
 
     # Create and enter a temporary build directory
@@ -439,7 +440,7 @@ oot-dist)
     cd "$builddir"
 
     # Run configure out of tree and generate the tar file
-    "$SRCDIR/configure" || failed_configure
+    "$SRCDIR/configure" "${MANDATORY_VENDOR_CONF_OPTS[@]}" || failed_configure
     $MAKE dist
 
     dist_srcdir="$(mktemp_compat -d)"
