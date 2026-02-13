@@ -293,7 +293,7 @@ PY_PLUGINS_OPT=
 if verlt "$PACKAGE_VERSION" "2.2"; then
     PY_BINDINGS_OPT=--enable-python-bindings
     PY_PLUGINS_OPT=--enable-python-plugins
-
+else
     # Always use the in-tree Catch2 v3 and {fmt} libraries because
     # they're not easily available on all systems.
     CONF_OPTS+=(--enable-vendor-catch2 --enable-vendor-fmt)
