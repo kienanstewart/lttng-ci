@@ -33,6 +33,13 @@
           ansible.builtin.systemd:
             name: networking.service
             masked: true
+        # @note: If the host got a dynamic address in the same network from
+        # ifupdown, sometimes netplan will remove the default route and not
+        # re-add it, necessitating a manual intervention.
+        - name: Disable ifupdown
+          ansible.builtin.systemd:
+            name: 'ifup@.service'
+            masked: true
         - name: Enable systemd-networkd
           ansible.builtin.systemd:
             name: systemd-networkd
