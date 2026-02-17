@@ -82,13 +82,10 @@
           name: 'GERRIT_PROJECT'
           default: 'babeltrace'
     scm:
-      - git: &babeltrace_scm_git_review
-          url: https://review.lttng.org/babeltrace
-          refspec: 'refs/changes/*:refs/changes/*'
-          branches:
-            - '$GERRIT_REFSPEC'
-          basedir: src/babeltrace
-          skip-tag: true
+      - git:
+          <<: *babeltrace_scm_git_default
+          shallow-clone: true
+          do-not-fetch-tags: true
           git-tool: '{git_tool}'
     triggers:
       - gerrit: &babeltrace_trigger_gerrit_defaults
@@ -102,6 +99,8 @@
               branches:
                 - branch-compare-type: 'PLAIN'
                   branch-pattern: '{version}'
+    # Job variables
+    gerrit: true
 
 ## Anchors
 - job-template: &babeltrace_matrix_axes_defaults
@@ -145,6 +144,11 @@
     name: 'babeltrace_builders_defaults'
     builders:
       !j2-yaml: |
+      {% if gerrit|default(false) %}
+      - shell:
+          !include-raw-verbatim:
+            - scripts/common/gerrit-fetch.sh
+      {% endif %}
       {% if buildtype is defined and buildtype == 'winbuild' %}
       - conditional-step:
           condition-kind: strings-match
@@ -399,9 +403,12 @@
 
     builders:
       - shell:
-         !include-raw-verbatim:
-          - scripts/common/print.sh
-          - scripts/babeltrace/lint.sh
+          !include-raw-verbatim:
+            - scripts/common/gerrit-fetch.sh
+      - shell:
+          !include-raw-verbatim:
+            - scripts/common/print.sh
+            - scripts/babeltrace/lint.sh
 
     properties:
       - inject:
@@ -469,7 +476,9 @@
 
     builders:
       - shell:
-         !include-raw-verbatim: scripts/common/check-format.sh
+          !include-raw-verbatim: scripts/common/gerrit-fetch.sh
+      - shell:
+          !include-raw-verbatim: scripts/common/check-format.sh
 
     properties:
       - inject:
