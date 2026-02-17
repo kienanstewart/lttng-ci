@@ -1,4 +1,4 @@
-- defaults:
+- defaults: &babeltrace-defaults
     name: babeltrace
     description: |
       The Babeltrace project provides trace read and write libraries, as well
@@ -57,6 +57,51 @@
     touchstone: ''
     test_report_type: tap
 
+- defaults:
+    <<: *babeltrace-defaults
+    name: babeltrace-review
+    concurrent: true
+    parameters:
+      - string:
+          name: 'GERRIT_BRANCH'
+          default: 'master'
+      - string:
+          name: 'GERRIT_REFSPEC'
+          default: ''
+          description: 'The refspec to fetch. E.g. `refs/changes/15/14715/2`. You may find it in the gerrit interface for downloading a specific revision of patch'
+      - string:
+          name: 'GERRIT_NAME'
+          default: 'review.lttng.org'
+      - string:
+          name: 'GERRIT_HOST'
+          default: 'review.lttng.org'
+      - string:
+          name: 'GERRIT_PATCHSET_REVISION'
+          default: ''
+      - string:
+          name: 'GERRIT_PROJECT'
+          default: 'babeltrace'
+    scm:
+      - git: &babeltrace_scm_git_review
+          url: https://review.lttng.org/babeltrace
+          refspec: 'refs/changes/*:refs/changes/*'
+          branches:
+            - '$GERRIT_REFSPEC'
+          basedir: src/babeltrace
+          skip-tag: true
+          git-tool: '{git_tool}'
+    triggers:
+      - gerrit: &babeltrace_trigger_gerrit_defaults
+          trigger-on:
+            - comment-added-event:
+                approval-category: 'CI-Build'
+                approval-value: 1
+          projects:
+            - project-compare-type: 'PLAIN'
+              project-pattern: 'babeltrace'
+              branches:
+                - branch-compare-type: 'PLAIN'
+                  branch-pattern: '{version}'
 
 ## Anchors
 - job-template: &babeltrace_matrix_axes_defaults
@@ -328,54 +373,7 @@
 
 - job-template:
     name: 'dev_review_babeltrace_{version}_{buildtype}'
-    defaults: babeltrace
-    concurrent: true
-
-    parameters:
-    parameters:
-      - string:
-          name: 'GERRIT_BRANCH'
-          default: 'master'
-      - string:
-          name: 'GERRIT_REFSPEC'
-          default: ''
-          description: 'The refspec to fetch. E.g. `refs/changes/15/14715/2`. You may find it in the gerrit interface for downloading a specific revision of patch'
-      - string:
-          name: 'GERRIT_NAME'
-          default: 'review.lttng.org'
-      - string:
-          name: 'GERRIT_HOST'
-          default: 'review.lttng.org'
-      - string:
-          name: 'GERRIT_PATCHSET_REVISION'
-          default: ''
-      - string:
-          name: 'GERRIT_PROJECT'
-          default: 'babeltrace'
-
-    scm:
-      - git: &babeltrace_scm_git_review
-          url: https://review.lttng.org/babeltrace
-          refspec: 'refs/changes/*:refs/changes/*'
-          branches:
-            - '$GERRIT_REFSPEC'
-          basedir: src/babeltrace
-          skip-tag: true
-          git-tool: '{git_tool}'
-
-    triggers:
-      - gerrit: &babeltrace_trigger_gerrit_defaults
-          trigger-on:
-            - comment-added-event:
-                approval-category: 'CI-Build'
-                approval-value: 1
-          projects:
-            - project-compare-type: 'PLAIN'
-              project-pattern: 'babeltrace'
-              branches:
-                - branch-compare-type: 'PLAIN'
-                  branch-pattern: '{version}'
-
+    defaults: babeltrace-review
     properties:
       - inject:
           properties-content: |
@@ -396,15 +394,7 @@
 
 - job-template:
     name: 'dev_review_babeltrace_{version}_lint'
-    defaults: babeltrace
-    concurrent: true
-
-    scm:
-      - git: *babeltrace_scm_git_review
-
-    triggers:
-      - gerrit: *babeltrace_trigger_gerrit_defaults
-
+    defaults: babeltrace-review
     node: 'deb13-amd64'
 
     builders:
@@ -430,11 +420,7 @@
 
 - job-template:
     name: 'dev_review_babeltrace_{version}_smokebuild'
-    defaults: babeltrace
-    concurrent: true
-
-    scm:
-      - git: *babeltrace_scm_git_review
+    defaults: babeltrace-review
 
     triggers:
       - gerrit: &babeltrace_trigger_gerrit_smoke
@@ -474,11 +460,7 @@
 
 - job-template:
     name: 'dev_review_babeltrace_{version}_check-format'
-    defaults: babeltrace
-    concurrent: true
-
-    scm:
-      - git: *babeltrace_scm_git_review
+    defaults: babeltrace-review
 
     triggers:
       - gerrit: *babeltrace_trigger_gerrit_smoke
