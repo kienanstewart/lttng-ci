@@ -144,11 +144,6 @@
     name: 'babeltrace_builders_defaults'
     builders:
       !j2-yaml: |
-      {% if gerrit|default(false) %}
-      - shell:
-          !include-raw-verbatim:
-            - scripts/common/gerrit-fetch.sh
-      {% endif %}
       {% if buildtype is defined and buildtype == 'winbuild' %}
       - conditional-step:
           condition-kind: strings-match
@@ -160,6 +155,9 @@
                !include-raw-verbatim:
                  - scripts/common/cygwin64-shebang
                  - scripts/common/cygpath-prefix
+      {% if gerrit|default(false) %}
+                 - scripts/common/gerrit-fetch.sh
+      {% endif %}
                  - scripts/common/print.sh
                  - scripts/babeltrace/build.sh
       - conditional-step:
@@ -174,11 +172,17 @@
                !include-raw-verbatim:
                  - scripts/common/msys2-shebang
                  - scripts/common/cygpath-prefix
+      {% if gerrit|default(false) %}
+                 - scripts/common/gerrit-fetch.sh
+      {% endif %}
                  - scripts/common/print.sh
                  - scripts/babeltrace/build.sh
       {% else %}
       - shell:
          !include-raw-verbatim:
+      {% if gerrit|default(false) %}
+           - scripts/common/gerrit-fetch.sh
+      {% endif %}
            - scripts/common/print.sh
            - scripts/babeltrace/build.sh
       {% endif %}
