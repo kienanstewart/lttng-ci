@@ -141,6 +141,14 @@ if [[ ( -f /etc/redhat-release || -f /etc/products.d/SLES.prod || -f /etc/yocto-
     fi
 fi
 
+if [[ "${conf}" =~ ^.*\+debian$ ]]; then
+    export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+    eval "$(dpkg-buildflags --export=sh)"
+else
+    export CFLAGS="-g -O2"
+    export CXXFLAGS="-g -O2"
+fi
+
 # When dependencies are present, adjust the environment
 if [ -d "$DEPSDIR" ]; then
     DEPS_INC="$DEPSDIR/$PREFIX/include"
@@ -151,8 +159,8 @@ if [ -d "$DEPSDIR" ]; then
 
     export LD_LIBRARY_PATH="$DEPS_LIB:${LD_LIBRARY_PATH:-}"
     export PKG_CONFIG_PATH="$DEPS_PKGCONFIG"
-    export CPPFLAGS="-I$DEPS_INC"
-    export LDFLAGS="-L$DEPS_LIB"
+    export CPPFLAGS="${CPPFLAGS:-} -I$DEPS_INC"
+    export LDFLAGS="${LDFLAGS:-} -L$DEPS_LIB"
 fi
 
 exit_status=0
@@ -168,8 +176,6 @@ rm -rf "$TMPDIR"
 mkdir -p "$TMPDIR"
 
 export TMPDIR
-export CFLAGS="-g -O2"
-export CXXFLAGS="-g -O2"
 
 # Set compiler variables
 case "$cc" in

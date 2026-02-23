@@ -738,7 +738,7 @@
           buildtype: linuxbuild
           version: master
           builds: !!python/tuple [std, dist, oot, oot-dist]
-          confs: !!python/tuple [std, agents, debug-rcu, tls_fallback]
+          confs: !!python/tuple [std, agents, debug-rcu, tls_fallback, std+debian]
           filter: '(build=="std") || ((liburcu_version=="master" && (conf=="std" || conf=="agents")))'
           touchstone: ''
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
@@ -818,7 +818,7 @@
           buildtype: linuxbuild
           version: stable-2.15
           builds: !!python/tuple [std, dist, oot, oot-dist]
-          confs: !!python/tuple [std, agents, debug-rcu, tls_fallback]
+          confs: !!python/tuple [std, agents, debug-rcu, tls_fallback, std+debian]
           filter: '(build=="std") || ((liburcu_version=="master" && (conf=="std" || conf=="agents")))'
           touchstone: ''
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
@@ -871,7 +871,7 @@
           buildtype: linuxbuild
           version: stable-2.14
           builds: !!python/tuple [std, dist, oot, oot-dist]
-          confs: !!python/tuple [std, agents, debug-rcu, tls_fallback]
+          confs: !!python/tuple [std, agents, debug-rcu, tls_fallback, std+debian]
           filter: '(build=="std") || ((liburcu_version=="master" && (conf=="std" || conf=="agents")))'
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
           touchstone: ''
