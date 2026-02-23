@@ -374,19 +374,19 @@
           version: master
           buildtype: linuxbuild
           builds: !!python/tuple [std, oot, dist]
-          confs: !!python/tuple [std, static, atomic-builtins, tls_fallback, debug-rcu]
+          confs: !!python/tuple [std, static, atomic-builtins, tls_fallback, debug-rcu, std+debian]
           touchstone: '(build == "std") && (conf == "std")'
       - '{job_prefix}liburcu_{version}_{buildtype}':
           version: stable-0.15
           buildtype: linuxbuild
           builds: !!python/tuple [std, oot, dist]
-          confs: !!python/tuple [std, static, atomic-builtins, tls_fallback, debug-rcu]
+          confs: !!python/tuple [std, static, atomic-builtins, tls_fallback, debug-rcu, std+debian]
           touchstone: '(build == "std") && (conf == "std")'
       - '{job_prefix}liburcu_{version}_{buildtype}':
           version: stable-0.14
           buildtype: linuxbuild
           builds: !!python/tuple [std, oot, dist]
-          confs: !!python/tuple [std, static, tls_fallback, debug-rcu]
+          confs: !!python/tuple [std, static, tls_fallback, debug-rcu, std+debian]
           touchstone: '(build == "std") && (conf == "std")'
       - '{job_prefix}liburcu_{version}_{buildtype}':
           version: stable-0.13

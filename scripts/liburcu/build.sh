@@ -172,8 +172,13 @@ rm -rf "$TMPDIR"
 mkdir -p "$TMPDIR"
 
 export TMPDIR
-export CFLAGS="-g -O2"
-export CXXFLAGS="-g -O2"
+if [[ "${conf}" =~ ^.*\+debian$ ]]; then
+    export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+    eval "$(dpkg-buildflags --export=sh)"
+else
+    export CFLAGS="-g -O2"
+    export CXXFLAGS="-g -O2"
+fi
 
 # Set compiler variables
 case "$cc" in
