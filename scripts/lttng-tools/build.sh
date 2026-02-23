@@ -190,6 +190,14 @@ if [[ ( -f /etc/redhat-release || -f /etc/products.d/SLES.prod || -f /etc/yocto-
     fi
 fi
 
+if [[ "${conf}" =~ ^.*\+debian$ ]]; then
+    export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+    eval "$(dpkg-buildflags --export=sh)"
+else
+    export CFLAGS="-g -O2"
+    export CXXFLAGS="-g -O2"
+fi
+
 # When dependencies are present, adjust the environment
 if [ -d "$DEPSDIR" ]; then
     DEPS_INC="$DEPSDIR/$PREFIX/include"
@@ -203,8 +211,8 @@ if [ -d "$DEPSDIR" ]; then
     export PKG_CONFIG_PATH="$DEPS_PKGCONFIG"
     export JAVA_PATH="$DEPS_JAVA"
 
-    export CPPFLAGS="-I$DEPS_INC"
-    export LDFLAGS="-L$DEPS_LIB"
+    export CPPFLAGS="${CPPFLAGS:-} -I$DEPS_INC"
+    export LDFLAGS="${LDFLAGS:-} -L$DEPS_LIB"
 
     # Create a symlink to "babeltrace" when the "babeltrace2" executable is found.
     # This is a temporary workaround until lttng-tools either allows the override of
@@ -238,9 +246,6 @@ mkdir -p "$TMPDIR"
 tmpdir="$(mktemp)"
 ln -sf "$TMPDIR" "$tmpdir"
 export TMPDIR="$tmpdir"
-
-export CFLAGS="-g -O2"
-export CXXFLAGS="-g -O2"
 
 # Set compiler variables
 case "$cc" in
