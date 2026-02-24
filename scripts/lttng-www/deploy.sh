@@ -51,6 +51,8 @@ apt-get update -y
 print_header "Install web tooling dependencies"
 apt-get install -y \
         doclifter \
+        doxygen \
+        graphviz \
         linkchecker \
         nodejs \
         node-grunt-cli \
