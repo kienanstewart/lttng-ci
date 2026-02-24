@@ -46,14 +46,22 @@ cp "$KEY_FILE_VARIABLE" ~/.ssh/id_rsa
 
 # lttng-www dependencies
 export DPKG_FRONTEND=noninteractive
-apt-get update
+apt-get update -y
 
 print_header "Install web tooling dependencies"
-apt-get install -y nodejs node-grunt-cli npm ruby-bundler ruby-dev python3-pip python3-venv
+apt-get install -y \
+        doclifter \
+        linkchecker \
+        nodejs \
+        node-grunt-cli \
+        npm \
+        python3-pip \
+        python3-venv \
+        ruby-bundler \
+        ruby-dev \
+        xmlto
 
 ruby -v
-
-apt-get install -y xmlto doclifter linkchecker
 
 python3 -m venv build_venv
 # shellcheck disable=SC1091
