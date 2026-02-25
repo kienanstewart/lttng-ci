@@ -1,0 +1,206 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+
+pipeline {
+  agent {
+    label 'deb13-amd64-rootnode'
+  }
+
+  environment {
+    PROJECT_NAME = "lttng-www"
+    BUILD_TARGET = "${params.BUILD_TARGET}"
+    DEPLOY_TARGET = "${params.DEPLOY_TARGET}"
+  }
+
+  options {
+    ansiColor('xterm')
+    skipDefaultCheckout()
+    timestamps()
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        dir('src/lttng-www') {
+          checkout([$class: 'GitSCM', branches: [[name: "${params.GIT_BRANCH}"]], userRemoteConfigs: [[url: "${params.GIT_URL}", credentialsId: "${params.GIT_CREDENTIALS}"]]])
+        }
+      }
+    }
+
+    stage('Fetch from review') {
+      when {
+        expression {
+          env.GERRIT_PROJECT == "lttng-www"
+        }
+      }
+
+      environment {
+        KNOWN_HOSTS = credentials("${params.REVIEW_KNOWN_HOSTS}")
+        GERRIT_CREDS = credentials("${params.REVIEW_GIT_CREDENTIALS}")
+        GERRIT_URL = "${params.REVIEW_GIT_URL}"
+      }
+
+      steps {
+        sh(
+          label: 'Setup SSH',
+          script: '''#!/usr/bin/bash -x
+mkdir -p ~/.ssh
+cat "${KNOWN_HOSTS}" >> ~/.ssh/known_hosts
+cp "${GERRIT_CREDS}" ~/.ssh/id_rsa
+''',
+        )
+
+        dir('src/lttng-www') {
+          sh(
+            label: "fetch",
+            script: '''#!/usr/bin/bash -x
+if [[ -z "${GERRIT_REFSPEC}" ]]; then
+   exit 1
+fi
+git fetch "${GERRIT_URL}" "${GERRIT_REFSPEC}"
+git checkout FETCH_HEAD
+''',
+          )
+        }
+      }
+
+      post {
+        always {
+          sh(
+            label: 'Cleanup SSH',
+            script: '''#!/usr/bin/bash -x
+rm -f ~/.ssh/id_rsa
+''',
+          )
+        }
+      }
+    }
+
+    stage('Setup') {
+      environment {
+        DPKG_FRONTEND = "noninteractive"
+      }
+
+      steps {
+        dir('src/lttng-www') {
+          sh(
+            label: 'install packages',
+            script: '''#!/usr/bin/bash -x
+apt-get update -y
+apt-get install -y \
+  doclifter \
+  doxygen \
+  graphviz \
+  linkchecker \
+  nodejs \
+  node-grunt-cli \
+  npm \
+  python3-pip \
+  python3-venv \
+  ruby-bundler \
+  ruby-dev \
+  xmlto
+''',
+          )
+
+          sh(
+            label: 'bootstrap virtualenv',
+            script: '''#!/usr/bin/bash -x
+python3 -m virtualenv venv/
+source venv/bin/activate
+bundle config set --local path vendor/bundle
+bundle install
+pip install -r requirements.txt
+npm install
+(
+  cd sass
+  bundle exec bourbon install
+)
+'''
+          )
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        dir('src/lttng-www') {
+          sh(
+            label: 'build',
+            script: '''#!/usr/bin/bash -x
+source venv/bin/activate
+bundle exec grunt build:${BUILD_TARGET}
+'''
+          )
+
+          archiveArtifacts(artifacts: "${params.BUILD_TARGET}/**")
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        dir('src/lttng-www') {
+          sh(
+            label: 'check links',
+            script: '''#!/usr/bin/bash -x
+source venv/bin/activate
+touch link_report.csv
+chown nobody: link_report.csv
+bundle exec grunt check_links:${BUILD_TARGET} --no-network
+ret=$?
+cat link_report.csv
+exit $ret
+''',
+          )
+        }
+      }
+
+      post {
+        always {
+          archiveArtifacts(artifacts: "src/lttng-www/link_report.csv")
+        }
+      }
+    }
+
+    stage('Deploy') {
+      environment {
+        KNOWN_HOSTS = credentials("${params.DEPLOY_KNOWN_HOSTS}")
+        DEPLOY_CREDS = credentials("${params.DEPLOY_CREDENTIALS}")
+      }
+
+      steps {
+        sh(
+          label: 'Setup SSH',
+          script: '''#!/usr/bin/bash -x
+mkdir -p ~/.ssh
+cat "${KNOWN_HOSTS}" >> ~/.ssh/known_hosts
+cp "${DEPLOY_CREDS}" ~/.ssh/id_rsa
+''',
+        )
+
+        dir('src/lttng-www') {
+          sh(
+            label: 'deploy',
+            script: '''#!/usr/bin/bash -x
+source venv/bin/activate
+bundle exec grunt "deploy:${DEPLOY_TARGET}" --no-network
+''',
+          )
+        }
+      }
+
+      post {
+        always {
+          sh(
+            label: 'Cleanup SSH',
+            script: '''#!/usr/bin/bash -x
+rm -f ~/.ssh/id_rsa
+''',
+          )
+        }
+      }
+    }
+  }
+}
