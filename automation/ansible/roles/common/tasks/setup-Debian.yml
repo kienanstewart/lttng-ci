@@ -27,7 +27,7 @@
 - name: Install unattended upgrades
   apt:
     name: 'unattended-upgrades'
-    state:  "{{(unattended_upgrades|bool)|ternary('present', 'absent')}}"
+    state: "{{(unattended_upgrades|bool)|ternary('present', 'absent')}}"
 
 - name: Enable extra repos for unattended upgrades
   template:

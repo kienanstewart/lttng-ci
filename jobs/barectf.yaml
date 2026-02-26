@@ -1,4 +1,5 @@
 ---
+
 ## Defaults ##
 - defaults:
     name: barectf
@@ -61,42 +62,42 @@
     defaults: barectf
 
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     axes:
       - axis:
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
 
     builders:
       - shell:
-         !include-raw-verbatim: scripts/barectf/build.sh
+          !include-raw-verbatim: scripts/barectf/build.sh
 
     publishers:
       - workspace-cleanup: *barectf_publisher_workspace_cleanup_defaults
       - ircbot: *barectf_publisher_ircbot_defaults
       - email-ext:
-         recipients: '{obj:email_to}'
-         reply-to: ci-notification@lists.lttng.org
-         always: false
-         unstable: false
-         first-failure: true
-         first-unstable: true
-         not-built: false
-         aborted: false
-         regression: false
-         failure: false
-         second-failure: false
-         improvement: false
-         still-failing: false
-         success: false
-         fixed: false
-         fixed-unhealthy: true
-         still-unstable: false
-         pre-build: false
-         matrix-trigger: only-parent
-         send-to:
-           - recipients
+          recipients: '{obj:email_to}'
+          reply-to: ci-notification@lists.lttng.org
+          always: false
+          unstable: false
+          first-failure: true
+          first-unstable: true
+          not-built: false
+          aborted: false
+          regression: false
+          failure: false
+          second-failure: false
+          improvement: false
+          still-failing: false
+          success: false
+          fixed: false
+          fixed-unhealthy: true
+          still-unstable: false
+          pre-build: false
+          matrix-trigger: only-parent
+          send-to:
+            - recipients
 
 - job-template:
     name: dev_review_barectf_{version}_{buildtype}
@@ -104,12 +105,12 @@
     concurrent: true
 
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     axes:
       - axis:
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
 
     scm:
       - git:
@@ -143,7 +144,7 @@
 
     builders:
       - shell:
-         !include-raw-verbatim: scripts/barectf/build.sh
+          !include-raw-verbatim: scripts/barectf/build.sh
 
     publishers:
       - workspace-cleanup: *barectf_publisher_workspace_cleanup_defaults

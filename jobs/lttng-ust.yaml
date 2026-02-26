@@ -58,7 +58,7 @@
 - _lttng-ust_matrix_axes_defaults: &lttng-ust_matrix_axes_defaults
     name: 'lttng-ust_matrix_axes_defaults'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     execution-strategy: &lttng-ust_matrix_execution-strategy_defaults
       combination-filter: '{filter}'
       touchstone:
@@ -66,26 +66,26 @@
         result: unstable
     axes:
       - axis: &lttng-ust_matrix_axis_platform
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
       - axis: &lttng-ust_matrix_axis_conf
-         type: user-defined
-         name: conf
-         values: '{obj:confs}'
+          type: user-defined
+          name: conf
+          values: '{obj:confs}'
       - axis: &lttng-ust_matrix_axis_build
-         type: user-defined
-         name: build
-         values: '{obj:builds}'
+          type: user-defined
+          name: build
+          values: '{obj:builds}'
       - axis: &lttng-ust_matrix_axis_liburcu_version
-         type: user-defined
-         name: liburcu_version
-         values: '{obj:liburcu_versions}'
+          type: user-defined
+          name: liburcu_version
+          values: '{obj:liburcu_versions}'
 
 - _lttng-ust_matrix_axes_review_lttng-tools: &lttng-ust_matrix_axes_review_lttng-tools
     name: 'lttng-ust_matrix_axes_review_lttng-tools'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     execution-strategy: *lttng-ust_matrix_execution-strategy_defaults
     axes:
       - axis: *lttng-ust_matrix_axis_platform
@@ -141,10 +141,10 @@
 
       # Run the build
       - shell:
-         !include-raw-verbatim:
-           - scripts/common/print.sh
-           - scripts/lttng-ust/build.sh
-           - scripts/common/clean-build-dir.sh
+          !include-raw-verbatim:
+          - scripts/common/print.sh
+          - scripts/lttng-ust/build.sh
+          - scripts/common/clean-build-dir.sh
 
 - _lttng-ust_builders_review_lttng-tools: &lttng-ust_builders_review_lttng-tools
     name: 'lttng-ust_builders_review_lttng-tools'
@@ -203,18 +203,18 @@
            git clone -b "$GERRIT_BRANCH" https://review.lttng.org/lttng-tools src/lttng-tools
 
       - shell:
-         !include-raw-verbatim:
-           - scripts/common/print.sh
-           - scripts/lttng-ust/build.sh
+          !include-raw-verbatim:
+          - scripts/common/print.sh
+          - scripts/lttng-ust/build.sh
 
       - shell:
-         !include-raw-verbatim:
-           - scripts/lttng-tools/gerrit-install-deps.sh
+          !include-raw-verbatim:
+          - scripts/lttng-tools/gerrit-install-deps.sh
 
       - shell:
-         !include-raw-verbatim:
-           - scripts/common/print.sh
-           - scripts/lttng-tools/build.sh
+          !include-raw-verbatim:
+          - scripts/common/print.sh
+          - scripts/lttng-tools/build.sh
 
 - _lttng-ust_publishers_defaults: &lttng-ust_publishers_defaults
     name: 'lttng-ust_publishers_defaults'
@@ -371,9 +371,9 @@
       - axis:
           <<: *lttng-ust_matrix_axis_liburcu_version
       - axis:
-         type: user-defined
-         name: cc
-         values: '{obj:ccs}'
+          type: user-defined
+          name: cc
+          values: '{obj:ccs}'
 
     <<: *lttng-ust_builders_defaults
     <<: *lttng-ust_publishers_defaults
@@ -438,9 +438,9 @@
       - axis:
           <<: *lttng-ust_matrix_axis_liburcu_version
       - axis:
-         type: user-defined
-         name: cc
-         values: '{obj:ccs}'
+          type: user-defined
+          name: cc
+          values: '{obj:ccs}'
     <<: *lttng-ust_builders_defaults
     <<: *lttng-ust_publishers_review
 
@@ -605,13 +605,13 @@
           steps:
             - shell:
                 !include-raw-verbatim:
-                  - scripts/common/override-build-std.sh
-                  - scripts/common/print.sh
-                  - scripts/babeltrace/build.sh
+                - scripts/common/override-build-std.sh
+                - scripts/common/print.sh
+                - scripts/babeltrace/build.sh
             - shell:
                 !include-raw-verbatim:
-                  # Copy to deps/build and leave build/ empty
-                  - scripts/lttng-tools/gerrit-install-deps.sh
+                # Copy to deps/build and leave build/ empty
+                - scripts/lttng-tools/gerrit-install-deps.sh
       # usespace-rcu
       - conditional-step:
           condition-kind: shell
@@ -628,13 +628,13 @@
           steps:
             - shell:
                 !include-raw-verbatim:
-                  - scripts/common/override-build-std.sh
-                  - scripts/common/print.sh
-                  - scripts/liburcu/build.sh
+                - scripts/common/override-build-std.sh
+                - scripts/common/print.sh
+                - scripts/liburcu/build.sh
             - shell:
                 !include-raw-verbatim:
-                  # Copy to deps/build and leave build/ empty
-                  - scripts/lttng-tools/gerrit-install-deps.sh
+                # Copy to deps/build and leave build/ empty
+                - scripts/lttng-tools/gerrit-install-deps.sh
       # lttng-ust
       - conditional-step:
           condition-kind: shell
@@ -651,14 +651,14 @@
           steps:
             - shell:
                 !include-raw-verbatim:
-                  - scripts/common/override-build-std.sh
-                  - scripts/common/override-conf-agents.sh
-                  - scripts/common/print.sh
-                  - scripts/lttng-ust/build.sh
+                - scripts/common/override-build-std.sh
+                - scripts/common/override-conf-agents.sh
+                - scripts/common/print.sh
+                - scripts/lttng-ust/build.sh
             - shell:
                 !include-raw-verbatim:
-                  # Copy to deps/build and leave build/ empty
-                  - scripts/lttng-tools/gerrit-install-deps.sh
+                # Copy to deps/build and leave build/ empty
+                - scripts/lttng-tools/gerrit-install-deps.sh
       - conditional-step:
           condition-kind: shell
           condition-command: 'test -z "$GERRIT_DEP_USERSPACE_RCU" && test -z "$GERRIT_DEP_LTTNG_UST" && test -z "$GERRIT_DEP_LTTNG_TOOLS"'
@@ -675,14 +675,13 @@
           steps:
             - shell:
                 !include-raw-verbatim:
-                  - scripts/common/override-build-std.sh
-                  - scripts/common/override-conf-agents.sh
-                  - scripts/common/print.sh
-                  - scripts/lttng-tools/build.sh
+                - scripts/common/override-build-std.sh
+                - scripts/common/override-conf-agents.sh
+                - scripts/common/print.sh
+                - scripts/lttng-tools/build.sh
             - shell:
                 !include-raw-verbatim:
-                  # Copy to deps/build and leave build/ empty
-                  - scripts/lttng-tools/gerrit-install-deps.sh
+                - scripts/lttng-tools/gerrit-install-deps.sh  # Copy to deps/build and leave build/ empty
       - shell:
           !include-raw-verbatim: scripts/lttng-ust/lttng-ust-java-tests.sh
     properties:
@@ -1134,7 +1133,6 @@
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
           babeltrace_version: stable-2.1
           java_preferred_jdk: '8'
-          liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: stable-2.14
           buildtype: portbuild

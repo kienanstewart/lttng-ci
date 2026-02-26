@@ -1,3 +1,5 @@
+---
+
 - defaults:
     name: lttng-ust-benchmarks
     description: |
@@ -61,7 +63,9 @@
       - string:
           name: 'BENCHMARK_FILTER'
           default: "basic.tracing_disabled.ns_per_event,basic.tracing_disabled.start_overhead_s,basic.tracing_enabled.ns_per_event,basic.tracing_enabled.start_overhead_s,sha2.tracing_disabled.ns_per_event,sha2.tracing_disabled.start_overhead_s,sha2.tracing_enabled.ns_per_event,sha2.tracing_enabled.start_overhead_s,gen-tp.tracing_disabled.ns_per_event,gen-tp.tracing_disabled.start_overhead_s,gen-tp.tracing_enabled.ns_per_event,gen-tp.tracing_enabled.start_overhead_s"
-          description: "(Regression check only) A comma-separated list of benchmarks to filter for, or 'all'. E.g. 'gen-tp.tracing_enabled.ns_per_event,sha2.tracing_enabled.ns_per_event,basic.tracing_enabled.ns_per_event'"
+          description: |
+            (Regression check only) A comma-separated list of benchmarks to filter for, or 'all'.
+            E.g. 'gen-tp.tracing_enabled.ns_per_event,sha2.tracing_enabled.ns_per_event'
       - bool:
           name: 'BENCHMARK_FORCE'
           default: false

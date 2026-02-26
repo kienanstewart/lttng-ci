@@ -1,3 +1,5 @@
+---
+
 - defaults:
     name: glibc
     description: |
@@ -44,21 +46,21 @@
 - _glibc_matrix_axes_defaults: &glibc_matrix_axes_defaults
     name: 'glibc_matrix_axes_defaults'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     axes:
       - axis: &glibc_matrix_axis_platform
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
 
 # Default builders
 - _glibc_builders_defaults: &glibc_builders_defaults
     name: 'glibc_builders_defaults'
     builders:
       - shell:
-         !include-raw-verbatim:
-           - scripts/common/print.sh
-           - scripts/glibc/build.sh
+          !include-raw-verbatim:
+          - scripts/common/print.sh
+          - scripts/glibc/build.sh
 
 
 ## Templates ##

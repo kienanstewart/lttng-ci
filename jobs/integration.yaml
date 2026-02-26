@@ -1,10 +1,11 @@
-## Jobs
+---
+
 - job:
     name: 'integration_ust-2.12-lower-urcu_testsuite'
     description: |
       <p>Job is managed by Jenkins Job Builder.</p>
     project-type: pipeline
-    sandbox:  true
+    sandbox: true
     dsl:
       !include-raw-verbatim: pipelines/integration/ust-2.12-lower-urcu_testsuite.groovy
 
@@ -16,7 +17,7 @@
 
       <p>Job is managed by Jenkins Job Builder.</p>
     project-type: pipeline
-    sandbox:  true
+    sandbox: true
     dsl:
       !include-jinja2: pipelines/integration/lttng-tools-_version_-32-64_testsuite.groovy.j2
     # Job variables

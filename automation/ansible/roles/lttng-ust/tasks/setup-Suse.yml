@@ -17,11 +17,11 @@
     - name: Check if download required
       ansible.builtin.command:
         argv: ['test', '-L', '/usr/share/java/log4j-core.jar', '-a',
-        '-e', '/usr/share/java/log4j-core.jar', '-a',
-        '-L', '/usr/share/java/log4j-api.jar', '-a',
-        '-e', '/usr/share/java/log4j-api.jar', '-a',
-        '-f', "/usr/share/java/apache-log4j-{{lttng_ust_log4j2_version}}-bin/log4j-api-{{lttng_ust_log4j2_version}}.jar", '-a',
-        '-f', "/usr/share/java/apache-log4j-{{lttng_ust_log4j2_version}}-bin/log4j-core-{{lttng_ust_log4j2_version}}.jar"
+               '-e', '/usr/share/java/log4j-core.jar', '-a',
+               '-L', '/usr/share/java/log4j-api.jar', '-a',
+               '-e', '/usr/share/java/log4j-api.jar', '-a',
+               '-f', "/usr/share/java/apache-log4j-{{lttng_ust_log4j2_version}}-bin/log4j-api-{{lttng_ust_log4j2_version}}.jar", '-a',
+               '-f', "/usr/share/java/apache-log4j-{{lttng_ust_log4j2_version}}-bin/log4j-core-{{lttng_ust_log4j2_version}}.jar"
         ]
       ignore_errors: true
       register: log4j2_download_required

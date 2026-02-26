@@ -1,3 +1,5 @@
+---
+
 - defaults: &babeltrace-defaults
     name: babeltrace
     description: |
@@ -68,7 +70,9 @@
       - string:
           name: 'GERRIT_REFSPEC'
           default: ''
-          description: 'The refspec to fetch. E.g. `refs/changes/15/14715/2`. You may find it in the gerrit interface for downloading a specific revision of patch'
+          description: |
+            The refspec to fetch. E.g. `refs/changes/15/14715/2`.
+            You may find it in the gerrit interface for downloading a specific revision of patch
       - string:
           name: 'GERRIT_NAME'
           default: 'review.lttng.org'
@@ -106,7 +110,7 @@
 - job-template: &babeltrace_matrix_axes_defaults
     name: 'babeltrace_matrix_axes_defaults'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     execution-strategy:
       combination-filter: '{filter}'
       touchstone:
@@ -114,17 +118,17 @@
         result: unstable
     axes:
       - axis: &babeltrace_matrix_axis_platform
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
       - axis: &babeltrace_matrix_axis_conf
-         type: user-defined
-         name: conf
-         values: '{obj:confs}'
+          type: user-defined
+          name: conf
+          values: '{obj:confs}'
       - axis: &babeltrace_matrix_axis_build
-         type: user-defined
-         name: build
-         values: '{obj:builds}'
+          type: user-defined
+          name: build
+          values: '{obj:builds}'
 
 - job-template: &babeltrace_matrix_axes_cc
     name: 'babeltrace_matrix_axes_cc'
@@ -136,9 +140,9 @@
       - axis: *babeltrace_matrix_axis_conf
       - axis: *babeltrace_matrix_axis_build
       - axis: &babeltrace_matrix_axis_cc
-         type: user-defined
-         name: cc
-         values: '{obj:ccs}'
+          type: user-defined
+          name: cc
+          values: '{obj:ccs}'
 
 - job-template: &babeltrace_builders_defaults
     name: 'babeltrace_builders_defaults'
@@ -209,9 +213,9 @@
           make -j `nproc` >/dev/null 2>&1 # Hide warnings
           make install
       - shell:
-         !include-raw-verbatim:
-           - scripts/common/print.sh
-           - scripts/babeltrace/build.sh
+          !include-raw-verbatim:
+          - scripts/common/print.sh
+          - scripts/babeltrace/build.sh
 
 - _anchors:
     - tap: &babeltrace_publisher_tap_defaults
@@ -409,11 +413,11 @@
     builders:
       - shell:
           !include-raw-verbatim:
-            - scripts/common/gerrit-fetch.sh
+          - scripts/common/gerrit-fetch.sh
       - shell:
           !include-raw-verbatim:
-            - scripts/common/print.sh
-            - scripts/babeltrace/lint.sh
+          - scripts/common/print.sh
+          - scripts/babeltrace/lint.sh
 
     properties:
       - inject:
@@ -592,10 +596,10 @@
           cron: "@daily"
 
     builders:
-       - shell:
+      - shell:
           !include-raw-verbatim:
-            - scripts/common/print.sh
-            - scripts/babeltrace/lint.sh
+          - scripts/common/print.sh
+          - scripts/babeltrace/lint.sh
 
     publishers:
       - workspace-cleanup: *babeltrace_publisher_workspace-cleanup_defaults
@@ -729,7 +733,7 @@
       - stable-2.1
       - master
     jobs:
-    ## Master ##
+      ## Master ##
       - 'dev_review_babeltrace_{version}_{buildtype}':
           version: master
           buildtype: linuxbuild

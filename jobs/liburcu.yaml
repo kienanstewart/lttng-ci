@@ -1,12 +1,4 @@
-# {project}_{version}_{jobtype}
-# liburcu_stable-0.8_build
-#
-# jobtypes:
-#   - build
-#   - portbuild
-#   - coverity
-#   - scan-build
-#   - pylint
+---
 
 - defaults:
     name: liburcu
@@ -70,7 +62,7 @@
 - _liburcu_matrix_axes_defaults: &liburcu_matrix_axes_defaults
     name: 'liburcu_matrix_axes_defaults'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     execution-strategy:
       combination-filter: '{filter}'
       touchstone:
@@ -78,17 +70,17 @@
         result: unstable
     axes:
       - axis:
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
       - axis:
-         type: user-defined
-         name: conf
-         values: '{obj:confs}'
+          type: user-defined
+          name: conf
+          values: '{obj:confs}'
       - axis:
-         type: user-defined
-         name: build
-         values: '{obj:builds}'
+          type: user-defined
+          name: build
+          values: '{obj:builds}'
 
 - _liburcu_builders_defaults: &liburcu_builders_defaults
     name: 'liburcu_builders_defaults'
@@ -214,21 +206,21 @@
     <<: *liburcu_matrix_axes_defaults
     axes:
       - axis:
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
       - axis:
-         type: user-defined
-         name: conf
-         values: '{obj:confs}'
+          type: user-defined
+          name: conf
+          values: '{obj:confs}'
       - axis:
-         type: user-defined
-         name: build
-         values: '{obj:builds}'
+          type: user-defined
+          name: build
+          values: '{obj:builds}'
       - axis:
-         type: user-defined
-         name: cc
-         values: '{obj:ccs}'
+          type: user-defined
+          name: cc
+          values: '{obj:ccs}'
     <<: *liburcu_builders_defaults
     <<: *liburcu_publishers_defaults
 

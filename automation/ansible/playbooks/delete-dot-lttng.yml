@@ -3,7 +3,7 @@
   hosts: all
 
   tasks:
-   - name: delete .lttng folder
-     file:
-             path: /home/jenkins/.lttng
-             state: absent
+    - name: delete .lttng folder
+      file:
+        path: /home/jenkins/.lttng
+        state: absent

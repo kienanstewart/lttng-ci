@@ -1,12 +1,4 @@
-# {project}_{version}_{jobtype}
-# librseq_stable-0.8_build
-#
-# jobtypes:
-#   - build
-#   - portbuild
-#   - coverity
-#   - scan-build
-#   - pylint
+---
 
 - defaults:
     name: librseq
@@ -58,7 +50,7 @@
 - _librseq_matrix_axes_defaults: &librseq_matrix_axes_defaults
     name: 'librseq_matrix_axes_defaults'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     execution-strategy:
       combination-filter: '{filter}'
       touchstone:
@@ -66,22 +58,22 @@
         result: unstable
     axes:
       - axis: &librseq_matrix_axis_platform
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
       - axis: &librseq_matrix_axis_conf
-         type: user-defined
-         name: conf
-         values: '{obj:confs}'
+          type: user-defined
+          name: conf
+          values: '{obj:confs}'
       - axis: &librseq_matrix_axis_build
-         type: user-defined
-         name: build
-         values: '{obj:builds}'
+          type: user-defined
+          name: build
+          values: '{obj:builds}'
 
 - _librseq_matrix_axes_cc: &librseq_matrix_axes_cc
     name: 'librseq_matrix_axes_cc'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     execution-strategy:
       combination-filter: '{filter}'
       touchstone:
@@ -92,17 +84,17 @@
       - axis: *librseq_matrix_axis_conf
       - axis: *librseq_matrix_axis_build
       - axis: &librseq_matrix_axis_cc
-         type: user-defined
-         name: cc
-         values: '{obj:ccs}'
+          type: user-defined
+          name: cc
+          values: '{obj:ccs}'
 
 - _librseq_builders_defaults: &librseq_builders_defaults
     name: 'librseq_builders_defaults'
     builders:
       - shell:
-         !include-raw-verbatim:
-           - scripts/common/print.sh
-           - scripts/librseq/build.sh
+          !include-raw-verbatim:
+          - scripts/common/print.sh
+          - scripts/librseq/build.sh
 
 - _librseq_publishers_defaults: &librseq_publishers_defaults
     name: 'librseq_publishers_defaults'

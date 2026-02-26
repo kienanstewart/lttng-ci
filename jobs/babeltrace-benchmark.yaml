@@ -1,3 +1,5 @@
+---
+
 - defaults:
     name: babeltrace_benchmark
     project-type: freestyle

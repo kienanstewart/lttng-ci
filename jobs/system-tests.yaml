@@ -21,7 +21,8 @@
       - bool:
           name: 'FORCE_JOB_RUN'
           default: false
-          description: 'Force the child jobs to run regardless of if the last run with those parameters was a success or failure'
+          description: |
+            Force the child jobs to run regardless of if the last run with those parameters was a success or failure
       - bool:
           name: 'FORCE_FAILED_JOB_RUN'
           default: true

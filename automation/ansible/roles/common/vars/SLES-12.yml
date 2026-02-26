@@ -12,4 +12,4 @@ common_packages:
   - vim
 
 common_sles_connect_repos:
-   - sle-sdk
+  - sle-sdk

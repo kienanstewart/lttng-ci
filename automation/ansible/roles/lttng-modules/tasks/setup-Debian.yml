@@ -4,4 +4,3 @@
 
 - name: Ensure lttng-modules build dependencies are installed.
   apt: "name={{ lttng_modules_packages }} state=present"
-

@@ -135,7 +135,9 @@
       - string: &lttng-modules_build_parameter_gerrit_refspec
           name: 'GERRIT_REFSPEC'
           default: ''
-          description: 'The refspec to fetch. E.g. `refs/changes/15/14715/2`. You may find it in the gerrit interface for downloading a specific revision of patch'
+          description: |
+            The refspec to fetch. E.g. `refs/changes/15/14715/2`.
+            You may find it in the gerrit interface for downloading a specific revision of patch
       - string: &lttng-modules_build_parameter_gerrit_name
           name: 'GERRIT_NAME'
           default: 'review.lttng.org'
@@ -249,15 +251,15 @@
     name: 'lttng-modules_build_builders_defaults'
     builders:
       - system-groovy:
-         command:
-           !include-raw-verbatim: scripts/lttng-modules/master.groovy
+          command:
+            !include-raw-verbatim: scripts/lttng-modules/master.groovy
 
 - _lttng-modules_build_rt_builders_defaults: &lttng-modules_build_rt_builders_defaults
     name: 'lttng-modules_build_rt_builders_defaults'
     builders:
       - system-groovy:
-         command:
-           !include-raw-verbatim: scripts/lttng-modules/master-rt.groovy
+          command:
+            !include-raw-verbatim: scripts/lttng-modules/master-rt.groovy
 
 
 - defaults:
@@ -270,7 +272,7 @@
       <p>Job is managed by Jenkins Job Builder.</p>
 
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
 
     wrappers:
       - workspace-cleanup
@@ -386,8 +388,8 @@
 
     builders:
       - system-groovy:
-         command:
-           !include-raw-verbatim: scripts/lttng-modules/trigger-vanilla.groovy
+          command:
+            !include-raw-verbatim: scripts/lttng-modules/trigger-vanilla.groovy
 
     publishers: []
 
@@ -760,7 +762,7 @@
       <p>Job is managed by Jenkins Job Builder.</p>
 
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
 
     wrappers:
       - workspace-cleanup
@@ -844,13 +846,14 @@
 
     builders:
       - shell: |
-         git clone --depth=1 -b v6.1 --reference-if-able $HOME/gitcache/linux-stable.git/ git://git-mirror.internal.efficios.com/kernel/stable/linux-stable.git src/linux
-         cd src/linux
-         make allyesconfig
-         sed -i "s/# CONFIG_KALLSYMS_ALL is not set/CONFIG_KALLSYMS_ALL=y/g" .config
-         make modules_prepare
+          git clone --depth=1 -b v6.1 --reference-if-able $HOME/gitcache/linux-stable.git/ \
+              git://git-mirror.internal.efficios.com/kernel/stable/linux-stable.git src/linux
+          cd src/linux
+          make allyesconfig
+          sed -i "s/# CONFIG_KALLSYMS_ALL is not set/CONFIG_KALLSYMS_ALL=y/g" .config
+          make modules_prepare
       - shell:
-         !include-raw-verbatim: scripts/common/coverity.sh
+          !include-raw-verbatim: scripts/common/coverity.sh
 
     publishers:
       - archive:
@@ -1099,7 +1102,7 @@
           kverceil: v5.18-rc1
           kverfilter: stable-head
 
-# Ubuntu cross builds
+      # Ubuntu cross builds
       - 'lttng-modules_{mversion}_{buildtype}-{uversion}': &job_lttng-modules_master_ubuntu_crossbuild
           mversion:
             - master

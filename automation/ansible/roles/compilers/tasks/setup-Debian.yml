@@ -2,18 +2,18 @@
 - name: Install legacy compilers
   when: compilers_legacy_install
   block:
-   # `apt-key` or `gnupg` are optional dependencies, but are required for this
-   # instance of `apt_repository`.
-   - ansible.builtin.package:
-       name: 'gnupg'
-   - name: Add sources for gcc 4.8
-     when: ansible_distribution == 'Debian'
-     ansible.builtin.apt_repository:
-       repo: 'deb [trusted=yes] http://archive.debian.org/debian jessie main'
-       state: "{{compilers_legacy_install|ternary('present', 'absent')}}"
-   - name: Install legacy compiler packages
-     ansible.builtin.apt:
-       name: "{{compilers_legacy_packages}}"
+    # `apt-key` or `gnupg` are optional dependencies, but are required for this
+    # instance of `apt_repository`.
+    - ansible.builtin.package:
+        name: 'gnupg'
+    - name: Add sources for gcc 4.8
+      when: ansible_distribution == 'Debian'
+      ansible.builtin.apt_repository:
+        repo: 'deb [trusted=yes] http://archive.debian.org/debian jessie main'
+        state: "{{compilers_legacy_install|ternary('present', 'absent')}}"
+    - name: Install legacy compiler packages
+      ansible.builtin.apt:
+        name: "{{compilers_legacy_packages}}"
 
 - name: Update apt cache.
   apt: update_cache=yes cache_valid_time=86400

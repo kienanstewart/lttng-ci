@@ -1,3 +1,5 @@
+---
+
 - defaults:
     name: efficios-www
     project-type: freestyle
@@ -28,14 +30,14 @@
       - ansicolor
       - timestamps
       - credentials-binding:
-        - ssh-user-private-key:
-            credential-id: f3c907b6-7485-49e1-afe1-4df24fac4ca1
-            key-file-variable: KEY_FILE_VARIABLE
-            username-variable: USER_NAME_VARIABLE
-            passphrase-variable: PASSPHRASE_VARIABLE
-        - file:
-            credential-id: d023f830-9ab0-409f-b977-8cd0e1944dd5
-            variable: HOST_PUBLIC_KEYS
+          - ssh-user-private-key:
+              credential-id: f3c907b6-7485-49e1-afe1-4df24fac4ca1
+              key-file-variable: KEY_FILE_VARIABLE
+              username-variable: USER_NAME_VARIABLE
+              passphrase-variable: PASSPHRASE_VARIABLE
+          - file:
+              credential-id: d023f830-9ab0-409f-b977-8cd0e1944dd5
+              variable: HOST_PUBLIC_KEYS
       - inject:
           properties-content: |
             DEPLOY_TARGET=deploy:prod
@@ -79,14 +81,14 @@
       - ansicolor
       - timestamps
       - credentials-binding:
-        - ssh-user-private-key:
-            credential-id: f3c907b6-7485-49e1-afe1-4df24fac4ca1
-            key-file-variable: KEY_FILE_VARIABLE
-            username-variable: USER_NAME_VARIABLE
-            passphrase-variable: PASSPHRASE_VARIABLE
-        - file:
-            credential-id: d023f830-9ab0-409f-b977-8cd0e1944dd5
-            variable: HOST_PUBLIC_KEYS
+          - ssh-user-private-key:
+              credential-id: f3c907b6-7485-49e1-afe1-4df24fac4ca1
+              key-file-variable: KEY_FILE_VARIABLE
+              username-variable: USER_NAME_VARIABLE
+              passphrase-variable: PASSPHRASE_VARIABLE
+          - file:
+              credential-id: d023f830-9ab0-409f-b977-8cd0e1944dd5
+              variable: HOST_PUBLIC_KEYS
       - inject:
           properties-content: |
             DEPLOY_TARGET=deploy:pre

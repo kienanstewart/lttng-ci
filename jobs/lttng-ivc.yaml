@@ -1,3 +1,5 @@
+---
+
 - defaults: &lttng-ivc-defaults
     name: lttng-ivc
     description: |
@@ -58,7 +60,9 @@
       - string:
           name: 'GERRIT_REFSPEC'
           default: ''
-          description: 'The refspec to fetch. E.g. `refs/changes/15/14715/2`. You may find it in the gerrit interface for downloading a specific revision of patch'
+          description: |
+            The refspec to fetch. E.g. `refs/changes/15/14715/2`.
+            You may find it in the gerrit interface for downloading a specific revision of patch
       - string:
           name: 'GERRIT_NAME'
           default: 'review.lttng.org'
@@ -114,16 +118,16 @@
     defaults: lttng-ivc
 
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     axes:
       - axis:
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
 
     builders:
       - shell:
-         !include-raw-verbatim: scripts/lttng-ivc/build.sh
+          !include-raw-verbatim: scripts/lttng-ivc/build.sh
 
     publishers:
       - archive:
@@ -166,20 +170,20 @@
     defaults: lttng-ivc
 
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     axes:
       - axis:
-         type: slave
-         name: slave
-         values: '{obj:slave}'
+          type: slave
+          name: slave
+          values: '{obj:slave}'
       - axis:
-         type: user-defined
-         name: platform
-         values: '{obj:platforms}'
+          type: user-defined
+          name: platform
+          values: '{obj:platforms}'
 
     builders:
       - shell:
-         !include-raw-verbatim: scripts/lttng-ivc/build.sh
+          !include-raw-verbatim: scripts/lttng-ivc/build.sh
 
     publishers:
       - archive:

@@ -129,7 +129,9 @@
       - string:
           name: 'GERRIT_REFSPEC'
           default: ''
-          description: 'The refspec to fetch. E.g. `refs/changes/15/14715/2`. You may find it in the gerrit interface for downloading a specific revision of patch'
+          description: |
+            The refspec to fetch. E.g. `refs/changes/15/14715/2`.
+            You may find it in the gerrit interface for downloading a specific revision of patch.
       - string:
           name: 'GERRIT_NAME'
           default: 'review.lttng.org'
@@ -217,7 +219,7 @@
 - _lttng-tools_matrix_axes_defaults: &lttng-tools_matrix_axes_defaults
     name: 'lttng-tools_matrix_axes_defaults'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     execution-strategy: &lttng-tools_matrix_execution-strategy_defaults
       combination-filter: 'evaluate(MATRIX_FILTER)'
       touchstone:
@@ -225,36 +227,36 @@
         result: unstable
     axes:
       - axis: &lttng-tools_matrix_axis_platform
-         type: slave
-         name: platform
-         values: '{obj:platforms}'
+          type: slave
+          name: platform
+          values: '{obj:platforms}'
       - axis: &lttng-tools_matrix_axis_conf
-         type: user-defined
-         name: conf
-         values: '{obj:confs}'
+          type: user-defined
+          name: conf
+          values: '{obj:confs}'
       - axis: &lttng-tools_matrix_axis_build
-         type: user-defined
-         name: build
-         values: '{obj:builds}'
+          type: user-defined
+          name: build
+          values: '{obj:builds}'
       - axis: &lttng-tools_matrix_axis_liburcu_version
-         type: user-defined
-         name: liburcu_version
-         values: '{obj:urcuversions}'
+          type: user-defined
+          name: liburcu_version
+          values: '{obj:urcuversions}'
       - axis: &lttng-tools_matrix_axis_babeltrace_version
-         type: user-defined
-         name: babeltrace_version
-         values: '{obj:babelversions}'
+          type: user-defined
+          name: babeltrace_version
+          values: '{obj:babelversions}'
 
 - _lttng-tools_matrix_axes_rootbuild: &lttng-tools_matrix_axes_rootbuild
     name: 'lttng-tools_matrix_axes_rootbuild'
     project-type: matrix
-    node: 'master' # Applies only to matrix flyweight task
+    node: 'master'  # Applies only to matrix flyweight task
     execution-strategy: *lttng-tools_matrix_execution-strategy_defaults
     axes:
       - axis: &lttng-tools_matrix_axis_root_node
-         type: slave
-         name: node
-         values: '{obj:nodes}'
+          type: slave
+          name: node
+          values: '{obj:nodes}'
       - axis: &lttng-tools_matrix_axis_root_platform
           <<: *lttng-tools_matrix_axis_platform
           type: user-defined
@@ -372,12 +374,12 @@
                 git clone -b "{version}" https://github.com/{github_user}/lttng-modules.git src/lttng-modules
 
       - shell:
-         !include-raw-verbatim: scripts/lttng-tools/prebuild_clean_processes_coredumps.sh
+          !include-raw-verbatim: scripts/lttng-tools/prebuild_clean_processes_coredumps.sh
 
       - shell:
-         !include-raw-verbatim:
-           - scripts/common/print.sh
-           - scripts/lttng-tools/build.sh
+          !include-raw-verbatim:
+          - scripts/common/print.sh
+          - scripts/lttng-tools/build.sh
 
 - _lttng-tools_builders_review: &lttng-tools_builders_review
     name: 'lttng-tools_builders_review'
@@ -418,7 +420,7 @@
       - inject:
           properties-file: env.properties
       - shell:
-         !include-raw-verbatim: scripts/lttng-tools/gerrit-depends-on.sh
+          !include-raw-verbatim: scripts/lttng-tools/gerrit-depends-on.sh
 
       - inject:
           properties-file: gerrit_custom_dependencies.properties
@@ -455,16 +457,16 @@
           condition-kind: and
           on-evaluation-failure: run
           condition-operands:
-              - condition-kind: shell
-                condition-command: 'test "$GERRIT_DEP_LTTNG_UST" = ""'
-              - condition-kind: not
-                condition-operand:
-                  condition-kind: regex-match
-                  label: '$conf'
-                  regex: '(no-ust|relayd-only)'
-              - condition-kind: regex-match
-                label: '$GERRIT_PROJECT'
-                regex: '(lttng-tools)'
+            - condition-kind: shell
+              condition-command: 'test "$GERRIT_DEP_LTTNG_UST" = ""'
+            - condition-kind: not
+              condition-operand:
+                condition-kind: regex-match
+                label: '$conf'
+                regex: '(no-ust|relayd-only)'
+            - condition-kind: regex-match
+              label: '$GERRIT_PROJECT'
+              regex: '(lttng-tools)'
           steps:
             - copyartifact:
                 <<: *lttng-tools_steps_copyartifact_defaults
@@ -477,16 +479,16 @@
           condition-kind: and
           on-evaluation-failure: run
           condition-operands:
-              - condition-kind: shell
-                condition-command: 'test "$GERRIT_DEP_LTTNG_UST" = ""'
-              - condition-kind: not
-                condition-operand:
-                  condition-kind: regex-match
-                  label: '$conf'
-                  regex: '(no-ust|relayd-only)'
-              - condition-kind: shell
-                label: '$GERRIT_PROJECT'
-                regex: 'if [[ $GERRIT_PROJECT =~ "lttng-tools" ]] ; then exit 1 ; fi'
+            - condition-kind: shell
+              condition-command: 'test "$GERRIT_DEP_LTTNG_UST" = ""'
+            - condition-kind: not
+              condition-operand:
+                condition-kind: regex-match
+                label: '$conf'
+                regex: '(no-ust|relayd-only)'
+            - condition-kind: shell
+              label: '$GERRIT_PROJECT'
+              regex: 'if [[ $GERRIT_PROJECT =~ "lttng-tools" ]] ; then exit 1 ; fi'
           steps:
             - copyartifact:
                 <<: *lttng-tools_steps_copyartifact_defaults
@@ -534,7 +536,7 @@
                 project: '{bt_job_prefix}babeltrace_${{babeltrace_version}}_{babeltrace_buildtype}/platform={babeltrace_platform},conf=std,build=std'
 
       - shell:
-         !include-raw-verbatim: scripts/lttng-tools/prebuild_clean_processes_coredumps.sh
+          !include-raw-verbatim: scripts/lttng-tools/prebuild_clean_processes_coredumps.sh
 
       # Build liburcu if we depend on a specific liburcu change
       - conditional-step:
@@ -542,13 +544,13 @@
           condition-command: 'test "$GERRIT_DEP_USERSPACE_RCU" != ""'
           steps:
             - shell:
-               !include-raw-verbatim:
-                   - scripts/common/override-build-std.sh
-                   - scripts/common/print.sh
-                   - scripts/liburcu/build.sh
-                   - scripts/common/clean-build-dir.sh
+                !include-raw-verbatim:
+                - scripts/common/override-build-std.sh
+                - scripts/common/print.sh
+                - scripts/liburcu/build.sh
+                - scripts/common/clean-build-dir.sh
             - shell:
-               !include-raw-verbatim: scripts/lttng-tools/gerrit-install-deps.sh
+                !include-raw-verbatim: scripts/lttng-tools/gerrit-install-deps.sh
 
       # Build babeltrace if we depend on a specific babeltrace change
       - conditional-step:
@@ -556,13 +558,13 @@
           condition-command: 'test "$GERRIT_DEP_BABELTRACE" != ""'
           steps:
             - shell:
-               !include-raw-verbatim:
-                   - scripts/common/override-build-std.sh
-                   - scripts/common/print.sh
-                   - scripts/babeltrace/build.sh
-                   - scripts/common/clean-build-dir.sh
+                !include-raw-verbatim:
+                - scripts/common/override-build-std.sh
+                - scripts/common/print.sh
+                - scripts/babeltrace/build.sh
+                - scripts/common/clean-build-dir.sh
             - shell:
-               !include-raw-verbatim: scripts/lttng-tools/gerrit-install-deps.sh
+                !include-raw-verbatim: scripts/lttng-tools/gerrit-install-deps.sh
 
       # Build lttng-ust if we depend on a specific lttng-ust change
       - conditional-step:
@@ -577,19 +579,19 @@
                 regex: '(no-ust|relayd-only)'
           steps:
             - shell:
-               !include-raw-verbatim:
-                   - scripts/common/override-build-std.sh
-                   - scripts/common/print.sh
-                   - scripts/lttng-ust/build.sh
-                   - scripts/common/clean-build-dir.sh
+                !include-raw-verbatim:
+                - scripts/common/override-build-std.sh
+                - scripts/common/print.sh
+                - scripts/lttng-ust/build.sh
+                - scripts/common/clean-build-dir.sh
             - shell:
-               !include-raw-verbatim: scripts/lttng-tools/gerrit-install-deps.sh
+                !include-raw-verbatim: scripts/lttng-tools/gerrit-install-deps.sh
 
       # Finaly build lttng-tools
       - shell:
-         !include-raw-verbatim:
-           - scripts/common/print.sh
-           - scripts/lttng-tools/build.sh
+          !include-raw-verbatim:
+          - scripts/common/print.sh
+          - scripts/lttng-tools/build.sh
 
 - _lttng-tools_builders_win: &lttng-tools_builders_win
     name: 'lttng-tools_builders_win'
@@ -610,11 +612,11 @@
           condition-string2: 'cygwin64'
           steps:
             - shell:
-               !include-raw-verbatim:
-                 - scripts/common/cygwin64-shebang
-                 - scripts/common/cygpath-prefix
-                 - scripts/common/print.sh
-                 - scripts/lttng-tools/build.sh
+                !include-raw-verbatim:
+                - scripts/common/cygwin64-shebang
+                - scripts/common/cygpath-prefix
+                - scripts/common/print.sh
+                - scripts/lttng-tools/build.sh
 
       - conditional-step:
           condition-kind: strings-match
@@ -623,13 +625,13 @@
           condition-string2: 'msys2-ucrt64'
           steps:
             - inject:
-               properties-content: 'MSYSTEM=UCRT64'
+                properties-content: 'MSYSTEM=UCRT64'
             - shell:
-               !include-raw-verbatim:
-                 - scripts/common/msys2-shebang
-                 - scripts/common/cygpath-prefix
-                 - scripts/common/print.sh
-                 - scripts/lttng-tools/build.sh
+                !include-raw-verbatim:
+                - scripts/common/msys2-shebang
+                - scripts/common/cygpath-prefix
+                - scripts/common/print.sh
+                - scripts/lttng-tools/build.sh
 
 - _lttng-tools_publishers_defaults: &lttng-tools_publishers_defaults
     name: 'lttng-tools_publishers_defaults'
@@ -642,10 +644,10 @@
           builders:
             - role: SLAVE
               build-on:
-                  - ABORTED
+                - ABORTED
               build-steps:
-                  - shell:
-                      !include-raw-verbatim: scripts/lttng-tools/postbuild_wait_10_seconds.sh
+                - shell:
+                    !include-raw-verbatim: scripts/lttng-tools/postbuild_wait_10_seconds.sh
 
       # On build failure, try to get partial tap results if any exists
       - postbuildscript: &lttng-tools_publisher_postbuildscript_collect_tap_on_failure
@@ -653,11 +655,11 @@
           builders:
             - role: SLAVE
               build-on:
-                  - ABORTED
-                  - FAILURE
+                - ABORTED
+                - FAILURE
               build-steps:
-                  - shell:
-                      !include-raw-verbatim: scripts/lttng-tools/postbuild_collect_tap_results.sh
+                - shell:
+                    !include-raw-verbatim: scripts/lttng-tools/postbuild_collect_tap_results.sh
 
       # If there are leftover lttng processes or core files present, kill the
       # processes, collect the core files, delete them and mark the build
@@ -667,14 +669,14 @@
           builders:
             - role: SLAVE
               build-on:
-                  - SUCCESS
-                  - UNSTABLE
-                  - NOT_BUILT
-                  - ABORTED
-                  - FAILURE
+                - SUCCESS
+                - UNSTABLE
+                - NOT_BUILT
+                - ABORTED
+                - FAILURE
               build-steps:
-                  - shell:
-                      !include-raw-verbatim: scripts/lttng-tools/postbuild_clean_processes_coredumps.sh
+                - shell:
+                    !include-raw-verbatim: scripts/lttng-tools/postbuild_clean_processes_coredumps.sh
 
       - tap: &lttng-tools_publisher_tap_defaults
           results: 'tap/**/*.log'
@@ -827,8 +829,8 @@
     triggers:
       - pollscm: *lttng-tools_trigger_pollscm_default
       - reverse:
-            jobs: '{ust_job_prefix}lttng-ust_{version}_{buildtype}'
-            result: 'success'
+          jobs: '{ust_job_prefix}lttng-ust_{version}_{buildtype}'
+          result: 'success'
 
 - job-template:
     name: '{job_prefix}lttng-tools_{version}_{cctype}'
@@ -857,8 +859,8 @@
     triggers:
       - pollscm: *lttng-tools_trigger_pollscm_default
       - reverse:
-            jobs: '{ust_job_prefix}lttng-ust_{version}_{cctype}'
-            result: 'success'
+          jobs: '{ust_job_prefix}lttng-ust_{version}_{cctype}'
+          result: 'success'
 
 - job-template:
     name: '{job_prefix}lttng-tools_{version}_root_{buildtype}'
@@ -879,8 +881,8 @@
     triggers:
       - pollscm: *lttng-tools_trigger_pollscm_default
       - reverse:
-            jobs: '{ust_job_prefix}lttng-ust_{version}_{buildtype}'
-            result: 'success'
+          jobs: '{ust_job_prefix}lttng-ust_{version}_{buildtype}'
+          result: 'success'
 
 - job-template:
     name: '{job_prefix}lttng-tools_{version}_root_{cctype}'
@@ -918,8 +920,8 @@
     triggers:
       - pollscm: *lttng-tools_trigger_pollscm_default
       - reverse:
-            jobs: '{ust_job_prefix}lttng-ust_{version}_{cctype}'
-            result: 'success'
+          jobs: '{ust_job_prefix}lttng-ust_{version}_{cctype}'
+          result: 'success'
 
 - job-template:
     name: lttng-tools_{version}_winbuild
@@ -1174,7 +1176,7 @@
 
     builders:
       - shell:
-         !include-raw-verbatim: scripts/common/check-format.sh
+          !include-raw-verbatim: scripts/common/check-format.sh
 
     properties:
       - inject: *lttng-tools_property_inject_defaults

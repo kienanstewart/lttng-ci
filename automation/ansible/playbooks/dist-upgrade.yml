@@ -6,34 +6,34 @@
     reboot_wait: 300
 
   vars_prompt:
-  - name: reboot
-    prompt: "Enter 'yes' to reboot"
-    default: 'no'
-    private: no
+    - name: reboot
+      prompt: "Enter 'yes' to reboot"
+      default: 'no'
+      private: false
 
   tasks:
-   - name: "apt update && apt dist-upgrade && apt clean && apt autoremove --purge"
-     ansible.builtin.apt:
-       update_cache: yes
-       cache_valid_time: 3600
-       upgrade: dist
-       clean: yes
-       autoremove: yes
-       purge: yes
+    - name: "apt update && apt dist-upgrade && apt clean && apt autoremove --purge"
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+        upgrade: dist
+        clean: true
+        autoremove: true
+        purge: true
 
-   - name: "Reboot server"
-     command: /sbin/reboot
-     async: 0
-     poll: 0
-     ignore_errors: true
-     when: reboot == "yes"
-     register: last_result
+    - name: "Reboot server"
+      command: /sbin/reboot
+      async: 0
+      poll: 0
+      ignore_errors: true
+      when: reboot == "yes"
+      register: last_result
 
-   - name: wait for the server to reboot
-     local_action: wait_for host={{ inventory_hostname }}
-                   port=22
-                   delay=1
-                   timeout=300
-                   state=started
-     when: last_result.changed
-     become: false
+    - name: wait for the server to reboot
+      local_action: wait_for host={{ inventory_hostname }}
+          port=22
+          delay=1
+          timeout=300
+          state=started
+      when: last_result.changed
+      become: false
