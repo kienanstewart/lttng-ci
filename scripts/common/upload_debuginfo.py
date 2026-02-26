@@ -3,8 +3,8 @@
 import argparse
 import enum
 import logging
-import pathlib
 import os
+import pathlib
 import re
 import shutil
 import subprocess

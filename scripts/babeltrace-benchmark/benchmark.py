@@ -13,7 +13,6 @@ import re
 import sys
 import tempfile
 import urllib.parse
-
 from operator import add
 from statistics import mean
 
