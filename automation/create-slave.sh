@@ -27,12 +27,12 @@ ci-slave-x64-02-01 amd64 52:54:00:c3:1a:30 cloud02.internal.efficios.com
 ci-slave-x64-02-02 amd64 52:54:00:b1:92:a3 cloud02.internal.efficios.com
 ci-slave-x64-02-03 amd64 52:54:00:3a:6b:ca cloud02.internal.efficios.com
 ci-slave-x64-02-04 amd64 52:54:00:c9:91:d1 cloud02.internal.efficios.com" | \
-while read node arch mac host
+while read -r node arch mac host
 do
 
-if [ "x$host" != "x" ]; then
+if [ "$host" != "" ]; then
 
-virt-install --name ${node} \
+virt-install --name "${node}" \
     --ram 4096 \
     --vcpus 8 \
     --disk pool=default,size=20 \
@@ -42,11 +42,10 @@ virt-install --name ${node} \
     --location "http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-${arch}/" \
     --initrd-inject='preseed.cfg' \
     --extra-args='debian-installer/locale=en_US.UTF-8 keyboard-configuration/layoutcode=us netcfg/choose_interface=auto hostname=unassigned' \
-    --connect=qemu+ssh://root@${host}/system \
+    --connect="qemu+ssh://root@${host}/system" \
     >/dev/null 2>&1 &
 
 sleep 10
 fi
 
 done
-

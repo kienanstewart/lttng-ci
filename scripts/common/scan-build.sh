@@ -55,34 +55,38 @@ mkdir -p "$DEPS_INC"
 # temp directory to store the scan-build report
 SCAN_BUILD_TMPDIR=$(mktemp -d)
 
+CONF_OPTS=()
 case "$PROJECT_NAME" in
 babeltrace)
     export BABELTRACE_DEV_MODE=1
     export BABELTRACE_DEBUG_MODE=1
     export BABELTRACE_MINIMAL_LOG_LEVEL=TRACE
-    CONF_OPTS="--enable-python-bindings --enable-python-bindings-doc --enable-python-plugins"
+    CONF_OPTS=(
+        "--enable-python-bindings"
+        "--enable-python-bindings-doc"
+        "--enable-python-plugins"
+    )
     BUILD_TYPE="autotools"
     ;;
 liburcu)
-    CONF_OPTS=""
     BUILD_TYPE="autotools"
     ;;
 lttng-modules)
-    CONF_OPTS=""
     BUILD_TYPE="autotools"
     ;;
 lttng-tools)
-    CONF_OPTS=""
     BUILD_TYPE="autotools"
     ;;
 lttng-ust)
-    CONF_OPTS="--enable-java-agent-all --enable-python-agent"
+    CONF_OPTS=(
+        "--enable-java-agent-all"
+        "--enable-python-agent"
+    )
     BUILD_TYPE="autotools"
     export CLASSPATH="/usr/share/java/log4j-api.jar:/usr/share/java/log4j-core.jar:/usr/share/java/log4j-1.2.jar"
     ;;
 *)
     echo "Generic project, no configure options."
-    CONF_OPTS=""
     BUILD_TYPE="autotools"
     ;;
 esac
@@ -100,7 +104,7 @@ autotools)
     # Prepare build dir for autotools based projects
     if [ -f "./bootstrap" ]; then
       ./bootstrap
-      ./configure $CONF_OPTS
+      ./configure "${CONF_OPTS[@]}"
     fi
 
     scan-build -k -o "${SCAN_BUILD_TMPDIR}" make -j"$NPROC" V=1

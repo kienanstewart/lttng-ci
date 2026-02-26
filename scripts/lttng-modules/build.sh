@@ -20,19 +20,21 @@ set -exu
 
 # Kernel version compare functions
 verlte() {
-    [  "$1" = "`printf '%s\n%s' $1 $2 | sort -V | head -n1`" ]
+    [  "$1" = "$(printf '%s\n%s' "$1" "$2" | sort -V | head -n1)" ]
 }
 
 verlt() {
-    [ "$1" = "$2" ] && return 1 || verlte $1 $2
+    [ "$1" = "$2" ] && return 1
+    verlte "$1" "$2"
 }
 
 vergte() {
-    [  "$1" = "`printf '%s\n%s' $1 $2 | sort -V | tail -n1`" ]
+    [  "$1" = "$(printf '%s\n%s' "$1" "$2" | sort -V | tail -n1)" ]
 }
 
 vergt() {
-    [ "$1" = "$2" ] && return 1 || vergte $1 $2
+    [ "$1" = "$2" ] && return 1
+    vergte "$1" "$2"
 }
 
 
@@ -67,10 +69,8 @@ if { vergte "$KVERSION" "3.10" && verlte "$KVERSION" "3.10.13"; } || \
     set +e
 
     # Build modules
-    KERNELDIR="${LNXBINDIR}" make -j${NPROC} V=1 CONFIG_LTTNG=m
-
     # We expect this build to fail, if it doesn't, fail the job.
-    if [ "$?" -eq 0 ]; then
+    if KERNELDIR="${LNXBINDIR}" make -j"${NPROC}" V=1 CONFIG_LTTNG=m ; then
         exit 1
     fi
 
@@ -97,7 +97,7 @@ else # Regular build
     esac
 
     # Build modules
-    KERNELDIR="${LNXBINDIR}" make -j${NPROC} "${make_args[@]}"
+    KERNELDIR="${LNXBINDIR}" make -j"${NPROC}" "${make_args[@]}"
 
     # Install modules to build dir
     KERNELDIR="${LNXBINDIR}" make INSTALL_MOD_PATH="${BUILDDIR}" modules_install "${make_args[@]}"

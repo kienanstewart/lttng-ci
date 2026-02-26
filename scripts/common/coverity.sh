@@ -16,7 +16,6 @@ WORKSPACE=${WORKSPACE:-}
 COVERITY_SCAN_DESCRIPTION="Automated CI build"
 COVERITY_SCAN_NOTIFICATION_EMAIL="ci-notification@lists.lttng.org"
 COVERITY_SCAN_BUILD_OPTIONS=""
-#COVERITY_SCAN_BUILD_OPTIONS=("--return-emit-failures 8" "--parse-error-threshold 85")
 
 DEPS_INC="$WORKSPACE/deps/build/include"
 DEPS_LIB="$WORKSPACE/deps/build/lib"
@@ -158,7 +157,7 @@ autotools)
       ./configure "${CONF_OPTS[@]}"
     fi
 
-    cov-build --dir "$RESULTS_DIR" ${COVERITY_SCAN_BUILD_OPTIONS[@]} make -j"$NPROC" V=1
+    cov-build --dir "$RESULTS_DIR" "${COVERITY_SCAN_BUILD_OPTIONS[@]}" make -j"$NPROC" V=1
     ;;
 *)
     echo "Unsupported build type: $BUILD_TYPE"

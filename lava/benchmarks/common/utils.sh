@@ -26,16 +26,16 @@ function upload_artifact()
     set +x
     local local_file=$1
     local s3_key=$2
-    local md5
-    local CURL_RC="$(mktemp)"
-    local ERR_LOG="$(mktemp)"
+    local md5 CURL_RC ERR_LOG
+    CURL_RC="$(mktemp)"
+    ERR_LOG="$(mktemp)"
 
-    md5="$(openssl md5 -binary $local_file | openssl base64)"
+    md5="$(openssl md5 -binary "$local_file" | openssl base64)"
 
     # Fetch the S3 keys stored in secrets. Usea a subshell to avoid source into
     # the current context.
     (
-        # shellcheck disable=SC1091
+        # shellcheck disable=SC1090,SC1091
         source "/lava-${LAVA_JOB_ID}/secrets"
         echo "user = \"$S3_ACCESS_KEY:$S3_SECRET_KEY\""
     ) > "${CURL_RC}"
@@ -56,13 +56,14 @@ function delete_artifact()
 {
     set +x
     local s3_key=$1
-    local CURL_RC="$(mktemp)"
-    local ERR_LOG="$(mktemp)"
+    local CURL_RC ERR_LOG
+    CURL_RC="$(mktemp)"
+    ERR_LOG="$(mktemp)"
 
     # Fetch the S3 keys stored in secrets. Usea a subshell to avoid source into
     # the current context.
     (
-        # shellcheck disable=SC1091
+        # shellcheck disable=SC1090,SC1091
         source "/lava-${LAVA_JOB_ID}/secrets"
         echo "user = \"$S3_ACCESS_KEY:$S3_SECRET_KEY\""
     ) > "${CURL_RC}"

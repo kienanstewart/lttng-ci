@@ -415,6 +415,12 @@ fetch_ubuntu_versions() {
     ret=
     while [[ "${ret}" != "0" ]]; do
         if [[ "${ret}" != "" ]]; then
+            retries=$((retries - 1))
+            if [[ "$retries" -lt "0" ]]; then
+                echo "Aborting after several attempts" >&2
+                exit 1
+            fi
+
             sleep "${backoff}"
             backoff=$((backoff + backoff_delta))
         fi
@@ -770,6 +776,7 @@ build_linux_kernel() {
 
     if { vergte "${kversion}" "6.13"; } && [ "${cross_arch}" = "powerpc" ]; then
         # @see https://lore.kernel.org/lkml/20250218-buildfix-extmod-powerpc-v2-1-1e78fcf12b56@efficios.com/
+        # shellcheck disable=SC2016 # '$(objtree)' is not meant to be expanded
         sed -i 's#KBUILD_LDFLAGS_MODULE += arch/powerpc/lib/crtsavres.o#KBUILD_LDFLAGS_MODULE += $(objtree)/arch/powerpc/lib/crtsavres.o#' arch/powerpc/Makefile
     fi
 
@@ -1408,7 +1415,7 @@ print_header "Clone LTTng-modules sources"
 git_clone_modules_sources
 
 # Setup cross compile env if available
-if [ "x${cross_arch}" != "x" ]; then
+if [[ "${cross_arch}" != "" ]]; then
 
     case "$cross_arch" in
         "armhf")
@@ -1457,7 +1464,7 @@ if [ "x${cross_arch}" != "x" ]; then
     export CROSS_COMPILE="${cross_compile}"
 
 # Set arch specific values if we are not cross compiling
-elif [ "x${arch}" != "x" ]; then
+elif [[ "${arch}" != "" ]]; then
 
     case "$arch" in
         "i386")
@@ -1614,13 +1621,13 @@ print_header "Check for built modules in install directory"
 
 # Make sure some modules were actually built
 tree "${MODULES_OUTPUT_KSRC_DIR}"
-if [ "x$(find "${MODULES_OUTPUT_KSRC_DIR}" -name '*.ko*' -printf yes -quit)" != "xyes" ]; then
+if [ "$(find "${MODULES_OUTPUT_KSRC_DIR}" -name '*.ko*' -printf yes -quit)" != "yes" ]; then
   echo "No modules built!"
   exit 1
 fi
 
 tree "${MODULES_OUTPUT_KHDR_DIR}"
-if [ "x$(find "${MODULES_OUTPUT_KHDR_DIR}" -name '*.ko*' -printf yes -quit)" != "xyes" ]; then
+if [ "$(find "${MODULES_OUTPUT_KHDR_DIR}" -name '*.ko*' -printf yes -quit)" != "yes" ]; then
   echo "No modules built!"
   exit 1
 fi

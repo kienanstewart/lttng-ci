@@ -3,9 +3,11 @@
 set -exu
 set -o pipefail
 
+# shellcheck source=SCRIPTDIR/../common/utils.sh disable=SC1091
 source lava/benchmarks/common/utils.sh
 
 enable_performance_cpu_governor || true
+# shellcheck disable=SC2119
 enable_coredumps || true
 
 # Setup ram disk
@@ -45,7 +47,7 @@ function set_commits_from_ust_commit()
     # The first heuristic is the nearest tag. This is _not_ very good on
     # the master branch, but otherwise it's probably "ok".
     tag="$(git -C "${UST_SRC_DIR}" describe --abbrev=0 "${commit}")"
-    vmajor_minor="$(echo $tag | cut -d '.' -f 1-2)"
+    vmajor_minor="$(echo "$tag" | cut -d '.' -f 1-2)"
 
     # Use the .0 release of the major.minor
     tools_commit="${vmajor_minor}.0"
@@ -57,7 +59,8 @@ function set_commits_from_ust_commit()
 function mark_commit_failure()
 {
     local msg="${1:-Unknown failure}"
-    local file="$(mktemp)"
+    local file
+    file="$(mktemp)"
     echo "[$(date)] ${msg}" > "$file"
     upload_artifact "$file" "$RESULTS_DIR/failed"
     rm -f "$file"
@@ -87,7 +90,7 @@ function build_urcu()
                 CXXFLAGS="${DEFAULT_CXXFLAGS}" \
                 LDFLAGS="${DEFAULT_LDFLAGS}" \
                 --prefix="${PREFIX}" > "${LOGS_DIR}/config.log" 2>&1
-            make -j$(nproc) > "${LOGS_DIR}/make.log" 2>&1
+            make -j"$(nproc)" > "${LOGS_DIR}/make.log" 2>&1
             make install > "${LOGS_DIR}/install.log" 2>&1
         ); then
         ret=1
@@ -131,7 +134,7 @@ function build_babeltrace()
                 CXXFLAGS="${DEFAULT_CXXFLAGS}" \
                 LDFLAGS="${DEFAULT_LDFLAGS}" \
                 --prefix="${PREFIX}" > "${LOG_DIR}/config.log" 2>&1
-            make -j$(nproc) > "${LOG_DIR}/make.log" 2>&1
+            make -j"$(nproc)" > "${LOG_DIR}/make.log" 2>&1
             make install > "${LOG_DIR}/install.log" 2>&1
         ); then
         ret=1
@@ -152,8 +155,8 @@ function build_modules()
     tag="$(git -C "${MODULES_SRC_DIR}" describe)" || true
     if [[ "${commit}" == "$(git -C "${MODULES_SRC_DIR}" rev-parse HEAD)" ]] || [[ "${commit}" == "${tag}" ]] ; then
         echo "lttng-modules already on commit '${commit}'" >&2
-        make -C "${MODULES_SRC_DIR}" modules_install INSTALL_MOD_PATH=$PREFIX/usr > install.log 2>&1
-        depmod --all --base-dir=$PREFIX/usr > depmod.log 2>&1
+        make -C "${MODULES_SRC_DIR}" modules_install INSTALL_MOD_PATH="$PREFIX/usr" > install.log 2>&1
+        depmod --all --base-dir="$PREFIX/usr" > depmod.log 2>&1
         return $ret
     fi
 
@@ -163,9 +166,9 @@ function build_modules()
             cd "${MODULES_SRC_DIR}"
             git clean -dxf >/dev/null
             git checkout "${commit}"
-            make -j$(nproc) > "${LOG_DIR}/make.log" 2>&1
-            make modules_install INSTALL_MOD_PATH=$PREFIX/usr > "${LOG_DIR}/install.log" 2>&1
-            depmod --all --base-dir=$PREFIX/usr > "${LOG_DIR}/depmod.log" 2>&1
+            make -j"$(nproc)" > "${LOG_DIR}/make.log" 2>&1
+            make modules_install INSTALL_MOD_PATH="$PREFIX/usr" > "${LOG_DIR}/install.log" 2>&1
+            depmod --all --base-dir="$PREFIX/usr" > "${LOG_DIR}/depmod.log" 2>&1
     ); then
         # It's okay if lttng-modules fails
         ret=0
@@ -205,7 +208,7 @@ function build_ust()
                 CXXFLAGS="${DEFAULT_CXXFLAGS}" \
                 LDFLAGS="${DEFAULT_LDFLAGS}" \
                 --prefix="${PREFIX}" > "${LOG_DIR}/config.log" 2>&1
-            make -j$(nproc) > "${LOG_DIR}/make.log" 2>&1
+            make -j"$(nproc)" > "${LOG_DIR}/make.log" 2>&1
             make install > "${LOG_DIR}/install.log" 2>&1
         ); then
         ret=1
@@ -248,7 +251,7 @@ function build_tools()
                 CXXFLAGS="${DEFAULT_CXXFLAGS}" \
                 LDFLAGS="${DEFAULT_LDFLAGS}" \
                 --prefix="${PREFIX}" > "${LOG_DIR}/config.log" 2>&1
-            make -j$(nproc) > "${LOG_DIR}/make.log" 2>&1
+            make -j"$(nproc)" > "${LOG_DIR}/make.log" 2>&1
             make install > "${LOG_DIR}/install.log" 2>&1
         ); then
         ret=1
@@ -270,7 +273,7 @@ function build_ust_benchmarks()
                 EXTRA_CPPFLAGS="${DEFAULT_CPPFLAGS}" \
                 EXTRA_LDFLAGS="${DEFAULT_LDFLAGS}" \
                 LTTNG_MODULES_DIR="${MODULES_SRC_DIR}"
-    make -C "${UST_BENCHMARKS_SRC_DIR}" -j$(nproc) \
+    make -C "${UST_BENCHMARKS_SRC_DIR}" -j"$(nproc)" \
                 EXTRA_CFLAGS="${DEFAULT_CFLAGS}" \
                 EXTRA_CPPFLAGS="${DEFAULT_CPPFLAGS}" \
                 EXTRA_LDFLAGS="${DEFAULT_LDFLAGS}" \

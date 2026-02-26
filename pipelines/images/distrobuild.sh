@@ -140,7 +140,7 @@ for IMAGE_DIR in "${IMAGE_DIRS[@]}" ; do
 done
 
 if [[ "${IMAGE_FILE}" == "" ]] ; then
-    fail 1 "Unable to find image file for '${OS}' in ${IMAGE_DIRS[@]}"
+    fail 1 "Unable to find image file for '${OS}' in ${IMAGE_DIRS[*]}"
 fi
 
 if grep -q -E 'XX[A-Za-z0-9_]+XX' "${IMAGE_FILE}" ; then
@@ -182,7 +182,7 @@ DISTROBUILDER_ARGS+=(
 )
 
 # Run the build
-${DISTROBUILDER_ARGS[@]}
+"${DISTROBUILDER_ARGS[@]}"
 
 # Import
 # As 'distrobuilder --import-into-incus=alias' doesn't work since it only
@@ -219,7 +219,7 @@ fi
 if [[ "${TEST}" == "true" ]] ; then
     set +e
     INSTANCE_NAME=''
-    if INSTANCE_NAME="$(incus -q launch -e ${VM_ARG[@]} -p default -p "${INCUS_INSTANCE_PROFILE}" "${FINGERPRINT}")" ; then
+    if INSTANCE_NAME="$(incus -q launch -e "${VM_ARG[@]}" -p default -p "${INCUS_INSTANCE_PROFILE}" "${FINGERPRINT}")" ; then
         INSTANCE_NAME="$(echo "${INSTANCE_NAME}" | cut -d':' -f2 | tr -d ' ')"
         CLEANUP+=(
             "incus stop -f ${INSTANCE_NAME}"

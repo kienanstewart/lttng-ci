@@ -120,7 +120,7 @@ clang-*)
     export CXX=clang++-${cc#clang-}
     ;;
 *)
-    if [ "x$cc" != "x" ]; then
+    if [[ "$cc" != "" ]]; then
         echo ""
         exit 1
     fi

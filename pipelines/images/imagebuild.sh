@@ -97,9 +97,9 @@ set +e
 TRIES_MAX=3
 TRIES=0
 while [[ "${TRIES}" -lt "${TRIES_MAX}" ]] ; do
-    if ! INSTANCE_NAME=$(${INCUS_ARGS[@]} "${SOURCE_IMAGE_NAME}/${IMAGE_TYPE}") ; then
+    if ! INSTANCE_NAME=$("${INCUS_ARGS[@]}" "${SOURCE_IMAGE_NAME}/${IMAGE_TYPE}") ; then
         # Try from images
-        if ! INSTANCE_NAME=$(${INCUS_ARGS[@]} images:"${SOURCE_IMAGE_NAME}") ; then
+        if ! INSTANCE_NAME=$("${INCUS_ARGS[@]}" images:"${SOURCE_IMAGE_NAME}") ; then
             TRIES=$((TRIES + 1))
             echo "Failed to deployed ephemereal instance attempt ${TRIES}/${TRIES_MAX}"
             if [[ "${TRIES}" -lt  "${TRIES_MAX}" ]] ; then
@@ -159,7 +159,7 @@ fi
 # Ref: https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
 #
 ANSIBLE_PYTHON_INTERPRETER="${ANSIBLE_PYTHON_INTERPRETER:-python3}"
-TARGET_PYTHON_VERSION="$(incus exec "${INSTANCE_NAME}" -- ${ANSIBLE_PYTHON_INTERPRETER} --version | cut -d' ' -f2 | cut -d'.' -f1,2)"
+TARGET_PYTHON_VERSION="$(incus exec "${INSTANCE_NAME}" -- "${ANSIBLE_PYTHON_INTERPRETER}" --version | cut -d' ' -f2 | cut -d'.' -f1,2)"
 ANSIBLE_VERSION="$(ansible --version | head -n1 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | cut -d'.' -f1,2)"
 case "${TARGET_PYTHON_VERSION}" in
     "3.13")

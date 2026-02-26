@@ -3,9 +3,11 @@
 set -exu
 set -o pipefail
 
+# shellcheck source=SCRIPTDIR/../common/utils.sh disable=SC1091
 source lava/benchmarks/common/utils.sh
 
 enable_performance_cpu_governor || true
+# shellcheck disable=SC2119
 enable_coredumps || true
 
 BASE_DIR="$(pwd)"
@@ -80,7 +82,7 @@ while read -d ' ' -r commit ; do
         continue
     fi
 
-    if ! make -j$(nproc) > ../make.log 2>&1 ; then
+    if ! make -j"$(nproc)" > ../make.log 2>&1 ; then
         # Upload log
         cat ../make.log
         echo "[${commit}] make failed" >&2
@@ -104,7 +106,7 @@ while read -d ' ' -r commit ; do
 
     ldconfig
     BT_BIN=$PREFIX/bin/babeltrace2
-    if [ -a "$PREFIX/bin/babeltrace" ] ; then
+    if [ -e "$PREFIX/bin/babeltrace" ] ; then
         echo "Running bt1"
         BT_BIN=$PREFIX/bin/babeltrace
     fi

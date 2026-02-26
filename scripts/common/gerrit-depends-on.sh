@@ -54,11 +54,9 @@ git rev-list --format=%B --max-count=1 HEAD | while read -r line; do
             # the change id. We could also be clever and require that the
             # "branch name" be included in the `Depends-on` clause.
             local_query="${gerrit_url}/changes/?q=change:${gerrit_id}+branch:${GERRIT_BRANCH}${gerrit_query}"
-            default_branch="${GERRIT_BRANCH}"
             ;;
         *)
             local_query="${gerrit_url}/changes/?q=change:${gerrit_id}${gerrit_query}"
-            default_branch="master"
             ;;
     esac
 

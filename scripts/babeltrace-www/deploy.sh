@@ -47,7 +47,8 @@ apt-get update
 
 print_header "Install web tooling dependencies"
 apt-get install -y jekyll npm grunt python3 python3-pip python3-venv linkchecker
-export PYTHON_CONFIG=$(realpath python3-config)
+PYTHON_CONFIG=$(realpath python3-config)
+export PYTHON_CONFIG="${PYTHON_CONFIG}"
 
 print_header "Install babeltrace build dependencies"
 apt-get install -y asciidoc xmlto libdw-dev libelf-dev elfutils autoconf automake libglib2.0-dev make doxygen flex bison
@@ -57,6 +58,7 @@ npm install
 
 print_header "Install Python requirements"
 python3 -m venv build_venv
+# shellcheck disable=SC1091
 source build_venv/bin/activate
 pip install -r requirements.txt
 

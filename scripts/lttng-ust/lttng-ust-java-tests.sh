@@ -8,6 +8,7 @@ set -exu
 os_field() {
     field=$1
     if [ -f /etc/os-release ]; then
+        # shellcheck disable=SC1091
         echo "$(source /etc/os-release; echo "${!field}")"
     fi
 }
@@ -16,6 +17,7 @@ os_id() {
     os_field 'ID'
 }
 
+# shellcheck disable=SC2317,SC2329
 os_version_id() {
     os_field 'VERSION_ID'
 }
@@ -50,6 +52,7 @@ vercomp () {
     return 0
 }
 
+# shellcheck disable=SC2317,SC2329
 verlte() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "0" ] || [ "$res" -eq "2" ]
@@ -65,17 +68,19 @@ vergte() {
     [ "$res" -eq "0" ] || [ "$res" -eq "1" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 vergt() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "1" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 verne() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -ne "0" ]
 }
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 function cleanup
 {
     killall lttng-sessiond

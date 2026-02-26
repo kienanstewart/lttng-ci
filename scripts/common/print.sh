@@ -36,7 +36,8 @@ print_os() {
     print_blue "Operating System Details"
 
     if [ -f "/etc/os-release" ]; then
-        (. "/etc/os-release"; echo "Version: $NAME $VERSION")
+        # shellcheck disable=SC1091
+        (source "/etc/os-release"; echo "Version: $NAME $VERSION")
     elif [ -f "/etc/release" ]; then
         echo "Version: $(head -n1 /etc/release)"
     elif command -v sw_vers >/dev/null 2>&1; then

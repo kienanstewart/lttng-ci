@@ -7,6 +7,7 @@
 set -exu
 
 # Version compare functions
+# shellcheck disable=SC2317,SC2329
 vercomp () {
     set +u
     if [[ "$1" == "$2" ]]; then
@@ -36,26 +37,31 @@ vercomp () {
     return 0
 }
 
+# shellcheck disable=SC2317,SC2329
 verlte() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "0" ] || [ "$res" -eq "2" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 verlt() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "2" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 vergte() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "0" ] || [ "$res" -eq "1" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 vergt() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "1" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 verne() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -ne "0" ]
@@ -161,7 +167,7 @@ clang-*)
     export CXX=clang++-${cc#clang-}
     ;;
 *)
-    if [ "x$cc" != "x" ]; then
+    if [[ "$cc" != "" ]]; then
         export CC="$cc"
     fi
     ;;

@@ -39,32 +39,32 @@ vercomp () {
 # Shellcheck flags the following functions that are unused as "unreachable",
 # ignore that.
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 verlte() {
     vercomp "$1" "$2"
     local res="$?"
     [ "$res" -eq "0" ] || [ "$res" -eq "2" ]
 }
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 verlt() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "2" ]
 }
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 vergte() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "0" ] || [ "$res" -eq "1" ]
 }
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 vergt() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "1" ]
 }
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 verne() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -ne "0" ]
@@ -119,7 +119,8 @@ failed_configure() {
 os_field() {
     field=$1
     if [ -f /etc/os-release ]; then
-        echo $(source /etc/os-release; echo ${!field})
+        # shellcheck disable=SC1091
+        echo "$(source /etc/os-release; echo "${!field}")"
     fi
 }
 
@@ -127,6 +128,7 @@ os_id() {
     os_field 'ID'
 }
 
+# shellcheck disable=SC2317,SC2329
 os_version_id() {
     os_field 'VERSION_ID'
 }
@@ -212,7 +214,7 @@ clang-*)
     export CXX=clang++-${cc#clang-}
     ;;
 *)
-    if [ "x$cc" != "x" ]; then
+    if [[ "$cc" != "" ]]; then
         echo ""
         exit 1
     fi

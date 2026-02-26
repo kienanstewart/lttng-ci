@@ -20,7 +20,7 @@ export LIBVIRT_DEFAULT_URI="qemu:///system"
 tmp=$(mktemp)
 name=$1
 virsh vol-create-as --pool default --name "${name}.raw" --capacity 2G --format raw
-data_disk_path="$(virsh vol-path ${name}.raw --pool default)"
+data_disk_path="$(virsh vol-path "${name}.raw" --pool default)"
 sudo mkfs.ext4 "$data_disk_path"
 virt-install --print-xml \
     --name "$name" \

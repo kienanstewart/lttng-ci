@@ -19,12 +19,14 @@
 set -exu
 
 # Version compare functions
+# shellcheck disable=SC2317,SC2329
 vercomp () {
     set +u
     if [[ "$1" == "$2" ]]; then
         return 0
     fi
     local IFS=.
+    # shellcheck disable=SC2206
     local i ver1=($1) ver2=($2)
     # fill empty fields in ver1 with zeros
     for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
@@ -46,26 +48,31 @@ vercomp () {
     return 0
 }
 
+# shellcheck disable=SC2317,SC2329
 verlte() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "0" ] || [ "$res" -eq "2" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 verlt() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "2" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 vergte() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "0" ] || [ "$res" -eq "1" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 vergt() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -eq "1" ]
 }
 
+# shellcheck disable=SC2317,SC2329
 verne() {
     vercomp "$1" "$2"; local res="$?"
     [ "$res" -ne "0" ]
