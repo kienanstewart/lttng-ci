@@ -1,0 +1,132 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+
+pipeline {
+  agent {
+    label 'deb13-amd64'
+  }
+
+  environment {
+    PROJECT_NAME = 'tailleur'
+  }
+
+  options {
+    ansiColor('xterm')
+    skipDefaultCheckout()
+    preserveStashes()
+    timestamps()
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        cleanWs()
+        dir('src/tailleur') {
+          checkout([$class: 'GitSCM', branches: [[name: "${params.GIT_BRANCH}"]], userRemoteConfigs: [[url: "${params.GIT_URL}"]]])
+        }
+      }
+    }
+
+    stage('Fetch gerrit') {
+      when {
+        expression {
+          env.GERRIT_PROJECT == "tailleur"
+        }
+      }
+
+      steps {
+        dir('src/tailleur') {
+          sh(
+            label: 'fetch gerrit changeset',
+            script: '''#!/usr/bin/bash -x
+git fetch "https://${GERRIT_HOST}/${GERRIT_PROJECT}" "${GERRIT_PATCHSET_REVISION}"
+git checkout FETCH_HEAD
+''',
+          )
+        }
+      }
+    }
+
+    stage('Install python requirements') {
+      steps {
+        dir('src/tailleur') {
+          sh(
+            label: 'poetry',
+            script: '''#!/usr/bin/bash -x
+python3 -m virtualenv ../venv/
+source ../venv/bin/activate
+pip3 install poetry
+poetry install
+''',
+          )
+        }
+      }
+    }
+
+    stage('Python lint') {
+      steps {
+        dir('src/tailleur') {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh(
+              label: 'black',
+              script: '''#!/usr/bin/bash -x
+source ../venv/bin/activate
+poetry run black --check --diff .
+''',
+            )
+          }
+
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh(
+              label: 'isort',
+              script: '''#!/usr/bin/bash -x
+source ../venv/bin/activate
+poetry run python3 -m isort --check --diff .
+''',
+            )
+          }
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        dir('src/tailleur') {
+          sh(
+            label: 'poetry build',
+            script: '''#!/usr/bin/bash -x
+source ../venv/bin/activate
+poetry build
+''',
+          )
+
+          archiveArtifacts(artifacts: "dist/**")
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        dir('src/tailleur') {
+          sh(
+            label: 'pytest',
+            script: '''#!/usr/bin/bash -x
+source ../venv/bin/activate
+poetry run pytest -- \
+  -vv -rA  --capture=tee-sys --tb=long --color=no \
+  --log-cli-level=INFO -o log_level=INFO \
+  --junit-xml="results.xml" \
+  -o junit_logging=all \
+  -o junit_log_passing_tests=true \
+  -o junit_family=xunit2
+''',
+          )
+
+          archiveArtifacts(artifacts: "results.xml")
+          junit("results.xml")
+        }
+      }
+    }
+  }
+}

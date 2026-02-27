@@ -1,0 +1,83 @@
+---
+
+- defaults:
+    name: tailleur
+    concurrent: true
+    description: |
+      Job is managed by Jenkins Job Builder
+    project-type: pipeline
+    sandbox: true
+    properties:
+      - build-discarder:
+          !include: common/default_discarder.yaml.inc
+    wrappers:
+      - workspace-cleanup
+      - timestamps
+      - ansicolor
+
+    # Job variables
+    git_url: 'https://github.com/efficios/tailleur.git'
+    prefix: ''
+    version:
+      - master
+    review: false
+
+- job-template:
+    name: '{prefix}tailleur_{version}'
+    defaults: tailleur
+    dsl: !include-jinja2: pipelines/tailleur.groovy.j2
+    parameters:  !j2-yaml: |
+      - string:
+          name: 'GIT_URL'
+          default: '{git_url}'
+      - string:
+          name: 'GIT_BRANCH'
+          default: '{version}'
+      {% if review %}
+      {% include 'common/review_parameters.yaml.inc' %}
+      {% endif %}
+
+    scm:
+      - git:
+          url: '{git_url}'
+          branches:
+            - origin/{version}
+          basedir: src/tailleur
+          skip-tag: true
+
+    properties:
+      !j2-yaml: |
+            {% if review %}
+            - build-discarder:
+                !include: common/review_discarder.yaml.inc
+            {% else %}
+            - build-discarder:
+                !include: common/default_discarder.yaml.inc
+            {% endif %}
+
+    triggers:
+      - !j2-yaml: |
+        {% if review %}
+        gerrit:
+          trigger-on:
+            - comment-added-event:
+                approval-category: 'CI-Build'
+                approval-value: 1
+          projects:
+            - project-compare-type: 'PLAIN'
+              project-pattern: 'tailleur'
+              branches:
+                - branch-compare-type: 'ANT'
+                  branch-pattern: '{version}'
+        {% else %}
+        pollscm:
+          cron: '@hourly'
+        {% endif %}
+
+- project:
+    name: tailleur
+    jobs:
+      - '{prefix}tailleur_{version}': {}
+      - '{prefix}tailleur_{version}':
+          prefix: 'dev_review_'
+          review: true
