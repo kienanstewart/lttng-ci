@@ -660,6 +660,9 @@ build_linux_kernel() {
         # fs/f2fs/file.c:1093:49: error: ‘mapping’ undeclared (first use in this function)
         scripts/config --disable CONFIG_F2FS_FS
 
+        # Disable build time Suse kABI checks, some of them fail in our environment, maybe because of the different toolchain?
+        scripts/config --disable CONFIG_SUSE_HAVE_STABLE_KABI
+
         if [[ "${SLES_RELEASE}" == "150500" ]]; then
             # kernel/dma/swiotlb.c:1013:64: error: ‘debugfs_dir’ undeclared (first use in this function)
             scripts/config --set-val CONFIG_DMA_RESTRICTED_POOL n
