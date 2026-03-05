@@ -39,6 +39,7 @@ packages = [
     "clang",
     "cloc",
     "curl",
+    "dmsetup",
     "elfutils",
     "flex",
     "gdb",
