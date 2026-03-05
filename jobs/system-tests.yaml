@@ -82,7 +82,7 @@
           description: 'The LTTng version string (e.g. stable-2.14)'
       - string:
           name: 'ROOTFS_URL'
-          default: 'https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2026-02-06.tar.xz'
+          default: 'https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2026-03-05.tar.xz'
           description: 'The URL at which the system root FS can be downloaded'
       - string:
           name: 'S3_BASE_DIR'
