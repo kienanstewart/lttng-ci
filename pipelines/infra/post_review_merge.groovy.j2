@@ -1,0 +1,74 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+
+pipeline {
+  agent {
+    label 'deb13-amd64'
+  }
+
+  options {
+    ansiColor('xterm')
+    skipDefaultCheckout()
+    preserveStashes()
+    timestamps()
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        cleanWs()
+        dir('src/lttng-ci') {
+          checkout([$class: 'GitSCM', branches: [[name: "${params.GIT_BRANCH}"]], userRemoteConfigs: [[url: "${params.GIT_URL}"]]])
+        }
+      }
+    }
+
+    stage('Install dependencies') {
+      steps {
+        dir('src/lttng-ci') {
+          sh(
+            label: 'poetry',
+            script: '''#!/usr/bin/bash -x
+python3 -m virtualenv ../venv/
+source ../venv/bin/activate
+pip3 install poetry
+poetry install
+''',
+          )
+        }
+      }
+    }
+
+    stage('Run review hook') {
+      environment {
+        REDMINE_support_API_KEY = credentials("1eebca06-df10-403e-b6f8-073dce274dbe")
+        REDMINE_bugs_API_KEY = credentials("657b46bc-bde1-48f7-83ad-e96ba67fce4d")
+      }
+
+      steps {
+        dir('src/lttng-ci') {
+          sh(
+            label: "run hooks script",
+            script: '''#!/usr/bin/bash -x
+source ../venv/bin/activate
+ARGS=(
+    --branch "$GERRIT_BRANCH"
+    --url "$GERRIT_CHANGE_URL"
+    --event "$GERRIT_EVENT_TYPE"
+    --project "$GERRIT_PROJECT"
+    --base64-message "$GERRIT_CHANGE_COMMIT_MESSAGE"
+)
+
+if [[ "${NOOP}" == "true" ]]; then
+  ARGS+=("--noop")
+fi
+
+poetry run python3 scripts/infra/post_review_merge.py "${ARGS[@]}"
+'''
+          )
+        }
+      }
+    }
+  }
+}

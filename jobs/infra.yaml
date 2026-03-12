@@ -73,6 +73,44 @@
     review: false
 
 - job:
+    name: 'infra_post_review_merge'
+    defaults: infra
+    project-type: pipeline
+    concurrent: true
+    dsl: !include-jinja2: pipelines/infra/post_review_merge.groovy.j2
+    parameters: !j2-yaml: |
+      - string:
+          name: 'GIT_URL'
+          default: 'https://github.com/lttng/lttng-ci'
+      - string:
+          name: 'GIT_BRANCH'
+          default: '{version|master}'
+      - bool:
+          name: 'NOOP'
+          default: false
+      {% include 'common/review_parameters.yaml.inc' %}
+      - string:
+          name: 'GERRIT_EVENT_TYPE'
+          default: ''
+      - string:
+          name: 'GERRIT_CHANGE_COMMIT_MESSAGE'
+          default: ''
+          description: 'Base64 encoded commit message'
+      - string:
+          name: 'GERRIT_CHANGE_URL'
+          default: ''
+    triggers:
+      - gerrit:
+          trigger-on:
+            - change-merged-event
+          projects:
+            - project-compare-type: 'ANT'
+              project-pattern: '*'
+              branches:
+                - branch-compare-type: 'ANT'
+                  branch-pattern: '*'
+
+- job:
     name: 'infra_system_clean'
     defaults: infra
     project-type: freestyle
