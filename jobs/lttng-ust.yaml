@@ -36,6 +36,7 @@
     triggers:
       - pollscm:
           cron: "@hourly"
+      - timed: "@monthly"
 
     properties:
       - inject:

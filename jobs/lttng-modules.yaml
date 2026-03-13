@@ -31,6 +31,7 @@
     triggers:
       - pollscm:
           cron: "@hourly"
+      - timed: "@monthly"
 
     properties:
       - build-discarder:
@@ -411,6 +412,7 @@
       # Check for new commits every hour
       - pollscm:
           cron: "@hourly"
+      - timed: "@monthly"
 
     <<: *lttng-modules_build_parameters_defaults
     <<: *lttng-modules_build_builders_defaults
@@ -719,6 +721,7 @@
     triggers:
       - pollscm:
           cron: "@midnight"
+      - timed: "@monthly"
 
 - job-template:
     name: lttng-modules_{mversion}_build-rt

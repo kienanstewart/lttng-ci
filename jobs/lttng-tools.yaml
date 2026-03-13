@@ -78,6 +78,7 @@
     triggers:
       - pollscm: &lttng-tools_trigger_pollscm_default
           cron: "@hourly"
+      - timed: "@monthly"
 
     properties:
       - inject: &lttng-tools_property_inject_defaults
@@ -828,6 +829,7 @@
 
     triggers:
       - pollscm: *lttng-tools_trigger_pollscm_default
+      - timed: "@monthly"
       - reverse:
           jobs: '{ust_job_prefix}lttng-ust_{version}_{buildtype}'
           result: 'success'
@@ -858,6 +860,7 @@
 
     triggers:
       - pollscm: *lttng-tools_trigger_pollscm_default
+      - timed: "@monthly"
       - reverse:
           jobs: '{ust_job_prefix}lttng-ust_{version}_{cctype}'
           result: 'success'
@@ -880,6 +883,7 @@
 
     triggers:
       - pollscm: *lttng-tools_trigger_pollscm_default
+      - timed: "@monthly"
       - reverse:
           jobs: '{ust_job_prefix}lttng-ust_{version}_{buildtype}'
           result: 'success'
@@ -919,6 +923,7 @@
 
     triggers:
       - pollscm: *lttng-tools_trigger_pollscm_default
+      - timed: "@monthly"
       - reverse:
           jobs: '{ust_job_prefix}lttng-ust_{version}_{cctype}'
           result: 'success'
