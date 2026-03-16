@@ -24,7 +24,7 @@
       - workspace-cleanup
 
     scm:
-      - git:
+      - git: &lttng-ust_scm_git_default
           url: https://github.com/{github_user}/{github_name}.git
           browser: githubweb
           browser-url: https://github.com/{github_user}/{github_name}
@@ -143,10 +143,14 @@
 
       # Run the build
       - shell:
-          !include-raw-verbatim:
-          - scripts/common/print.sh
-          - scripts/lttng-ust/build.sh
-          - scripts/common/clean-build-dir.sh
+          !j2-yaml: |
+            !include-raw-verbatim:
+            {% if review|default(false) %}
+              - scripts/common/gerrit-fetch.sh
+            {% endif %}
+              - scripts/common/print.sh
+              - scripts/lttng-ust/build.sh
+              - scripts/common/clean-build-dir.sh
 
 - _lttng-ust_builders_review_lttng-tools: &lttng-ust_builders_review_lttng-tools
     name: 'lttng-ust_builders_review_lttng-tools'
@@ -205,9 +209,13 @@
            git clone -b "$GERRIT_BRANCH" https://review.lttng.org/lttng-tools src/lttng-tools
 
       - shell:
-          !include-raw-verbatim:
-          - scripts/common/print.sh
-          - scripts/lttng-ust/build.sh
+          !j2-yaml: |
+            !include-raw-verbatim:
+            {% if review|default(false) %}
+              - scripts/common/gerrit-fetch.sh
+            {% endif %}
+              - scripts/common/print.sh
+              - scripts/lttng-ust/build.sh
 
       - shell:
           !include-raw-verbatim:
@@ -364,14 +372,11 @@
           option: 'category'
           categories:
             - 'gerrit-{buildtype}'
-    scm: &lttng-ust_dev_review_scm
+    scm:
       - git:
-          url: https://review.lttng.org/lttng-ust
-          refspec: 'refs/changes/*:refs/changes/*'
-          branches:
-            - '$GERRIT_REFSPEC'
-          basedir: src/lttng-ust
-          skip-tag: true
+          <<: *lttng-ust_scm_git_default
+          shallow-clone: true
+          do-not-fetch-tags: true
     triggers: &lttng-ust_dev_review_triggers
       - gerrit: &lttng-ust_trigger_gerrit_defaults
           trigger-on:
@@ -387,6 +392,9 @@
     <<: *lttng-ust_matrix_axes_defaults
     <<: *lttng-ust_builders_defaults
     <<: *lttng-ust_publishers_review
+
+    # Job variables
+    review: true
 
 ## Templates
 - job-template:
