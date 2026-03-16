@@ -58,6 +58,8 @@ ARGS=(
     --event "$GERRIT_EVENT_TYPE"
     --project "$GERRIT_PROJECT"
     --base64-message "$GERRIT_CHANGE_COMMIT_MESSAGE"
+    --subject "${GERRIT_CHANGE_SUBJECT}"
+    --number "${GERRIT_CHANGE_NUMBER}"
 )
 
 if [[ "${NOOP}" == "true" ]]; then

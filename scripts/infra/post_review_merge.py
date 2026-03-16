@@ -82,13 +82,18 @@ def do_redmine_verbs(tracker, **kwargs):
         if verb not in actions.keys():
             raise Exception("Unknown verb: '{}'".format(verb))
 
-        message = tracker["messages"][kwargs["event"]].format(
+        message = tracker["messages"][
+            "{}:{}".format(
+                kwargs["event"], "resolves" if verb == "Resolves" else "references"
+            )
+        ].format(
             **kwargs
             | {
                 "verb": verb,
                 "verb_past_tense": "resolved" if verb == "Resolves" else "referenced",
             }
         )
+        logging.warning(message)
         action_kwargs = kwargs | {
             "issue_link": link,
             "issue_id": issue_id,
@@ -98,10 +103,19 @@ def do_redmine_verbs(tracker, **kwargs):
 
 
 MESSAGES = {
-    "change-merged": """
-This issue has been {verb_past_tense} by a change[1] merged into {project}'s {branch} branch.
+    "change-merged:resolves": """
+Automatically closing this issue because the following commit is now merged:
 
-[1]: {gerrit_url}
+  * *Commit*: {subject}
+  * *Gerrit change*: "{number}":{gerrit_url}
+  * *Branch*: {branch}
+""",
+    "change-merged:references": """
+The following merged commit references this issue:
+
+  * *Commit*: {subject}
+  * *Gerrit change*: "{number}":{gerrit_url}
+  * *Branch*: {branch}
 """,
 }
 
@@ -144,7 +158,17 @@ HOOKS = {
 }
 
 
-def run_hooks(hooks, project, event, gerrit_url, branch, commit_message, noop=False):
+def run_hooks(
+    hooks,
+    project,
+    event,
+    gerrit_url,
+    branch,
+    commit_message,
+    subject=None,
+    number=None,
+    noop=False,
+):
     logging.debug(
         "{} for project {} on branch {}, url={}".format(
             event, project, branch, gerrit_url
@@ -167,6 +191,8 @@ def run_hooks(hooks, project, event, gerrit_url, branch, commit_message, noop=Fa
                 "event": event,
                 "branch": branch,
                 "commit_message": commit_message,
+                "subject": subject,
+                "number": number,
                 "noop": noop,
             }
             logging.debug(
@@ -228,6 +254,8 @@ def get_parser():
     parser.add_argument("-e", "--event", help="The gerrit event type")
     parser.add_argument("-u", "--url", help="Gerrit changeset URL")
     parser.add_argument("-p", "--project", help="Gerrit project")
+    parser.add_argument("--subject", help="Change subject")
+    parser.add_argument("--number", help="Change number")
     return parser
 
 
@@ -250,7 +278,15 @@ def main(args):
         message = base64.b64decode(args.base64_message, validate=True).decode("utf-8")
 
     return run_hooks(
-        HOOKS, args.project, args.event, args.url, args.branch, message, noop=args.noop
+        HOOKS,
+        args.project,
+        args.event,
+        args.url,
+        args.branch,
+        message,
+        subject=args.subject,
+        number=args.number,
+        noop=args.noop,
     )
 
 
