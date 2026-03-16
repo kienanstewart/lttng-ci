@@ -1,6 +1,6 @@
 ---
 
-- defaults:
+- defaults: &liburcu-defaults
     name: liburcu
     description: |
       liburcu is a LGPLv2.1 userspace RCU (read-copy-update) library. This
@@ -30,7 +30,7 @@
       - workspace-cleanup
 
     scm:
-      - git:
+      - git: &liburcu_scm_git_default
           url: https://github.com/{github_user}/{github_name}.git
           browser: githubweb
           browser-url: https://github.com/{github_user}/{github_name}
@@ -47,7 +47,7 @@
     properties:
       - inject:
           properties-content: |
-            PROJECT_NAME=liburcu
+            PROJECT_NAME=userspace-rcu
             PYTHON={python}
       - build-discarder:
           !include: common/default_discarder.yaml.inc
@@ -56,8 +56,8 @@
 
     # Job variables
     filter: ''
+    review: false
     python: ''
-
 
 ## Anchors
 - _liburcu_matrix_axes_defaults: &liburcu_matrix_axes_defaults
@@ -98,11 +98,17 @@
                !include-raw-verbatim:
                  - scripts/common/cygwin64-shebang
                  - scripts/common/cygpath-prefix
+      {% if review|default(false) %}
+                 - scripts/common/gerrit-fetch.sh
+      {% endif %}
                  - scripts/common/print.sh
                  - scripts/liburcu/build.sh
       {% else %}
       - shell:
          !include-raw-verbatim:
+      {% if review|default(false) %}
+           - scripts/common/gerrit-fetch.sh
+      {% endif %}
            - scripts/common/print.sh
            - scripts/liburcu/build.sh
       {% endif %}
@@ -191,6 +197,40 @@
           send-to:
             - recipients
 
+- defaults:
+    <<: *liburcu-defaults
+    name: liburcu_review
+    concurrent: true
+    properties:
+      - inject:
+          properties-content: |
+            PROJECT_NAME=userspace-rcu
+            PYTHON={python}
+      - throttle:
+          option: 'category'
+          categories:
+            - 'gerrit-{buildtype}'
+    scm:
+      - git:
+          <<: *liburcu_scm_git_default
+          shallow-clone: true
+          do-not-fetch-tags: true
+    triggers:
+      - gerrit:
+          trigger-on:
+            - comment-added-event:
+                approval-category: 'CI-Build'
+                approval-value: 1
+          projects:
+            - project-compare-type: 'PLAIN'
+              project-pattern: 'userspace-rcu'
+              branches:
+                - branch-compare-type: 'PLAIN'
+                  branch-pattern: '{version}'
+    # job variables
+    review: true
+
+
 ## Templates
 - job-template:
     name: '{job_prefix}liburcu_{version}_{buildtype}'
@@ -227,43 +267,7 @@
 
 - job-template:
     name: dev_review_liburcu_{version}_{buildtype}
-    defaults: liburcu
-    concurrent: true
-
-    scm:
-      - git:
-          url: https://review.lttng.org/userspace-rcu
-          refspec: 'refs/changes/*:refs/changes/*'
-          branches:
-            - '$GERRIT_REFSPEC'
-          basedir: src/liburcu
-          skip-tag: true
-
-    triggers:
-      - gerrit:
-          trigger-on:
-            - comment-added-event:
-                approval-category: 'CI-Build'
-                approval-value: 1
-          projects:
-            - project-compare-type: 'PLAIN'
-              project-pattern: 'userspace-rcu'
-              branches:
-                - branch-compare-type: 'PLAIN'
-                  branch-pattern: '{version}'
-
-    properties:
-      - inject:
-          properties-content: |
-            PROJECT_NAME=liburcu
-            PYTHON={python}
-      - build-discarder:
-          !include: common/review_discarder.yaml.inc
-      - throttle:
-          option: 'category'
-          categories:
-            - 'gerrit-{buildtype}'
-
+    defaults: liburcu_review
     <<: *liburcu_matrix_axes_defaults
     <<: *liburcu_builders_defaults
 
