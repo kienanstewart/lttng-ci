@@ -1,6 +1,6 @@
 ---
 ## Defaults
-- defaults:
+- defaults: &lttng-ust-defaults
     name: lttng-ust
     description: |
       LTTng-UST, the Linux Trace Toolkit Next Generation Userspace Tracer, is a
@@ -52,6 +52,7 @@
     java_agents: 'true'  # when building with the agents config, include java agents
     java_preferred_jdk: 'default'
     python: ''
+    review: false
     touchstone: ''
 
 
@@ -349,6 +350,44 @@
       - archive: *lttng-ust_publisher_archive_defaults
       - workspace-cleanup: *lttng-ust_publisher_workspace-cleanup_defaults
 
+- defaults:
+    <<: *lttng-ust-defaults
+    name: lttng-ust-review
+    concurrent: true
+    properties: &lttng-ust_dev_review_properties
+      - inject:
+          properties-content: |
+            PROJECT_NAME=lttng-ust
+      - build-discarder:
+          !include: common/review_discarder.yaml.inc
+      - throttle:
+          option: 'category'
+          categories:
+            - 'gerrit-{buildtype}'
+    scm: &lttng-ust_dev_review_scm
+      - git:
+          url: https://review.lttng.org/lttng-ust
+          refspec: 'refs/changes/*:refs/changes/*'
+          branches:
+            - '$GERRIT_REFSPEC'
+          basedir: src/lttng-ust
+          skip-tag: true
+    triggers: &lttng-ust_dev_review_triggers
+      - gerrit: &lttng-ust_trigger_gerrit_defaults
+          trigger-on:
+            - comment-added-event:
+                approval-category: 'CI-Build'
+                approval-value: 1
+          projects:
+            - project-compare-type: 'PLAIN'
+              project-pattern: 'lttng-ust'
+              branches:
+                - branch-compare-type: 'PLAIN'
+                  branch-pattern: '{version}'
+    <<: *lttng-ust_matrix_axes_defaults
+    <<: *lttng-ust_builders_defaults
+    <<: *lttng-ust_publishers_review
+
 ## Templates
 - job-template:
     name: '{job_prefix}lttng-ust_{version}_{buildtype}'
@@ -381,54 +420,11 @@
 
 - job-template:
     name: dev_review_lttng-ust_{version}_{buildtype}
-    defaults: lttng-ust
-    concurrent: true
-
-    scm: &lttng-ust_dev_review_scm
-      - git:
-          url: https://review.lttng.org/lttng-ust
-          refspec: 'refs/changes/*:refs/changes/*'
-          branches:
-            - '$GERRIT_REFSPEC'
-          basedir: src/lttng-ust
-          skip-tag: true
-
-    triggers: &lttng-ust_dev_review_triggers
-      - gerrit: &lttng-ust_trigger_gerrit_defaults
-          trigger-on:
-            - comment-added-event:
-                approval-category: 'CI-Build'
-                approval-value: 1
-          projects:
-            - project-compare-type: 'PLAIN'
-              project-pattern: 'lttng-ust'
-              branches:
-                - branch-compare-type: 'PLAIN'
-                  branch-pattern: '{version}'
-
-    <<: *lttng-ust_matrix_axes_defaults
-    <<: *lttng-ust_builders_defaults
-    <<: *lttng-ust_publishers_review
-
-    properties: &lttng-ust_dev_review_properties
-      - inject:
-          properties-content: |
-            PROJECT_NAME=lttng-ust
-      - build-discarder:
-          !include: common/review_discarder.yaml.inc
-      - throttle:
-          option: 'category'
-          categories:
-            - 'gerrit-{buildtype}'
+    defaults: lttng-ust-review
 
 - job-template:
     name: 'dev_review_lttng-ust_{version}_{cctype}'
-    defaults: lttng-ust
-    concurrent: true
-    scm: *lttng-ust_dev_review_scm
-    triggers: *lttng-ust_dev_review_triggers
-    properties: *lttng-ust_dev_review_properties
-    <<: *lttng-ust_matrix_axes_defaults
+    defaults: lttng-ust-review
     axes:
       - axis:
           <<: *lttng-ust_matrix_axis_platform
@@ -442,41 +438,12 @@
           type: user-defined
           name: cc
           values: '{obj:ccs}'
-    <<: *lttng-ust_builders_defaults
-    <<: *lttng-ust_publishers_review
 
 - job-template:
     name: dev_review_lttng-ust_lttng-tools_{version}_{buildtype}
-    defaults: lttng-ust
-    concurrent: true
-
-    scm:
-      - git:
-          url: https://review.lttng.org/lttng-ust
-          refspec: 'refs/changes/*:refs/changes/*'
-          branches:
-            - '$GERRIT_REFSPEC'
-          basedir: src/lttng-ust
-          skip-tag: true
-
-    triggers:
-      - gerrit: *lttng-ust_trigger_gerrit_defaults
-
+    defaults: lttng-ust-review
     <<: *lttng-ust_matrix_axes_review_lttng-tools
     <<: *lttng-ust_builders_review_lttng-tools
-    <<: *lttng-ust_publishers_review
-
-    properties:
-      - inject:
-          properties-content: |
-            PROJECT_NAME=lttng-ust
-      - build-discarder:
-          !include: common/review_discarder.yaml.inc
-      - throttle:
-          option: 'category'
-          categories:
-            - 'gerrit-{buildtype}'
-
 
 - job-template:
     name: lttng-ust_{version}_scan-build
