@@ -14,30 +14,27 @@
     project-type: freestyle
 
     parameters:
-      - string:
-          name: 'MATRIX_FILTER'
-          default: '{filter}'
-          description: 'The groovy filter for the matrix jobs to execute'
-      - string:
-          name: 'MATRIX_TOUCHSTONE'
-          default: '{touchstone}'
-          description: 'The groovy filter for the jobs to execute first'
-      - bool:
-          name: 'VERBOSE_BABELTRACE'
-          default: 'false'
-          description: 'Enable verbose output for babeltrace'
-      - bool:
-          name: 'VERBOSE_LTTNG_CLIENT'
-          default: 'false'
-          description: 'Enable verbose output for the lttng client'
-      - bool:
-          name: 'VERBOSE_SESSIOND'
-          default: 'false'
-          description: 'Enable verbose sessiond and consumerd output'
-      - bool:
-          name: 'VERBOSE_RELAYD'
-          default: 'false'
-          description: 'Enable verbose relayd output'
+      !j2-yaml: |
+        {% include 'common/matrix_parameters.yaml.inc' %}
+        {% if review|default(false) %}
+        {% include 'common/review_parameters.yaml.inc' %}
+        {% endif %}
+        - bool:
+            name: 'VERBOSE_BABELTRACE'
+            default: 'false'
+            description: 'Enable verbose output for babeltrace'
+        - bool:
+            name: 'VERBOSE_LTTNG_CLIENT'
+            default: 'false'
+            description: 'Enable verbose output for the lttng client'
+        - bool:
+            name: 'VERBOSE_SESSIOND'
+            default: 'false'
+            description: 'Enable verbose sessiond and consumerd output'
+        - bool:
+            name: 'VERBOSE_RELAYD'
+            default: 'false'
+            description: 'Enable verbose relayd output'
 
     wrappers:
       - ansicolor: &lttng-tools_wrapper_ansicolor_defaults
@@ -109,6 +106,7 @@
     modules_aligned_access: !!python/tuple ['default']
     python: ''
     review: false
+    review_project: lttng-tools
     timeout: '30'
     touchstone: ''
     urcu_buildtype: '{buildtype}'
@@ -124,52 +122,6 @@
     <<: *lttng-tools-defaults
     name: lttng-tools-review
     concurrent: true
-    parameters:
-      - string:
-          name: 'GERRIT_BRANCH'
-          default: 'master'
-      - string:
-          name: 'GERRIT_REFSPEC'
-          default: ''
-          description: |
-            The refspec to fetch. E.g. `refs/changes/15/14715/2`.
-            You may find it in the gerrit interface for downloading a specific revision of patch.
-      - string:
-          name: 'GERRIT_NAME'
-          default: 'review.lttng.org'
-      - string:
-          name: 'GERRIT_HOST'
-          default: 'review.lttng.org'
-      - string:
-          name: 'GERRIT_PATCHSET_REVISION'
-          default: ''
-      - string:
-          name: 'GERRIT_PROJECT'
-          default: 'lttng-tools'
-      - string:
-          name: 'MATRIX_FILTER'
-          default: '{filter}'
-          description: 'The groovy filter for the matrix jobs to execute'
-      - string:
-          name: 'MATRIX_TOUCHSTONE'
-          default: '{touchstone}'
-          description: 'The groovy filter for the jobs to execute first'
-      - bool:
-          name: 'VERBOSE_BABELTRACE'
-          default: 'false'
-          description: 'Enable verbose output for babeltrace'
-      - bool:
-          name: 'VERBOSE_LTTNG_CLIENT'
-          default: 'false'
-          description: 'Enable verbose output for the lttng client'
-      - bool:
-          name: 'VERBOSE_SESSIOND'
-          default: 'false'
-          description: 'Enable verbose sessiond and consumerd output'
-      - bool:
-          name: 'VERBOSE_RELAYD'
-          default: 'false'
-          description: 'Enable verbose relayd output'
     scm:
       - git:
           <<: *lttng-tools_scm_git_default
@@ -1112,6 +1064,7 @@
 - job-template:
     name: 'dev_review_lttng-modules_with_lttng-tools_{version}_root_{buildtype}'
     defaults: lttng-tools-review
+    review_project: lttng-modules
 
     # Check out lttng-tools from github, not lttng-tools from gerrit
     scm:
