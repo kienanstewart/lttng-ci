@@ -46,7 +46,7 @@ pipeline {
 
           script {
             if (env.GERRIT_PROJECT == env.PROJECT_NAME) {
-              sh('git fetch origin "${GERRIT_PATCHSET_REVISION}" ; git checkout FETCH_HEAD')
+              sh('git fetch origin "${GERRIT_REFSPEC}" ; git checkout FETCH_HEAD')
             }
           }
         }

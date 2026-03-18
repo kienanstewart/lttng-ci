@@ -448,7 +448,7 @@
                   # This gets used when building lttng-tools for review with lttng-modules changesets.
                   git clone "https://${{GERRIT_HOST}}/${{GERRIT_PROJECT}}" src/lttng-modules
                   pushd src/lttng-modules
-                  git fetch "https://${{GERRIT_HOST}}/${{GERRIT_PROJECT}}" "${{GERRIT_PATCHSET_REVISION}}"
+                  git fetch "https://${{GERRIT_HOST}}/${{GERRIT_PROJECT}}" "${{GERRIT_REFSPEC}}"
                   git checkout FETCH_HEAD
                   popd
                 fi
