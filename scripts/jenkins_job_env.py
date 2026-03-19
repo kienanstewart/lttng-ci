@@ -50,6 +50,13 @@ def _get_argparser():
         type=pathlib.Path,
     )
     fetch_parser.add_argument(
+        "-f",
+        "--file",
+        default=None,
+        type=pathlib.Path,
+        help="An archive file downloaded from Jenkins",
+    )
+    fetch_parser.add_argument(
         "-s",
         "--server",
         default="https://ci.lttng.org",
@@ -60,7 +67,6 @@ def _get_argparser():
         "--job",
         help="The job name, eg. 'lttng-tools_master_root_slesbuild'",
         default=None,
-        required=True,
     )
     fetch_parser.add_argument(
         "-jc",
@@ -69,7 +75,7 @@ def _get_argparser():
         default=None,
     )
     fetch_parser.add_argument(
-        "-b", "--build-id", help="The build ID, eg. '28'", default=None, required=True
+        "-b", "--build-id", help="The build ID, eg. '28'", default=None
     )
     fetch_parser.add_argument(
         "-n",
@@ -83,13 +89,27 @@ def _get_argparser():
     return parser
 
 
-def fetch(destination, server, job, build, job_configuration=None, download=True):
+def fetch(
+    destination,
+    server,
+    job,
+    build,
+    job_configuration=None,
+    download=True,
+    archive_file=None,
+):
     if destination.exists() and not destination.is_dir():
         raise Exception("'{}' exists but is not a directory".format(str(destination)))
+
     if not destination.exists():
         destination.mkdir()
 
-    if download:
+    if archive_file is not None and not archive_file.is_file():
+        raise Exception(
+            "Archive file '{}' given, but it is not a file".format(str(archive_file))
+        )
+
+    if archive_file is None and download:
         components = [
             "job",
             job,
@@ -107,6 +127,10 @@ def fetch(destination, server, job, build, job_configuration=None, download=True
             subprocess.run(["wget", url, "-O", archive.name])
             subprocess.run(["unzip", "-d", str(destination), archive.name])
 
+    if archive_file is not None:
+        subprocess.run(["unzip", "-d", str(destination), str(archive_file)], check=True)
+
+    if destination.is_dir():
         # The artifact archive doesn't include symlinks, so the the symlinks for
         # the ".so" in libdir_arch must be rebuilt
         lib_dir = "lib"
@@ -320,6 +344,13 @@ if __name__ == "__main__":
     logging.debug("Initialized with log level: {}".format(logger.getEffectiveLevel()))
 
     if args.command == "fetch":
+        if args.file is None:
+            # Assert that the other options are supplied
+            if not args.build_id or not args.server or not args.job:
+                raise Exception(
+                    "When `-f|--file` is not given, server (`-s|--server`), job (`-j|--job`), and build id (`-b|--build-id`) are required"
+                )
+
         fetch(
             destination=args.directory,
             server=args.server,
@@ -327,6 +358,7 @@ if __name__ == "__main__":
             build=args.build_id,
             job_configuration=args.job_configuration,
             download=args.download,
+            archive_file=args.file,
         )
     else:
         raise Exception("Command '{}' unsupported".format(args.command))
