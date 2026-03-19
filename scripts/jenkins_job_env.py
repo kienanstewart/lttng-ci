@@ -177,14 +177,19 @@ def create_activate(destination):
                 ),
             )
         elif var == "LD_LIBRARY_PATH":
-            env["LD_LIBRARY_PATH"] = "{}{}".format(
-                "{}:".format(original) if original else "",
+            paths = [
+                str((destination / "archive" / "build" / lib_dir_arch).absolute()),
                 str(
                     (
                         destination / "archive" / "deps" / "build" / lib_dir_arch
                     ).absolute()
                 ),
-            )
+            ]
+
+            if os.getenv("LD_LIBRARY_PATH"):
+                paths.append(os.getenv("LD_LIBRARY_PATH"))
+
+            env["LD_LIBRARY_PATH"] = ":".join(paths)
         elif var == "LDFLAGS":
             env["LDFLAGS"] = "{}-L{}".format(
                 "{} ".format(original) if original else "",
@@ -195,10 +200,13 @@ def create_activate(destination):
                 ),
             )
         elif var == "PATH":
-            env["PATH"] = "{}:{}".format(
-                original,
+            paths = [
+                str((destination / "archive" / "build" / "bin").absolute()),
                 str((destination / "archive" / "deps" / "build" / "bin").absolute()),
-            )
+                os.getenv("PATH"),
+            ]
+
+            env["PATH"] = ":".join(paths)
         elif var == "PKG_CONFIG_PATH":
             env["PKG_CONFIG_PATH"] = "{}{}".format(
                 "{}:" if original else "",
