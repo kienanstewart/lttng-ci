@@ -22,6 +22,10 @@ _ENV_VARS = [
     "CPPFLAGS",
     "LD_LIBRARY_PATH",
     "LDFLAGS",
+    "LIBBABELTRACE2_PLUGIN_PROVIDER_DIR",
+    "LTTNG_CONSUMERD32_BIN",
+    "LTTNG_CONSUMERD64_BIN",
+    "LTTNG_SESSION_CONFIG_XSD_PATH",
     "PATH",
     "PKG_CONFIG_PATH",
     "PYTHONPATH",
@@ -151,6 +155,7 @@ def create_activate(destination):
 
     env = {}
     env["_JENKINS_ENV"] = destination.name
+    archive_dir = (destination / "archive").absolute()
     for var in _ENV_VARS:
         original = os.getenv(var)
         env["_JENKINS_{}".format(var)] = original if original else ""
@@ -199,6 +204,48 @@ def create_activate(destination):
                     ).absolute()
                 ),
             )
+        elif var == "LIBBABELTRACE2_PLUGIN_PROVIDER_DIR":
+            if not archive_dir.exists():
+                logging.warning("Assuming '{}' value since archive is not downloaded")
+                env["LIBBABELTRACE2_PLUGIN_PROVIDER_DIR"] = str(
+                    archive_dir
+                    / "deps"
+                    / "build"
+                    / libdir_arch
+                    / "babeltrace2"
+                    / "plugin-providers"
+                )
+            else:
+                for entry in archive_dir.glob("**/babeltrace2/plugin-providers"):
+                    if entry.is_dir() and var not in env:
+                        env[var] = str(entry.absolute())
+        elif var in ["LTTNG_CONSUMERD32_BIN", "LTTNG_CONSUMERD64_BIN"]:
+            if not archive_dir.exists():
+                logging.warning(
+                    "Assuming '{}' value since archive is not downloaded".format(var)
+                )
+                env[var] = str(
+                    archive_dir
+                    / "build"
+                    / libdir_arch
+                    / "lttng"
+                    / "libexec"
+                    / "lttng-consumerd"
+                )
+            else:
+                for entry in archive_dir.glob("**/lttng/libexec/lttng-consumerd"):
+                    if entry.is_file() and var not in env:
+                        env[var] = str(entry)
+        elif var == "LTTNG_SESSION_CONFIG_XSD_PATH":
+            if not archive_dir.exists():
+                logging.warning(
+                    "Assuming '{}' value since archive is not downloaded".format(var)
+                )
+                env[var] = str(archive_dir / "build" / "share" / "xml" / "lttng")
+            else:
+                for entry in archive_dir.glob("**/session.xsd"):
+                    if entry.is_file() and var not in env:
+                        env[var] = str(entry.parents[0])
         elif var == "PATH":
             paths = [
                 str((destination / "archive" / "build" / "bin").absolute()),
@@ -223,7 +270,6 @@ def create_activate(destination):
             )
         elif var == "PYTHONPATH":
             # This searches the downloaded archive for matching directories
-            archive_dir = destination / "archive"
             if not (archive_dir).exists():
                 logging.warning(
                     "PYTHONPATH not set in activate as it requires the artifacts to be downloaded first"
@@ -242,7 +288,8 @@ def create_activate(destination):
         elif var == "WORKSPACE":
             env["WORKSPACE"] = str((destination / "archive").absolute())
         else:
-            raise Exception("Unsupported environment variable '{}'".format(var))
+            logging.warning("Not supported: {}".format(var))
+            # raise Exception("Unsupported environment variable '{}'".format(var))
 
     args = ["{}={}".format(k, shlex.quote(v)) for k, v in env.items()]
     with open(str(destination / "activate"), "w") as fp:
