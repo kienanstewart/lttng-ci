@@ -114,7 +114,7 @@ def fetch(destination, server, job, build, job_configuration=None, download=True
         ) and "64bit" in platform.architecture():
             lib_dir_arch = "{}64"
 
-        so_re = re.compile("^.*\.so\.\d+\.\d+\.\d+$")
+        so_re = re.compile(r"^.*\.so\.\d+\.\d+\.\d+$")
         for root, dirs, files in os.walk(
             str(destination / "deps" / "build" / lib_dir_arch)
         ):
