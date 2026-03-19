@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import urllib
+import urllib.parse
 
 _ENV_VARS = [
     "BABELTRACE_PLUGIN_PATH",
