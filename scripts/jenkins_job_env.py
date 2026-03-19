@@ -214,7 +214,23 @@ def create_activate(destination):
                 ),
             )
         elif var == "PYTHONPATH":
-            pass
+            # This searches the downloaded archive for matching directories
+            archive_dir = destination / "archive"
+            if not (archive_dir).exists():
+                logging.warning(
+                    "PYTHONPATH not set in activate as it requires the artifacts to be downloaded first"
+                )
+            else:
+                python_paths = list()
+                for entry in archive_dir.glob("**/site-packages"):
+                    if entry.is_dir():
+                        python_paths.append(str(entry.absolute()))
+
+                if os.getenv("PYTHONPATH"):
+                    python_paths.append(os.getenv("PYTHONPATH"))
+
+                if python_paths:
+                    env["PYTHONPATH"] = ":".join(python_paths)
         elif var == "WORKSPACE":
             env["WORKSPACE"] = str((destination / "archive").absolute())
         else:
