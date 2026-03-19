@@ -78,6 +78,12 @@ def _get_argparser():
         "-b", "--build-id", help="The build ID, eg. '28'", default=None
     )
     fetch_parser.add_argument(
+        "-u",
+        "--url",
+        help="A URL from which to download the artifacts archive ZIP file",
+        default=None,
+    )
+    fetch_parser.add_argument(
         "-n",
         "--no-download",
         help="Do not activate environment after fetching artifacts",
@@ -92,9 +98,7 @@ def _get_argparser():
 def fetch(
     destination,
     server,
-    job,
-    build,
-    job_configuration=None,
+    url=None,
     download=True,
     archive_file=None,
 ):
@@ -109,18 +113,7 @@ def fetch(
             "Archive file '{}' given, but it is not a file".format(str(archive_file))
         )
 
-    if archive_file is None and download:
-        components = [
-            "job",
-            job,
-            job_configuration or "",
-            build,
-            "artifact",
-            "*zip*",
-            "archive.zip",
-        ]
-        url_components = [urllib.parse.quote_plus(x) for x in components]
-        url = "/".join([server] + url_components)
+    if url is not None and download:
         logging.info("Fetching archive from '{}'".format(url))
 
         with tempfile.NamedTemporaryFile() as archive:
@@ -346,17 +339,40 @@ if __name__ == "__main__":
     if args.command == "fetch":
         if args.file is None:
             # Assert that the other options are supplied
-            if not args.build_id or not args.server or not args.job:
+            if not args.url and (not args.build_id or not args.server or not args.job):
                 raise Exception(
-                    "When `-f|--file` is not given, server (`-s|--server`), job (`-j|--job`), and build id (`-b|--build-id`) are required"
+                    "When `-f|--file` is not given, either `-u|--url` or server (`-s|--server`), job (`-j|--job`), and build id (`-b|--build-id`) are required"
                 )
+
+        if args.url is None:
+            # Assert that the other options are supplied
+            if not args.file and (not args.build_id or not args.server or not args.job):
+                raise Exception(
+                    "When `-u|--url` is not given, either `-f|--file` or server (`-s|--server`), job (`-j|--job`), and build id (`-b|--build-id`) are required"
+                )
+
+        if args.url and args.file:
+            raise Exception("Only one of `-f|--file` and `-u|--url` may be given")
+
+        if args.file is None and args.url is None:
+            # URL from compoenents
+            components = [
+                "job",
+                args.job,
+                args.job_configuration or "",
+                args.build_,
+                "artifact",
+                "*zip*",
+                "archive.zip",
+            ]
+            url_components = [urllib.parse.quote_plus(x) for x in components]
+            url = "/".join([server] + url_components)
+            args.url = url
 
         fetch(
             destination=args.directory,
             server=args.server,
-            job=args.job,
-            build=args.build_id,
-            job_configuration=args.job_configuration,
+            url=args.url,
             download=args.download,
             archive_file=args.file,
         )
