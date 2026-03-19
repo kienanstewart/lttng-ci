@@ -141,6 +141,19 @@ def fetch(
         ):
             add_lib_symlinks(x)
 
+        # If an unclean src archive, exists, unpack it.
+        src_archive = (destination / "archive" / "src.tar.xz").absolute()
+        if src_archive.is_file():
+            src_dir = (destination / "archive" / "src").absolute()
+            if not src_dir.is_dir():
+                os.mkdir(str(src_dir))
+
+            subprocess.run(
+                ["tar", "-x", "-f", str(src_archive)],
+                check=True,
+                cwd=str(src_dir),
+            )
+
     env = create_activate(destination)
     create_deactivate(destination, env)
 
