@@ -164,7 +164,7 @@
               <scm/>
             </io.jenkins.plugins.analysis.core.steps.IssuesRecorder>
       - archive: &liburcu_publisher_archive_defaults
-          artifacts: 'build/**,tap/**,log/**'
+          artifacts: 'build/**,tap/**,log/**,src.tar.xz'
           follow-symlinks: true
           allow-empty: false
       - workspace-cleanup: &liburcu_publisher_workspace_cleanup_defaults

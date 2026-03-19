@@ -695,7 +695,7 @@
           allow-empty-results: true
 
       - archive: &lttng-tools_publisher_archive_defaults
-          artifacts: 'build/**,coverage/**,deps/**,log/**,tap/**,core.tar.xz'
+          artifacts: 'build/**,coverage/**,deps/**,log/**,tap/**,core.tar.xz,src.tar.xz'
           follow-symlinks: true
           allow-empty: false
 

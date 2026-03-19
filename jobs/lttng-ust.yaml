@@ -277,7 +277,7 @@
               <scm/>
             </io.jenkins.plugins.analysis.core.steps.IssuesRecorder>
       - archive: &lttng-ust_publisher_archive_defaults
-          artifacts: 'build/**,tap/**,log/**'
+          artifacts: 'build/**,tap/**,log/**,src.tar.xz'
           follow-symlinks: true
           allow-empty: false
       - workspace-cleanup: &lttng-ust_publisher_workspace-cleanup_defaults

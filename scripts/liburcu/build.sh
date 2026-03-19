@@ -459,6 +459,12 @@ if [ "$USERSPACE_RCU_RUN_TESTS" = "yes" ]; then
     fi
 fi
 
+# Archive the un-cleaned source directory as a compressed tarball on failure only,
+# so that developers can re-use the built test artifacts for manual investigations.
+if [[ "$exit_status" != "0" ]]; then
+    tar -c -J -f "${WORKSPACE}/src.tar.xz" -C "${WORKSPACE}/src/" "./"
+fi
+
 # Clean the build directory
 if [ "$USERSPACE_RCU_MAKE_CLEAN" = "yes" ]; then
     print_header "Clean"

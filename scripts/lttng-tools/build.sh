@@ -778,6 +778,12 @@ if test -d "${FAILED_TEST_ENV_DIR}" ; then
     rm -rf "${FAILED_TEST_ENV_DIR}"
 fi
 
+# Archive the un-cleaned source directory as a compressed tarball on failure only,
+# so that developers can re-use the built test artifacts for manual investigations.
+if [[ "$exit_status" != "0" ]]; then
+    tar -c -J -f "${WORKSPACE}/src.tar.xz" -C "${WORKSPACE}/src/" "./"
+fi
+
 # Clean the build directory
 if [ "$LTTNG_TOOLS_MAKE_CLEAN" = "yes" ]; then
     print_header "Clean"
