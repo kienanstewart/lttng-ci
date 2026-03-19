@@ -116,7 +116,7 @@ def fetch(destination, server, job, build, job_configuration=None, download=True
 
         so_re = re.compile(r"^.*\.so\.\d+\.\d+\.\d+$")
         for root, dirs, files in os.walk(
-            str(destination / "deps" / "build" / lib_dir_arch)
+            str(destination / "archive" / "deps" / "build" / lib_dir_arch)
         ):
             for f in files:
                 if so_re.match(f):
