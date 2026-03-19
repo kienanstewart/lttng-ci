@@ -114,23 +114,29 @@ def fetch(destination, server, job, build, job_configuration=None, download=True
         ) and "64bit" in platform.architecture():
             lib_dir_arch = "{}64"
 
-        so_re = re.compile(r"^.*\.so\.\d+\.\d+\.\d+$")
-        for root, dirs, files in os.walk(
-            str(destination / "archive" / "deps" / "build" / lib_dir_arch)
+        for x in (
+            (destination / "archive" / "deps" / "build" / lib_dir_arch),
+            (destination / "archive" / "build" / lib_dir_arch),
         ):
-            for f in files:
-                if so_re.match(f):
-                    bits = f.split(".")
-                    alts = [
-                        ".".join(bits[:-1]),
-                        ".".join(bits[:-2]),
-                        ".".join(bits[:-3]),
-                    ]
-                    for a in alts:
-                        os.symlink(f, os.path.join(root, a))
+            add_lib_symlinks(x)
 
     env = create_activate(destination)
     create_deactivate(destination, env)
+
+
+def add_lib_symlinks(directory):
+    so_re = re.compile(r"^.*\.so\.\d+\.\d+\.\d+$")
+    for root, dirs, files in os.walk(str(directory)):
+        for f in files:
+            if so_re.match(f):
+                bits = f.split(".")
+                alts = [
+                    os.path.join(root, ".".join(bits[:-1])),
+                    os.path.join(root, ".".join(bits[:-2])),
+                    os.path.join(root, ".".join(bits[:-3])),
+                ]
+                for a in [alt for alt in alts if not os.path.exists(alt)]:
+                    os.symlink(f, a)
 
 
 def create_activate(destination):
