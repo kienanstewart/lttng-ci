@@ -253,6 +253,7 @@
       - rockylinux
     ARCHES:
       - amd64
+      - arm64
     RELEASES:
       - '8'
       - '9'
@@ -267,6 +268,7 @@
           choices:
             - all
             - amd64
+            - arm64
       - choice:
           <<: *images_parameters_IMAGE_TYPE_FILTER
       - choice:

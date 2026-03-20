@@ -24,6 +24,11 @@ c.removeAll({
   OS == 'debian' && it[1] == 'i386' && it[0] in ['trixie', 'forky', 'sid']
 })
 
+// Remove arm64 VMs for el*
+c.removeAll({
+  OS == 'rockylinux' && it[1] == 'arm64' && it[2] == 'vm'
+})
+
 def base_image_tasks = [:]
 def profile_image_tasks = [:]
 for(int index = 0; index < c.size(); index++) {
