@@ -95,6 +95,19 @@ def _get_argparser():
     return parser
 
 
+def get_lib_dir():
+    lib_dir = "lib"
+    lib_dir_arch = lib_dir
+    if (
+        pathlib.Path("/etc/products.d/SLES.prod").exists()
+        or pathlib.Path("/etc/redhat-release").exists()
+        or pathlib.Path("/etc/yocto-release").exists()
+    ) and "64bit" in platform.architecture():
+        lib_dir_arch = "{}64".format(lib_dir)
+
+    return lib_dir_arch
+
+
 def fetch(
     destination,
     server,
@@ -126,15 +139,7 @@ def fetch(
     if destination.is_dir():
         # The artifact archive doesn't include symlinks, so the the symlinks for
         # the ".so" in libdir_arch must be rebuilt
-        lib_dir = "lib"
-        lib_dir_arch = lib_dir
-        if (
-            pathlib.Path("/etc/products.d/SLES.prod").exists()
-            or pathlib.Path("/etc/redhat-release").exists()
-            or pathlib.Path("/etc/yocto-release").exists()
-        ) and "64bit" in platform.architecture():
-            lib_dir_arch = "{}64"
-
+        lib_dir_arch = get_lib_dir()
         for x in (
             (destination / "archive" / "deps" / "build" / lib_dir_arch),
             (destination / "archive" / "build" / lib_dir_arch),
@@ -174,15 +179,7 @@ def add_lib_symlinks(directory):
 
 
 def create_activate(destination):
-    lib_dir = "lib"
-    lib_dir_arch = lib_dir
-    if (
-        pathlib.Path("/etc/products.d/SLES.prod").exists()
-        or pathlib.Path("/etc/redhat-release").exists()
-        or pathlib.Path("/etc/yocto-release").exists()
-    ) and "64bit" in platform.architecture():
-        lib_dir_arch = "{}64"
-
+    lib_dir_arch = get_lib_dir()
     env = {}
     env["_JENKINS_ENV"] = destination.name
     archive_dir = (destination / "archive").absolute()
