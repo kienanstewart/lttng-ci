@@ -42,7 +42,7 @@ for(int index = 0; index < c.size(); index++) {
     def job_ids = []
     def node_label = 'deb13-amd64-rootnode'
     if (envMap.ARCH in ['armhf', 'arm64']) {
-      node_label = 'deb12-arm64-rootnode'
+      node_label = 'deb13-arm64-rootnode'
     }
 
     stage("base:${image_name}") {
