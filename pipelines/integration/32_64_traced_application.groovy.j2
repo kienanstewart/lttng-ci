@@ -1,0 +1,166 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+
+pipeline {
+  agent {
+    label '{{agent_label}}'
+  }
+
+  options {
+    ansiColor('xterm')
+    skipDefaultCheckout()
+    preserveStashes()
+    timestamps()
+  }
+
+  stages {
+    stage('Fetch dependencies') {
+      steps {
+        cleanWs()
+        copyArtifacts(
+          projectName: "babeltrace_{{babeltrace_version}}_linuxbuild/platform={{build_label_amd64}},conf=std,build=std",
+          selector: lastCompleted(),
+          filter: 'build/**',
+          target: 'deps-64',
+          fingerprintArtifacts: false
+        )
+        copyArtifacts(
+          projectName: "lttng-tools_{{version}}_linuxbuild/babeltrace_version={{babeltrace_version}},build=std,conf=std,liburcu_version={{urcu_version}},platform={{build_label_amd64}}",
+          selector: lastCompleted(),
+          filter: 'build/**,deps/**',
+          target: 'deps-64',
+          fingerprintArtifacts: false
+        )
+        copyArtifacts(
+          projectName: "lttng-tools_{{version}}_portbuild/babeltrace_version={{babeltrace_version}},build=std,conf=std,liburcu_version={{urcu_version}},platform={{build_label_i386}}",
+          selector: lastCompleted(),
+          filter: 'build/**,deps/**',
+          target: 'deps-32',
+          fingerprintArtifacts: false
+        )
+        copyArtifacts(
+          projectName: "lttng-ust_{{version}}_portbuild/build=std,conf=std,liburcu_version={{urcu_version}},platform={{build_label_i386}}",
+          selector: lastCompleted(),
+          filter: 'build/**',
+          target: 'deps-32',
+          fingerprintArtifacts: false
+        )
+        copyArtifacts(
+          projectName: "liburcu_{{urcu_version}}_portbuild/build=std,conf=std,platform={{build_label_i386}}",
+          selector: lastCompleted(),
+          filter: 'build/**',
+          target: 'deps-32',
+          fingerprintArtifacts: false
+        )
+
+        sh(
+          label: 'update .so symlinks',
+          script: '''#!/usr/bin/bash
+set -eux
+for x in "${WORKSPACE}/deps-64/build/lib" "${WORKSPACE}/deps-64/deps/build/lib" "${WORKSPACE}/deps-32/build/lib" "${WORKSPACE}/deps-32/deps/build/lib" ; do
+    /usr/sbin/ldconfig -n "$(realpath "$x")"
+done
+''',
+        )
+
+        sh(
+          label: 'update deps-32 rpath',
+          script: '''#!/usr/bin/bash
+set -eux
+apt-get update -y
+apt-get install -y patchelf
+
+patchelf --set-rpath "${WORKSPACE}/deps-32/build/lib" \
+    "${WORKSPACE}/deps-32/build/lib/liblttng-ust-ctl.so"
+ldd "${WORKSPACE}/deps-32/build/lib/liblttng-ust-ctl.so"
+
+patchelf --set-rpath "${WORKSPACE}/deps-32/build/lib" \
+    "${WORKSPACE}/deps-32/build/lib/lttng/libexec/lttng-consumerd"
+ldd "${WORKSPACE}/deps-32/build/lib/lttng/libexec/lttng-consumerd" || true
+
+'''
+        )
+      }
+    }
+
+    stage('Build 32-bit traced application') {
+      environment {
+        CC="i686-linux-gnu-gcc"
+        CPPFLAGS="-I${WORKSPACE}/deps-32/build/include"
+        CXX="i686-linux-gnu-g++"
+        LD_LIBRARY_PATH="${WORKSPACE}/deps-32/build/lib"
+        LDFLAGS="-L${WORKSPACE}/deps-32/build/lib"
+      }
+
+      steps {
+        dir('src/lttng-ust') {
+          checkout([$class: 'GitSCM', branches: [[name: "{{version}}"]], userRemoteConfigs: [[url: "https://github.com/lttng/lttng-ust"]]])
+        }
+
+        dir('src/lttng-ust/doc/examples/demo') {
+          sh(
+            label: "build",
+            script: '''
+make -j$(nproc) V=1
+''',
+          )
+        }
+      }
+    }
+
+    stage('Test') {
+      environment {
+        BABELTRACE_PLUGIN_PATH="${WORKSPACE}/deps-64/build/lib/babeltrace2/plugins"
+        LD_LIBRARY_PATH="${WORKSPACE}/deps-64/build/lib:${WORKSPACE}/deps-64/deps/build/lib"
+        LIBBABELTRACE2_PLUGIN_PROVIDER_DIR="${WORKSPACE}/deps-64/build/lib/babeltrace2/plugin-providers"
+        LTTNG_CONSUMERD32_BIN="${WORKSPACE}/deps-32/build/lib/lttng/libexec/lttng-consumerd"
+        LTTNG_CONSUMERD64_BIN="${WORKSPACE}/deps-64/build/lib/lttng/libexec/lttng-consumerd"
+        LTTNG_SESSION_CONFIG_XSD_PATH="${WORKSPACE}/deps-64/build/share/xml/lttng"
+        LTTNG_SESSIOND_PATH="${WORKSPACE}/deps-64/build/bin/lttng-sessiond"
+        LTTNG_UST_DEBUG="1"
+        PATH="${WORKSPACE}/deps-64/build/bin:${WORKSPACE}/deps-64/deps/build/bin:${env.PATH}"
+      }
+
+      steps {
+        dir('src/lttng-ust/doc/examples/demo') {
+          sh(
+            label: 'run',
+            script: '''#!/usr/bin/bash
+set -eux
+OUTPUT="${WORKSPACE}/trace"
+lttng create --output="${OUTPUT}"
+lttng enable-event -u --all
+lttng start
+
+LD_LIBRARY_PATH="${WORKSPACE}/deps-32/build/lib:${LD_LIBRARY_PATH}" ./demo-trace
+
+lttng stop
+lttng destroy
+babeltrace2 "${OUTPUT}"
+''',
+          )
+        }
+      }
+
+      post {
+        always {
+          sh(
+            label: 'kill sessiond',
+            script: 'killall lttng-sessiond',
+          )
+        }
+
+        failure {
+          archiveArtifacts(artifacts: "trace/**")
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      cleanWs(disableDeferredWipeout: true, cleanWhenFailure: false)
+    }
+  }
+}

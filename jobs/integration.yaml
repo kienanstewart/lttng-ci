@@ -1,6 +1,29 @@
 ---
 
 - job-template:
+    name: 'lttng-tools-{version}-64bit_with_32bit_traced_application'
+    description: |
+      Multi-bitness (32/64) test scenario for traced applications only.
+
+      <p>Job is managed by Jenkins Job Builder.</p>
+    project-type: pipeline
+    sandbox: true
+    dsl:
+      !include-jinja2: pipelines/integration/32_64_traced_application.groovy.j2
+    triggers:
+      - reverse:
+          jobs:
+            - 'lttng-tools_{version}_linuxbuild'
+            - 'lttng-ust_{version}_portbuild'
+          results: 'success'
+    # Job variables
+    agent_label: 'deb13-amd64-rootnode'
+    build_label_amd64: 'deb13-amd64'
+    build_label_i386: 'deb13-i386'
+    urcu_version: 'master'
+    babeltrace_version: 'master'
+
+- job-template:
     name: 'integration_lttng-tools-{version}-32-64_testsuite'
     description: |
       Integration pipeline for multi-bitness scenario (32/64).
@@ -45,3 +68,13 @@
           version: stable-2.13
           babelversion: stable-2.0
           urcu_version: stable-0.13
+      - 'lttng-tools-{version}-64bit_with_32bit_traced_application':
+          version: master
+          babeltrace_version: stable-2.1
+      - 'lttng-tools-{version}-64bit_with_32bit_traced_application':
+          version:
+            - stable-2.15
+            - stable-2.14
+            - stable-2.13
+          babeltrace_version: stable-2.1
+          urcu_version: stable-0.15
