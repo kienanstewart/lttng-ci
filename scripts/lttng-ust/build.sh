@@ -217,7 +217,7 @@ freebsd*)
     export PYTHON="${PYTHON:-python3}"
     export PYTHON_CONFIG="${PYTHON:-python3}-config"
     export CLASSPATH='/usr/local/share/java/classes/*'
-    export JAVA_HOME='/usr/local/openjdk17'
+    export JAVA_HOME='/usr/local/openjdk21'
     ;;
 *)
     export MAKE=make
