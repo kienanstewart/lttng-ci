@@ -101,24 +101,6 @@ if [[ ( -f /etc/redhat-release || -f /etc/products.d/SLES.prod || -f /etc/yocto-
     fi
 fi
 
-# Work-around for the sles12sp5, sles15sp4 where the last successful builds were
-# completed before 'followSymlinks' was set to try, and is thus missing the
-# links for all the libraries.
-if [[ -f /etc/products.d/SLES.prod ]] ; then
-    pushd "${WORKSPACE}/deps/build/${LIBDIR_ARCH}"
-    while read -r LIB ; do
-        LIB_ANY=$(echo "${LIB}" | rev | cut -d'.' -f4- | rev)
-        LIB_MAJOR=$(echo "${LIB}" | rev | cut -d'.' -f3- | rev)
-        if [[ ! -f "${LIB_ANY}" ]]; then
-            ln -s "$(realpath "${LIB}")" "${LIB_ANY}"
-        fi
-        if [[ ! -f "${LIB_MAJOR}" ]] ; then
-            ln -s "$(realpath "${LIB}")" "${LIB_MAJOR}"
-        fi
-    done < <(find . -type f -iregex '.*\.so\.[0-9]+\.[0-9]+\.[0-9]+')
-    popd
-fi
-
 if [[ -z "${JAVA_HOME:-}" ]] ; then
     export JAVA_HOME="/usr/lib/jvm/default-java"
 fi
@@ -130,14 +112,6 @@ case "${java_preferred_jdk:-}" in
         ;;
     '8')
         case "$(os_id)" in
-            'sles')
-                export JAVA_HOME="/usr/${LIBDIR_ARCH}/jvm/java-1.8.0-openjdk-1.8.0"
-                export PATH="/usr/${LIBDIR_ARCH}/jvm/java-1.8.0-openjdk-1.8.0/bin:/usr/${LIBDIR_ARCH}/jvm/jre-1.8.0-openjdk/bin:${PATH}"
-                SLES_VERSION="$(grep -E '</version>' /etc/products.d/SLES.prod | grep -E -o '[0-9]+\.[0-9]+')"
-                if vergte "${SLES_VERSION}" "15.4" ; then
-                    export CLASSPATH="${JAVA_PATH}/lttng-ust-agent-all.jar:/usr/share/java/log4j/log4j-api.jar:/usr/share/java/log4j/log4j-core.jar:/usr/share/java/log4j12/log4j-12.jar"
-                fi
-                ;;
             'ci') # yocto
                 export JAVA_HOME="/usr/${LIBDIR_ARCH}/jvm/openjdk-8/"
                 export PATH="/usr/${LIBDIR_ARCH}/jvm/openjdk-8/bin/:${PATH}"

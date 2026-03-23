@@ -330,13 +330,6 @@ cygwin|cygwin64|msys32|msys64)
     ;;
 esac
 
-# Some warning flags are very dumb in GCC 4.8 on SLES12, disable them
-# even if they are available.
-if [[ $platform = sles12sp5* ]]; then
-    CFLAGS="$CFLAGS -Wno-missing-field-initializers -Wno-shadow"
-    CXXFLAGS="$CXXFLAGS -Wno-missing-field-initializers -Wno-shadow"
-fi
-
 # If we have modules, build them
 if [ -d "$WORKSPACE/src/lttng-modules" ]; then
     print_header "Build and install LTTng-modules"
@@ -472,14 +465,6 @@ case "${java_preferred_jdk}" in
         ;;
     '8')
         case "$(os_id)" in
-            'sles')
-                export JAVA_HOME="/usr/${LIBDIR_ARCH}/jvm/java-1.8.0-openjdk-1.8.0"
-                export PATH="/usr/${LIBDIR_ARCH}/jvm/java-1.8.0-openjdk-1.8.0/bin:/usr/${LIBDIR_ARCH}/jvm/jre-1.8.0-openjdk/bin:${PATH}"
-                SLES_VERSION="$(grep -E '</version>' /etc/products.d/SLES.prod | grep -E -o '[0-9]+\.[0-9]+')"
-                if vergte "${SLES_VERSION}" "15.4" ; then
-                    export CLASSPATH="${JAVA_PATH}/lttng-ust-agent-all.jar:/usr/share/java/log4j/log4j-api.jar:/usr/share/java/log4j/log4j-core.jar:/usr/share/java/log4j12/log4j-12.jar"
-                fi
-                ;;
             'ci') # yocto
                 export JAVA_HOME="/usr/${LIBDIR_ARCH}/jvm/openjdk-8/"
                 export PATH="/usr/${LIBDIR_ARCH}/jvm/openjdk-8/bin/:${PATH}"

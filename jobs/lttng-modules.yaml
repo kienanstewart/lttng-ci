@@ -1010,22 +1010,6 @@
           kverceil: ''
           kverfilter: stable-head
 
-      # SLES normal builders
-      - 'lttng-modules_{mversion}_{buildtype}-{slesversion}': &job_lttng-modules_sles
-          mversion:
-            - master
-            - stable-2.15
-            - stable-2.14
-            - stable-2.13
-            - stable-2.12
-          slesversion:
-            - sles15sp5
-          buildtype: build
-          parambuildtype: build
-          kverfloor: ''
-          kverceil: ''
-          kverfilter: stable-head
-
       # Ubuntu normal builds
       - 'lttng-modules_{mversion}_{buildtype}-{uversion}': &job_lttng-modules_master_ubuntu
           mversion:
@@ -1173,8 +1157,6 @@
           <<: *job_lttng-modules_stable-2-12
       - 'dev_review_lttng-modules_{mversion}_build-{elversion}':
           <<: *job_lttng-modules_el
-      - 'dev_review_lttng-modules_{mversion}_build-{slesversion}':
-          <<: *job_lttng-modules_sles
       - 'dev_review_lttng-modules_{mversion}_{buildtype}-{uversion}':
           <<: *job_lttng-modules_master_ubuntu_crossbuild
           enable_gerrit_trigger: false

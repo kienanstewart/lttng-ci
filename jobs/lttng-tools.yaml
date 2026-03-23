@@ -253,18 +253,11 @@
               ;;
           esac
 
-          # Run java tests only on 'linuxbuild' and 'slesbuild' jobs
-          if [ "{buildtype}" = "linuxbuild" ] || [ "{buildtype}" = "slesbuild" ]; then
+          # Run java tests only on 'linuxbuild' jobs
+          if [ "{buildtype}" = "linuxbuild" ]; then
             echo "LTTNG_TOOLS_RUN_UST_JAVA_TESTS=yes" >> env.properties
           else
             echo "LTTNG_TOOLS_RUN_UST_JAVA_TESTS=no" >> env.properties
-          fi
-
-          if [ "{buildtype}" = "slesbuild" ] ; then
-            echo "TAP_AUTOTIME=0" >> env.properties
-            echo "LTTNG_TESTS_TAP_AUTOTIME=0" >> env.properties
-            # On SLES, force log4j to 2.17.1
-            echo "LTTNG_TOOLS_UST_JAVA_TESTS_LOG4J_API_VERSION=2.17.1" >> env.properties
           fi
 
           echo "liburcu_conf=$liburcu_conf" >> env.properties
@@ -339,15 +332,11 @@
       - shell: |
           #!/bin/bash
           set -exu
-          # Run java tests only on 'linuxbuild' and 'slesbuild' jobs
-          if [ "{buildtype}" = "linuxbuild" ] || [ "{buildtype}" = "slesbuild" ]; then
+          # Run java tests only on 'linuxbuild' jobs
+          if [ "{buildtype}" = "linuxbuild" ]; then
             echo "LTTNG_TOOLS_RUN_UST_JAVA_TESTS=yes" >> env.properties
           else
             echo "LTTNG_TOOLS_RUN_UST_JAVA_TESTS=no" >> env.properties
-          fi
-          if [ "{buildtype}" = "slesbuild" ] ; then
-            echo "TAP_AUTOTIME=0" >> env.properties
-            echo "LTTNG_TESTS_TAP_AUTOTIME=0" >> env.properties
           fi
           echo "LTTNG_TOOLS_JAVA_AGENTS={java_agents|true}" >> env.properties
           # If not using java_agents, disable that for any lttng-ust which may be
@@ -1342,9 +1331,8 @@
               value: 'no'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_slesbuild
           buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
+          platforms: !!python/tuple [sles16-amd64]
           confs: !!python/tuple [agents]
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_yoctobuild
           buildtype: yoctobuild
           platforms: !!python/tuple [yocto40-powerpc, yocto50-ppc64]
@@ -1410,13 +1398,6 @@
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
-      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_master_root_slesbuild
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
-          nodes: !!python/tuple [sles15sp5-amd64-rootnode]
-          confs: !!python/tuple [agents]
-          filter: '(node=="sles15sp5-amd64-rootnode" && platform=="sles15sp5-amd64")'
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_master_root_yoctobuild_extended
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild
@@ -1491,9 +1472,8 @@
               value: 'no'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_slesbuild
           buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
+          platforms: !!python/tuple [sles16-amd64]
           confs: !!python/tuple [agents]
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_yoctobuild
           buildtype: yoctobuild
           timeout: '60'
@@ -1559,13 +1539,6 @@
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
               value: 'no'
-      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_slesbuild
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
-          nodes: !!python/tuple [sles15sp5-amd64-rootnode]
-          confs: !!python/tuple [agents]
-          filter: '(node=="sles15sp5-amd64-rootnode" && platform=="sles15sp5-amd64")'
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_yoctobuild_extended
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild
@@ -1634,9 +1607,8 @@
               value: 'stable-2.14'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_slesbuild
           buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
+          platforms: !!python/tuple [sles16-amd64]
           confs: !!python/tuple [agents]
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_elbuild
           buildtype: elbuild
           confs: !!python/tuple [agents]
@@ -1697,13 +1669,6 @@
               value: 'no'
             - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
               value: 'stable-2.14'
-      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-14_root_slesbuild
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
-          nodes: !!python/tuple [sles15sp5-amd64-rootnode]
-          confs: !!python/tuple [agents]
-          filter: '(node=="sles15sp5-amd64-rootnode" && platform=="sles15sp5-amd64")'
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-14_root_elbuild
           buildtype: elbuild
           confs: !!python/tuple [agents]
@@ -1765,12 +1730,6 @@
               value: 'no'
             - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
               value: 'stable-2.14'
-      - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-13_slesbuild
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
-          confs: !!python/tuple [agents]
-          urcuversions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-13_elbuild
           buildtype: elbuild
           confs: !!python/tuple [agents]
@@ -1825,14 +1784,6 @@
               value: 'no'
             - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
               value: 'stable-2.14'
-      - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-13_root_slesbuild
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
-          nodes: !!python/tuple [sles15sp5-amd64-rootnode]
-          confs: !!python/tuple [agents]
-          urcuversions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
-          filter: '(node=="sles15sp5-amd64-rootnode" && platform=="sles15sp5-amd64")'
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-13_root_elbuild
           buildtype: elbuild
           confs: !!python/tuple [agents]
@@ -1891,12 +1842,6 @@
             - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
               value: 'stable-2.14'
       - '{job_prefix}lttng-tools_{version}_{buildtype}':
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
-          urcuversions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
-          confs: !!python/tuple [agents]
-          java_preferred_jdk: '8'
-      - '{job_prefix}lttng-tools_{version}_{buildtype}':
           buildtype: elbuild
           confs: !!python/tuple [agents]
           java_agents: 'false'
@@ -1940,14 +1885,6 @@
           confs: !!python/tuple [agents]
           babelversions: !!python/tuple [stable-2.0, stable-2.1, master]
           filter: '(node=="deb12-amd64-rootnode-linux5" && platform=="deb12-amd64")'
-      - '{job_prefix}lttng-tools_{version}_root_{buildtype}':
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
-          nodes: !!python/tuple [sles15sp5-amd64-rootnode]
-          confs: !!python/tuple [agents]
-          urcuversions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
-          filter: '(node=="sles15sp5-amd64-rootnode" && platform=="sles15sp5-amd64")'
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}':
           buildtype: elbuild
           confs: !!python/tuple [agents]
@@ -2007,7 +1944,6 @@
           <<: *job_lttng-tools_master_portbuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_master_slesbuild
-          gerrit_approval_values: "{_gerrit_approval_build_only_and_more}"
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_master_yoctobuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
@@ -2027,8 +1963,6 @@
           <<: *job_lttng-tools_master_root_elbuild
       - 'dev_review_lttng-tools_{version}_root_{buildtype}':
           <<: *job_lttng-tools_master_root_portbuild
-      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
-          <<: *job_lttng-tools_master_root_slesbuild
           gerrit_approval_values: "{_gerrit_approval_fast_and_more}"
       - 'dev_review_lttng-tools_{version}_root_{buildtype}':
           <<: *job_lttng-tools_master_root_yoctobuild_extended
@@ -2082,7 +2016,6 @@
           <<: *job_lttng-tools_stable-2-15_portbuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-15_slesbuild
-          gerrit_approval_values: "{_gerrit_approval_build_only_and_more}"
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-15_yoctobuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
@@ -2102,9 +2035,6 @@
           <<: *job_lttng-tools_stable-2-15_root_elbuild
       - 'dev_review_lttng-tools_{version}_root_{buildtype}':
           <<: *job_lttng-tools_stable-2-15_root_portbuild
-      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
-          <<: *job_lttng-tools_stable-2-15_root_slesbuild
-          gerrit_approval_values: "{_gerrit_approval_fast_and_more}"
       - 'dev_review_lttng-tools_{version}_root_{buildtype}':
           <<: *job_lttng-tools_stable-2-15_root_yoctobuild_extended
       - 'dev_review_lttng-modules_with_lttng-tools_{version}_root_{buildtype}':
@@ -2148,7 +2078,6 @@
           <<: *job_lttng-tools_stable-2-14_portbuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-14_slesbuild
-          gerrit_approval_values: '{_gerrit_approval_build_only_and_more}'
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-14_yoctobuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
@@ -2168,9 +2097,6 @@
           <<: *job_lttng-tools_stable-2-14_root_elbuild
       - 'dev_review_lttng-tools_{version}_root_{buildtype}':
           <<: *job_lttng-tools_stable-2-14_root_portbuild
-      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
-          <<: *job_lttng-tools_stable-2-14_root_slesbuild
-          gerrit_approval_values: '{_gerrit_approval_fast_and_more}'
       - 'dev_review_lttng-tools_{version}_root_{buildtype}':
           <<: *job_lttng-tools_stable-2-14_root_yoctobuild_extended
       - 'dev_review_lttng-modules_with_lttng-tools_{version}_root_{buildtype}':
@@ -2206,7 +2132,6 @@
           <<: *job_lttng-tools_stable-2-13_elbuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_slesbuild
-          gerrit_approval_values: '{_gerrit_approval_build_only_and_more}'
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_yoctobuild_extended
       - 'dev_review_lttng-tools_{version}_{buildtype}':
@@ -2224,9 +2149,6 @@
           <<: *job_lttng-tools_stable-2-13_root_elbuild
       - 'dev_review_lttng-tools_{version}_root_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_root_portbuild
-      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
-          <<: *job_lttng-tools_stable-2-13_root_slesbuild
-          gerrit_approval_values: '{_gerrit_approval_fast_and_more}'
       - 'dev_review_lttng-tools_{version}_root_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_root_yoctobuild_extended
       - 'dev_review_lttng-modules_with_lttng-tools_{version}_root_{buildtype}':
@@ -2261,13 +2183,6 @@
           confs: !!python/tuple [agents]
           filter: '(node=="deb12-amd64-rootnode" && platform=="deb12-amd64")'
           modules_branch_pattern: 'stable-2.12'
-      - 'dev_review_lttng-tools_{version}_root_{buildtype}':
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles15sp5-amd64]
-          nodes: !!python/tuple [sles15sp5-amd64-rootnode]
-          confs: !!python/tuple [agents]
-          filter: '(node=="sles15sp5-amd64-rootnode" && platform=="sles15sp5-amd64")'
-          java_preferred_jdk: '8'
 
 
 - project:

@@ -294,15 +294,7 @@
     ARCHES:
       - amd64
     RELEASES:
-      # 12.5 Doesn't currently work well with Incus either as a container or a VM
-      #   * 12.5 has systemd 228, which doesn't support cgroups v2. Hosts _could_
-      #   be configured to disable the unified cgroup hierarchy in order to have
-      #   this version systemd work correctly.
-      #   * Running as a QEMU VM, virtio_scsi isn't correctly able to bring the
-      #   virtual disks online. The version of incus currently deployed doesn't
-      #   support the io.bus option to use virtio-blk instead.
-      # - '12.5'
-      - '15.5'
+      - '16.0'
     parameters:
       - bool:
           <<: *images_parameters_SKIP_BASE_IMAGES
@@ -322,7 +314,7 @@
           name: 'RELEASE_FILTER'
           choices:
             - 'all'
-            - '15.5'
+            - '16.0'
       - string:
           <<: *images_parameters_GIT_URL
       - string:

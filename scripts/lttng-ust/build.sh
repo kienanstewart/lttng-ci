@@ -229,27 +229,11 @@ freebsd*)
     ;;
 esac
 
-if [[ -f /etc/products.d/SLES.prod ]] ; then
-    # Used by automake
-    SLES_VERSION="$(grep -E '</version>' /etc/products.d/SLES.prod | grep -E -o '[0-9]+\.[0-9]+')"
-    if verlte "${SLES_VERSION}" "12.5" ; then
-        # liburcu 0.14+ needs C++-11, which is "experimental" on this platform
-        CXXFLAGS="${CXXFLAGS} -std=gnu++-11"
-    fi
-fi
-
 case "${java_preferred_jdk}" in
     'default')
         ;;
     '8')
         case "$(os_id)" in
-            'sles')
-                export JAVA_HOME="/usr/${LIBDIR_ARCH}/jvm/java-1.8.0-openjdk-1.8.0"
-                export PATH="/usr/${LIBDIR_ARCH}/jvm/java-1.8.0-openjdk-1.8.0/bin:/usr/${LIBDIR_ARCH}/jvm/jre-1.8.0/:${PATH}"
-                if vergte "${SLES_VERSION}" "15.4" ; then
-                    export CLASSPATH='/usr/share/java/log4j/log4j-api.jar:/usr/share/java/log4j/log4j-core.jar:/usr/share/java/log4j12/log4j-12.jar'
-                fi
-                ;;
             'ci') # yocto
                 export JAVA_HOME="/usr/${LIBDIR_ARCH}/jvm/openjdk-8/"
                 export PATH="/usr/${LIBDIR_ARCH}/jvm/openjdk-8/bin/:${PATH}"
