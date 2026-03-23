@@ -933,34 +933,6 @@
 
       ## Stable 2.12 ##
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
-          buildtype: linuxbuild
-          version: stable-2.12
-          builds: !!python/tuple [std, dist, oot, oot-dist]
-          confs: !!python/tuple [std, agents, debug-rcu, tls_fallback]
-          liburcu_versions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
-          filter: '(build=="std") || ((liburcu_version=="stable-0.13" && (conf=="std" || conf=="agents")))'
-      - '{job_prefix}lttng-ust_{version}_{buildtype}':
-          buildtype: portbuild
-          version: stable-2.12
-          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std, agents]
-      - '{job_prefix}lttng-ust_{version}_{buildtype}':
-          buildtype: elbuild
-          version: stable-2.12
-          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
-          java_agents: 'false'
-      - '{job_prefix}lttng-ust_{version}_{buildtype}':
-          buildtype: yoctobuild_extended
-          version: stable-2.12
-          platforms: !!python/tuple [yocto33-amd64, yocto33-arm64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
-          liburcu_versions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
-          java_preferred_jdk: '8'
-      - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: elbuild_extended
           version: stable-2.12
           java_agents: 'false'
@@ -968,8 +940,6 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
           liburcu_versions: !!python/tuple [stable-0.12, stable-0.13]
-      - 'lttng-ust_{version}_scan-build':
-          version: stable-2.12
 
 - project:
     name: review-lttng-ust
@@ -1131,30 +1101,6 @@
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: stable-2.13
-          buildtype: portbuild
-          platforms: !!python/tuple [deb13-ppc64el, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
-          touchstone: '(platform == "deb12-i386")'
-          liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
-
-      ## Stable 2.12 ##
-      - 'dev_review_lttng-ust_{version}_{buildtype}':
-          version: stable-2.12
-          buildtype: linuxbuild
-          builds: !!python/tuple [std, oot, dist, oot-dist]
-          confs: !!python/tuple [std, agents]
-          liburcu_versions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
-          touchstone: '(build == "std") && (conf == "std")'
-      - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
-          version: stable-2.12
-          buildtype: linuxbuild
-          builds: !!python/tuple [std, oot, dist, oot-dist]
-          confs: !!python/tuple [std, agents]
-          babeltrace_version: stable-2.0
-          liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
-      - 'dev_review_lttng-ust_{version}_{buildtype}':
-          version: stable-2.12
           buildtype: portbuild
           platforms: !!python/tuple [deb13-ppc64el, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
           builds: !!python/tuple [std]

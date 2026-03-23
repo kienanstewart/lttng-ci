@@ -871,7 +871,6 @@
     name: lttng-modules
     email_to: 'ci-notification@lists.lttng.org, cc:mathieu.desnoyers@efficios.com'
     mversion:
-      - stable-2.12
       - stable-2.13
       - stable-2.14
       - stable-2.15
@@ -970,23 +969,6 @@
           kverceil: ''
           kverfilter: none
 
-      - 'lttng-modules_{mversion}_{buildtype}-vanilla': &job_lttng-modules_stable-2-12
-          mversion:
-            - stable-2.12
-          buildtype: build
-          parambuildtype: build
-          kverfloor: v3.0
-          kverceil: v5.18-rc1
-          kverfilter: stable-head
-      - 'lttng-modules_{mversion}_fullbuild-vanilla':
-          mversion:
-            - stable-2.12
-          buildtype: build
-          parambuildtype: build
-          kverfloor: v3.0
-          kverceil: v5.18-rc1
-          kverfilter: none
-
       # EL normal builds
       - 'lttng-modules_{mversion}_{buildtype}-{elversion}': &job_lttng-modules_el
           mversion:
@@ -994,7 +976,6 @@
             - stable-2.15
             - stable-2.14
             - stable-2.13
-            - stable-2.12
           elversion:
             - el8
           buildtype: build
@@ -1024,17 +1005,6 @@
           parambuildtype: build
           kverfloor: ''
           kverceil: ''
-          kverfilter: stable-head
-
-      - 'lttng-modules_{mversion}_{buildtype}-{uversion}':
-          mversion:
-            - stable-2.12
-          uversion:
-            - jammy
-          buildtype: build
-          parambuildtype: build
-          kverfloor: ''
-          kverceil: Ubuntu-hwe-5.18.0-0.0
           kverfilter: stable-head
 
       # Vanilla crossbuilds
@@ -1080,15 +1050,6 @@
           kverceil: ''
           kverfilter: stable-head
 
-      - 'lttng-modules_{mversion}_{buildtype}-vanilla':
-          mversion:
-            - stable-2.12
-          buildtype: crossbuild
-          parambuildtype: crossbuild
-          kverfloor: v3.18
-          kverceil: v5.18-rc1
-          kverfilter: stable-head
-
       # Ubuntu cross builds
       - 'lttng-modules_{mversion}_{buildtype}-{uversion}': &job_lttng-modules_master_ubuntu_crossbuild
           mversion:
@@ -1103,17 +1064,6 @@
           parambuildtype: crossbuild
           kverfloor: ''
           kverceil: ''
-          kverfilter: stable-head
-
-      - 'lttng-modules_{mversion}_{buildtype}-{uversion}':
-          mversion:
-            - stable-2.12
-          uversion:
-            - jammy
-          buildtype: crossbuild
-          parambuildtype: crossbuild
-          kverfloor: ''
-          kverceil: Ubuntu-hwe-5.18.0-0.0
           kverfilter: stable-head
 
       # Parametrized kernel and modules build jobs
@@ -1153,8 +1103,6 @@
           <<: *job_lttng-modules_stable-2-13
       - 'dev_review_lttng-modules_{mversion}_{buildtype}':
           <<: *job_lttng-modules_stable-2-13_nocompat
-      - 'dev_review_lttng-modules_{mversion}_{buildtype}':
-          <<: *job_lttng-modules_stable-2-12
       - 'dev_review_lttng-modules_{mversion}_build-{elversion}':
           <<: *job_lttng-modules_el
       - 'dev_review_lttng-modules_{mversion}_{buildtype}-{uversion}':
@@ -1174,8 +1122,6 @@
         naming_rule: 'Stable 2.14'
       - group_regex: '.*_stable-2.13_.*'
         naming_rule: 'Stable 2.13'
-      - group_regex: '.*_stable-2.12_.*'
-        naming_rule: 'Stable 2.12'
 
 - project:
     name: lttng-modules-views

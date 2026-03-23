@@ -1,14 +1,5 @@
 ---
 
-- job:
-    name: 'integration_ust-2.12-lower-urcu_testsuite'
-    description: |
-      <p>Job is managed by Jenkins Job Builder.</p>
-    project-type: pipeline
-    sandbox: true
-    dsl:
-      !include-raw-verbatim: pipelines/integration/ust-2.12-lower-urcu_testsuite.groovy
-
 - job-template:
     name: 'integration_lttng-tools-{version}-32-64_testsuite'
     description: |
@@ -35,13 +26,6 @@
 
 
 ## Projects
-- project:
-    name: integration
-    views:
-      - 'Integration'
-    jobs:
-      - 'integration_ust-2.12-lower-urcu_testsuite'
-
 - project:
     name: integration-32-64
     jobs:

@@ -274,14 +274,6 @@
           bt_branch: stable-2.0
           lttngversion:
             - stable-2.13
-      - '{prefix}system_tests-{lttngversion}{suffix}':
-          bt_branch: stable-2.0
-          lttngversion:
-            - stable-2.12
-          kversion:
-            - linux-4.4.y
-            - linux-5.10.y
-            - linux-5.15.y
       - 'system_tests_build_kernel_and_modules':
           email_to: ''
       - 'system_tests_run_lava_job':
