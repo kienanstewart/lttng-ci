@@ -345,12 +345,6 @@
         naming_rule: 'Stable 0.13'
       - group_regex: '.*_stable-0.12_.*'
         naming_rule: 'Stable 0.12'
-      - group_regex: '.*_stable-0.11_.*'
-        naming_rule: 'Stable 0.11'
-      - group_regex: '.*_stable-0.10_.*'
-        naming_rule: 'Stable 0.10'
-      - group_regex: '.*_stable-0.9_.*'
-        naming_rule: 'Stable 0.9'
 
 
 ## Projects
@@ -439,10 +433,6 @@
           confs: !!python/tuple [std]
           touchstone: '(build == "std")'
           version:
-            - stable-0.9
-            - stable-0.10
-            - stable-0.11
-            - stable-0.12
             - stable-0.13
             - stable-0.14
             - stable-0.15
@@ -476,38 +466,6 @@
       - 'liburcu_{version}_scan-build'
       - 'liburcu_{version}_coverity':
           version: master
-
-
-- project:
-    name: liburcu-dev-upstream
-    job_prefix: 'dev_upstream_'
-    github_user: urcu
-    github_name: userspace-rcu
-    email_to: 'ci-notification@lists.lttng.org, cc:mathieu.desnoyers@efficios.com'
-    version:
-      - stable-0.9
-      - stable-0.10
-      - stable-0.11
-      - stable-0.12
-    jobs:
-      - '{job_prefix}liburcu_{version}_{buildtype}':
-          buildtype: linuxbuild
-          platforms: !!python/tuple [deb13-amd64]
-          builds: !!python/tuple [std, oot, dist]
-          confs: !!python/tuple [std, static, tls_fallback, debug-rcu]
-          touchstone: '(build == "std") && (conf == "std")'
-      - '{job_prefix}liburcu_{version}_{buildtype}':
-          buildtype: portbuild
-          platforms: !!python/tuple [deb13-ppc64el, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std, static, tls_fallback, debug-rcu]
-          touchstone: '(build == "std") && (conf == "std") && (platform == "deb12-i386")'
-      - '{job_prefix}liburcu_{version}_{buildtype}':
-          buildtype: elbuild
-          platforms: !!python/tuple [el8-amd64, el9-amd64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std]
-          touchstone: '(build == "std")'
 
 
 - project:

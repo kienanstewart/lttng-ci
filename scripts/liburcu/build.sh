@@ -288,16 +288,7 @@ tls_fallback)
 debug-rcu)
     print_header "Conf: Enable RCU sanity checks for debugging"
 
-    if vergte "$PACKAGE_VERSION" "0.10"; then
-       CONF_OPTS+=("--enable-rcu-debug")
-    else
-       export CFLAGS="$CFLAGS -DDEBUG_RCU"
-    fi
-
-    echo "Enable iterator sanity validator"
-    if vergte "$PACKAGE_VERSION" "0.11"; then
-       CONF_OPTS+=("--enable-cds-lfht-iter-debug")
-    fi
+    CONF_OPTS+=("--enable-rcu-debug" "--enable-cds-lfht-iter-debug")
     ;;
 
 atomic-builtins)
@@ -440,23 +431,14 @@ if [ "$USERSPACE_RCU_RUN_TESTS" = "yes" ]; then
     # Run tests, don't fail now, we want to run the archiving steps
     $MAKE --keep-going check || exit_status=1
 
-    # Only run regtest for 0.9 and up
-    if vergte "$PACKAGE_VERSION" "0.9"; then
-       $MAKE --keep-going regtest || exit_status=1
-    fi
+    # Run the regression tests, don't fail now, we want to run the archiving steps
+    $MAKE --keep-going regtest || exit_status=1
 
     # Copy tap logs for the jenkins tap parser before cleaning the build dir
     rsync -a --exclude 'test-suite.log' --include '*/' --include '*.log' --exclude='*' tests/ "$WORKSPACE/tap"
 
     # Copy the test suites top-level log which includes all tests failures
     rsync -a --include 'test-suite.log' --include '*/' --exclude='*' tests/ "$WORKSPACE/log"
-
-    # The test suite prior to 0.11 did not produce TAP logs
-    if verlt "$PACKAGE_VERSION" "0.11"; then
-        mkdir -p "$WORKSPACE/tap/no-log"
-        echo "1..1" > "$WORKSPACE/tap/no-log/tests.log"
-        echo "ok 1 - Test suite doesn't support logging" >> "$WORKSPACE/tap/no-log/tests.log"
-    fi
 fi
 
 # Archive the un-cleaned source directory as a compressed tarball on failure only,
