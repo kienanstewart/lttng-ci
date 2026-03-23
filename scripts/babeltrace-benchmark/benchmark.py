@@ -27,6 +27,11 @@ from minio.error import NoSuchKey, ResponseError
 sys.path.insert(0, str((pathlib.Path(__file__).parents[1] / "common").absolute()))
 import lava_submit
 
+
+class EvaluationException(Exception):
+    pass
+
+
 BENCHMARK_TYPES = [
     "dummy-default",
     "text-default",
@@ -671,8 +676,7 @@ def evaluate_benchmark_regression(
 
     # If there's no results for the current commit, give up
     if current_commit not in results.keys():
-        logging.error("No results for current commit '{}'".format(commit))
-        return True
+        raise EvaluationException("No results for current commit '{}'".format(commit))
 
     data = dict()
     # { 'commit':
