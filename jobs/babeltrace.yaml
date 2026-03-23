@@ -49,6 +49,7 @@
             PROJECT_NAME=babeltrace
             PYTHON={python}
             TEST_REPORT_TYPE={test_report_type}
+            WITH_VENDOR_PYTEST={vendor_pytest}
       - build-discarder:
           !include: common/default_discarder.yaml.inc
       - github:
@@ -59,6 +60,7 @@
     python: ''
     touchstone: ''
     test_report_type: tap
+    vendor_pytest: 'auto'
 
 - defaults:
     <<: *babeltrace-defaults
@@ -204,6 +206,7 @@
             conf=std
             build=std
             PYTHON={python}
+            WITH_VENDOR_PYTEST={vendor_pytest}
       - shell: |
           curl -OL 'https://ftp.gnome.org/pub/gnome/sources/glib/2.28/glib-2.28.6.tar.gz'
           tar xf glib-2.28.6.tar.gz
@@ -395,6 +398,7 @@
             BABELTRACE_GIT_UNTRACKED=yes
             PYTHON={python}
             TEST_REPORT_TYPE={test_report_type}
+            WITH_VENDOR_PYTEST={vendor_pytest}
       - build-discarder:
           !include: common/review_discarder.yaml.inc
       - throttle:
@@ -426,6 +430,7 @@
             PROJECT_NAME=babeltrace
             PYTHON={python}
             TEST_REPORT_TYPE={test_report_type}
+            WITH_VENDOR_PYTEST={vendor_pytest}
       - build-discarder:
           !include: common/review_discarder.yaml.inc
 
@@ -466,6 +471,7 @@
             BABELTRACE_GIT_UNTRACKED=yes
             PYTHON={python}
             TEST_REPORT_TYPE={test_report_type}
+            WITH_VENDOR_PYTEST={vendor_pytest}
       - build-discarder:
           !include: common/review_discarder.yaml.inc
 
@@ -496,6 +502,7 @@
             PROJECT_NAME=babeltrace
             PYTHON={python}
             TEST_REPORT_TYPE={test_report_type}
+            WITH_VENDOR_PYTEST={vendor_pytest}
       - build-discarder:
           !include: common/review_discarder.yaml.inc
 
@@ -703,6 +710,7 @@
           platforms: !!python/tuple [cygwin64, msys2-ucrt64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
+          vendor_pytest: '1'
       - 'babeltrace_{version}_{cctype}':
           cctype: clangbuild
           platforms: !!python/tuple [deb13-amd64]
@@ -776,6 +784,7 @@
           confs: !!python/tuple [std]
           warnings_status: FAILED
           test_report_type: junit
+          vendor_pytest: '1'
 
       ## Stable 2.1 ##
       - 'dev_review_babeltrace_{version}_{buildtype}':
@@ -814,6 +823,7 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           warnings_status: WARNING
+          vendor_pytest: '1'
 
       ## Stable 2.0 ##
       - 'dev_review_babeltrace_{version}_{buildtype}':
@@ -852,6 +862,7 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           warnings_status: WARNING
+          vendor_pytest: '1'
 
       ## ALL ##
       - 'dev_review_babeltrace_{version}_smokebuild':
