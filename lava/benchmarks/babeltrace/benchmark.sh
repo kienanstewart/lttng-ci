@@ -71,7 +71,9 @@ while read -d ' ' -r commit ; do
         BABELTRACE_DEBUG_MODE=0 \
         BABELTRACE_MINIMAL_LOG_LEVEL=INFO \
         --prefix="$PREFIX" \
-        --disable-man-pages > ../config.log 2>&1 ; then
+        --disable-man-pages \
+        --enable-vendor-catch2 \
+        --enable-vendor-fmt > ../config.log 2>&1 ; then
         # Upload log
         cat ../config.log
         echo "[${commit}] configure failed" >&2
