@@ -2,7 +2,7 @@
 # The search domain for instance names
 search_domain: internal.efficios.com
 # Which DNS server to use for checks + updates
-name_server: smb-adc02.internal.efficios.com
+name_server: smb-adc03.internal.efficios.com
 # The host to use for delegating lxd commands
 lxd_host: ci-host-amd64-1a.internal.efficios.com
 # Default host to create libvirt VMs on if not specified
