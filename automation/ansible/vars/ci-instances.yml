@@ -1458,6 +1458,54 @@ containers:
       node_name: 'ripper'
       config:
         <<: *jenkins_ssh_agent_default_config
+  - meta:
+      address: 172.18.16.189
+    jenkins:
+      label: 'yocto50-amd64'
+      config:
+        <<: *jenkins_ssh_agent_default_config
+    lxd:
+      name: ci-node-yocto50-amd64-1c-01
+      target: ci-host-amd64-1c
+      source:
+        alias: yocto/scarthgap/amd64/incus
+        type: image
+  - meta:
+      address: 172.18.16.190
+    jenkins:
+      label: 'yocto50-amd64'
+      config:
+        <<: *jenkins_ssh_agent_default_config
+    lxd:
+      name: ci-node-yocto50-amd64-1d-01
+      target: ci-host-amd64-1d
+      source:
+        alias: yocto/scarthgap/amd64/incus
+        type: image
+  - meta:
+      address: 172.18.16.191
+    jenkins:
+      label: 'yocto50-amd64'
+      config:
+        <<: *jenkins_ssh_agent_default_config
+    lxd:
+      name: ci-node-yocto50-amd64-2a-01
+      target: ci-host-amd64-2a
+      source:
+        alias: yocto/scarthgap/amd64/incus
+        type: image
+  - meta:
+      address: 172.18.16.192
+    jenkins:
+      label: 'yocto50-amd64'
+      config:
+        <<: *jenkins_ssh_agent_default_config
+    lxd:
+      name: ci-node-yocto50-amd64-2b-01
+      target: ci-host-amd64-2b
+      source:
+        alias: yocto/scarthgap/amd64/incus
+        type: image
   # "Root " nodes in libvirt, since Jenkins can use the "libvirt agents" plugin
   # to revert to a specific snapshot before running a job
   #

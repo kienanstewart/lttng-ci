@@ -120,6 +120,8 @@ ci-node-yocto33-amd64-2a-01 ansible_host=172.18.16.104
 ci-node-yocto33-amd64-2b-01 ansible_host=172.18.16.105
 ci-node-yocto33-arm64-2[a:b]-01
 ci-rootnode-yocto33-amd64-2[c:d]-01
+ci-node-yocto50-amd64-1[c:d]-01
+ci-node-yocto50-amd64-2[a:b]-01
 
 [node:children]
 node_i386
