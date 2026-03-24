@@ -1,4 +1,10 @@
 ---
+#
+# Example:
+#   ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ansible-playbook playbooks/ci-instances.yml \
+#  -e '{"skip_libvirt": true, "limit": ["ci-node-amd64-1a-01"]}'
+#
+
 - hosts: cluster_ci:localhost
   vars_files:
     - ../vars/ci-instances.yml
