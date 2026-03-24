@@ -14,6 +14,7 @@
 - when: netplan_manage
   block:
     - name: Install netplan
+      when: netplan_manage_package
       ansible.builtin.package:
         name: "{{netplan_package}}"
     - name: Update netplan default.yaml
