@@ -122,6 +122,7 @@ ci-node-yocto33-arm64-2[a:b]-01
 ci-rootnode-yocto33-amd64-2[c:d]-01
 ci-node-yocto50-amd64-1[c:d]-01
 ci-node-yocto50-amd64-2[a:b]-01
+ci-node-yocto50-arm64-[1:2][a:b]-01
 
 [node:children]
 node_i386
