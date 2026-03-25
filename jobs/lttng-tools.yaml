@@ -2042,6 +2042,8 @@
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_elbuild
       - 'dev_review_lttng-tools_{version}_{buildtype}':
+          <<: *job_lttng-tools_stable-2-13_portbuild
+      - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_yoctobuild_extended
       - 'dev_review_lttng-tools_{version}_{buildtype}':
           <<: *job_lttng-tools_stable-2-13_macosbuild
