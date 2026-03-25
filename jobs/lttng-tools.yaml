@@ -1723,7 +1723,7 @@
           buildtype: portbuild
           platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
           confs: !!python/tuple [std, no-ust, agents]
-          urcuversions: !!python/tuple [stable-0.13]
+          urcuversions: !!python/tuple [stable-0.15, master]
           timeout: '45'
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
