@@ -1,7 +1,6 @@
 localhost ansible_connection=local ansible_python_interpreter=python3
 
 [jenkins]
-ci-master-04
 ci-master-05
 
 [hosts]
