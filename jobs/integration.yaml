@@ -45,7 +45,3 @@
           version: stable-2.13
           babelversion: stable-2.0
           urcu_version: stable-0.13
-      - 'integration_lttng-tools-{version}-32-64_testsuite':
-          version: stable-2.12
-          babelversion: stable-2.0
-          urcu_version: stable-0.13

@@ -290,10 +290,8 @@ pipeline {
               steps {
                 stash name: "i386-deps-lttng-tools", includes: 'deps-32/**'
 
-                {% if version != 'stable-2.12' %}
                 /* Save the i386 ld_preloaded libraries for sessiond pausing */
                 stash name: "i386-deps-sessiond-notification-pause-lib", includes: 'src/lttng-tools/tests/regression/tools/notification/.libs/libpause_sessiond.so'
-                {% endif %}
               }
             }
           } /* stages */
@@ -311,11 +309,7 @@ pipeline {
       parallel {
         {% for test_type in ["64bit-canary", "32bit-sessiond", "32bit-relayd", "32bit-cli" ] %}
         stage('Testing {{ test_type }}') {
-          {% if version == 'stable-2.12' %}
-          agent { label '{{test_label_amd64}}-linux5' }
-          {% else %}
           agent { label '{{test_label_amd64}}' }
-          {% endif %}
 
           environment {
             BASEDIR_32 = "$WORKSPACE/deps-32"
@@ -383,12 +377,10 @@ pipeline {
                 unstash name: "amd64-lttng-tools"
                 sh 'tar xf amd64-lttng-tools.tgz'
 
-                {% if version != 'stable-2.12' %}
                 dir('testing-overlay/sessiond') {
                   /* Save the i386 LD_PRELOAD libraries for sessiond pausing */
                   unstash name: "i386-deps-sessiond-notification-pause-lib"
                 }
-                {% endif %}
 
                 /* Stable 2.12 and 2.13 still look for "babeltrace" */
                 sh 'ln -s "$BASEDIR_BUILD_64/bin/babeltrace2" "$BASEDIR_BUILD_64/bin/babeltrace"'
@@ -431,9 +423,7 @@ pipeline {
                   sh 'ln -s "$BASEDIR_BUILD_32/bin/lttng-sessiond" lttng-sessiond'
                 }
 
-                {% if version != 'stable-2.12' %}
                 sh 'cp -rv "testing-overlay/sessiond/"* ./'
-                {% endif %}
 
                 {% elif test_type == '32bit-relayd' %}
 
