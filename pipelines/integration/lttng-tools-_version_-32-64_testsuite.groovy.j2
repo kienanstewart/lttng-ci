@@ -435,7 +435,7 @@ pipeline {
                    * This will mark the job as FAILED if the test suite is not
                    * successful but will continue the execution of the stages.
                    */
-                  catchError {
+                  catchError(stageResult: 'FAILURE') {
                     sh(
                       label: 'test',
                       script: '''#!/usr/bin/bash
