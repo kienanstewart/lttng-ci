@@ -1344,8 +1344,9 @@
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild
           platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std, agents]
           java_preferred_jdk: '8'
+          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_macosbuild
           buildtype: macosbuild
           platforms: !!python/tuple [macos-arm64]
@@ -1485,8 +1486,9 @@
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild
           platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std, agents]
           java_preferred_jdk: '8'
+          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_macosbuild
           buildtype: macosbuild
           platforms: !!python/tuple [macos-arm64]
@@ -1623,8 +1625,9 @@
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild
           platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std, agents]
           java_preferred_jdk: '8'
+          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_macosbuild
           buildtype: macosbuild
           platforms: !!python/tuple [macos-arm64]
@@ -1739,8 +1742,9 @@
           buildtype: yoctobuild_extended
           babeltrace_buildtype: yoctobuild
           platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std, agents]
           java_preferred_jdk: '8'
+          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-13_macosbuild
           buildtype: macosbuild
           platforms: !!python/tuple [macos-arm64]

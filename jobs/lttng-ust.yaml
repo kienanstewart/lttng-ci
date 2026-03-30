@@ -747,17 +747,19 @@
             - master
           platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std, agents]
           java_preferred_jdk: '8'
+          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild_extended
           version:
             - stable-2.15
           platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std, agents]
           liburcu_versions: !!python/tuple [stable-0.15, master]
           java_preferred_jdk: '8'
+          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild_extended
           version:
@@ -765,9 +767,10 @@
             - stable-2.14
           platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std, agents]
           liburcu_versions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
           java_preferred_jdk: '8'
+          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: freebsdbuild
           version: master
