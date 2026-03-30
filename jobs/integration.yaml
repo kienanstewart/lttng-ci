@@ -34,6 +34,31 @@
     sandbox: true
     dsl:
       !include-jinja2: pipelines/integration/lttng-tools-_version_-32-64_testsuite.groovy.j2
+    parameters:
+      - string:
+          name: LIBURCU_GIT_URL
+          default: 'https://github.com/urcu/userspace-rcu'
+      - string:
+          name: LIBURCU_GIT_BRANCH
+          default: '{urcu_version}'
+      - string:
+          name: LTTNG_MODULES_GIT_URL
+          default: 'https://github.com/lttng/lttng-modules'
+      - string:
+          name: LTTNG_MODULES_GIT_BRANCH
+          default: '{version}'
+      - string:
+          name: LTTNG_UST_GIT_URL
+          default: 'https://github.com/lttng/lttng-ust'
+      - string:
+          name: LTTNG_UST_GIT_BRANCH
+          default: '{version}'
+      - string:
+          name: LTTNG_TOOLS_GIT_URL
+          default: 'https://github.com/lttng/lttng-tools'
+      - string:
+          name: LTTNG_TOOLS_GIT_BRANCH
+          default: '{version}'
     # Job variables
     checkout_label: 'deb13-amd64'
     build_label_amd64: 'deb13-amd64'
