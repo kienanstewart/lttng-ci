@@ -59,6 +59,22 @@
       - string:
           name: LTTNG_TOOLS_GIT_BRANCH
           default: '{version}'
+      - bool:
+          name: 'VERBOSE_BABELTRACE'
+          default: 'false'
+          description: 'Enable verbose output for babeltrace'
+      - bool:
+          name: 'VERBOSE_LTTNG_CLIENT'
+          default: 'false'
+          description: 'Enable verbose output for the lttng client'
+      - bool:
+          name: 'VERBOSE_SESSIOND'
+          default: 'false'
+          description: 'Enable verbose sessiond and consumerd output'
+      - bool:
+          name: 'VERBOSE_RELAYD'
+          default: 'false'
+          description: 'Enable verbose relayd output'
     # Job variables
     checkout_label: 'deb13-amd64'
     build_label_amd64: 'deb13-amd64'
