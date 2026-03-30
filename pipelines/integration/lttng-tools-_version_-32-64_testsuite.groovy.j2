@@ -22,17 +22,6 @@ pipeline {
     pollSCM('@hourly')
   }
 
-  parameters {
-      string(name: 'LIBURCU_GIT_URL', defaultValue: 'https://github.com/urcu/userspace-rcu', description: 'The http git repo to be cloned for the liburcu project')
-      string(name: 'LIBURCU_GIT_BRANCH', defaultValue: '{{ urcu_version }}', description: 'The {{ version }} equivalent branch to be checkout-ed')
-      string(name: 'LTTNG_MODULES_GIT_URL', defaultValue: 'https://github.com/lttng/lttng-modules', description: 'The http git repo to be cloned for the lttng-modules project')
-      string(name: 'LTTNG_MODULES_GIT_BRANCH', defaultValue: '{{ version }}', description: 'The {{ version }} equivalent branch to be checkout-ed')
-      string(name: 'LTTNG_UST_GIT_URL', defaultValue: 'https://github.com/lttng/lttng-ust', description: 'The http git repo to be cloned for the lttng-ust project')
-      string(name: 'LTTNG_UST_GIT_BRANCH', defaultValue: '{{ version }}', description: 'The {{ version }} equivalent branch to be checkout-ed')
-      string(name: 'LTTNG_TOOLS_GIT_URL', defaultValue: 'https://github.com/lttng/lttng-tools', description: 'The http git repo to be cloned for the lttng-tools project')
-      string(name: 'LTTNG_TOOLS_GIT_BRANCH', defaultValue: '{{ version }}', description: 'The {{ version }} equivalent branch to be checkout-ed')
-  }
-
   /* Default environment for the pipeline */
   environment {
     PREFIX = '/build'
