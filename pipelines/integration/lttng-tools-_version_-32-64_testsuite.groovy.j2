@@ -441,6 +441,7 @@ pipeline {
                     sh(
                       label: 'test',
                       script: '''#!/usr/bin/bash
+systemctl stop systemd-timesyncd.service || true
 if [[ "${VERBOSE_BABELTRACE}" == "true" ]]; then
   export LTTNG_TEST_VERBOSE_BABELTRACE=1
 fi
@@ -468,6 +469,7 @@ make --keep-going check
 
           post {
             always {
+              sh 'systemctl start systemd-timesyncd.service || true'
               dir("src/lttng-tools/tests") {
                 /* Gather the TAP logs */
                 sh '''
