@@ -466,6 +466,18 @@ make --keep-going check
           } /* stages */
 
           post {
+            unsuccessful {
+              sh(
+                label: 'save source',
+                script: 'tar -czf "${WORKSPACE}/src-{{ test_type }}.tgz" src/',
+              )
+              sh(
+                label: 'save build artifacts',
+                script: 'tar -czf "${WORKSPACE}/artifacts-{{ test_type }}.tgz" deps*',
+              )
+              archiveArtifacts(artifacts: '*{{test_type}}.tgz', fingerprint: false)
+            }
+
             always {
               sh 'systemctl start systemd-timesyncd.service || true'
               dir("src/lttng-tools/tests") {
