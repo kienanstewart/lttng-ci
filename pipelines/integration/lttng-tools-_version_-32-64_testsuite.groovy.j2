@@ -5,13 +5,21 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+def gerrit_fetch_script(project) {
+  return  """#!/usr/bin/bash -x
+if [[ "\${GERRIT_PROJECT:-}" == "${project}" ]] && [[ -n "\$GERRIT_REFSPEC" ]]; then
+  git fetch "https://\$GERRIT_HOST/\$GERRIT_PROJECT" "\$GERRIT_REFSPEC"
+  git checkout FETCH_HEAD
+fi
+"""
+}
+
 pipeline {
   agent none
 
   /* Global options for the pipeline */
   options {
     preserveStashes()
-    buildDiscarder(logRotator(numToKeepStr: '5'))
     timeout(time: 2, unit: 'HOURS')
     disableConcurrentBuilds()
     timestamps()
@@ -43,20 +51,45 @@ pipeline {
       steps {
         cleanWs()
 
+        // @TODO: Depends-on if fetching from gerrit
+        dir("src/lttng-tools") {
+          checkout([$class: 'GitSCM', branches: [[name: "${params.LTTNG_TOOLS_GIT_BRANCH}"]], extensions: [], gitTool: 'Default', userRemoteConfigs: [[url: "${params.LTTNG_TOOLS_GIT_URL}"]]])
+          {% if review %}
+          sh(
+            label: 'fetch from gerrit',
+            script: gerrit_fetch_script('lttng-tools'),
+          )
+          {% endif %}
+        }
+
         dir("src/userspace-rcu") {
           checkout([$class: 'GitSCM', branches: [[name: "${params.LIBURCU_GIT_BRANCH}"]], extensions: [], gitTool: 'Default', userRemoteConfigs: [[url: "${params.LIBURCU_GIT_URL}"]]])
+          {% if review %}
+          sh(
+            label: 'fetch from gerrit',
+            script: gerrit_fetch_script('userspace-rcu'),
+          )
+          {% endif %}
         }
 
         dir("src/lttng-modules") {
           checkout([$class: 'GitSCM', branches: [[name: "${params.LTTNG_MODULES_GIT_BRANCH}"]], extensions: [], gitTool: 'Default', userRemoteConfigs: [[url: "${params.LTTNG_MODULES_GIT_URL}"]]])
+          {% if review %}
+          sh(
+            label: 'fetch from gerrit',
+            script: gerrit_fetch_script('lttng-modules'),
+          )
+          {% endif %}
         }
 
         dir("src/lttng-ust") {
           checkout([$class: 'GitSCM', branches: [[name: "${params.LTTNG_UST_GIT_BRANCH}"]], extensions: [], gitTool: 'Default', userRemoteConfigs: [[url: "${params.LTTNG_UST_GIT_URL}"]]])
-        }
-
-        dir("src/lttng-tools") {
-          checkout([$class: 'GitSCM', branches: [[name: "${params.LTTNG_TOOLS_GIT_BRANCH}"]], extensions: [], gitTool: 'Default', userRemoteConfigs: [[url: "${params.LTTNG_TOOLS_GIT_URL}"]]])
+          {% if review %}
+          sh(
+            label: 'fetch from gerrit',
+            script: gerrit_fetch_script('lttng-ust'),
+          )
+          {% endif %}
         }
 
         stash name: 'dep-sources', includes: 'src/userspace-rcu/**,src/lttng-ust/**'
