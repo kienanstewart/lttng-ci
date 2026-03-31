@@ -60,6 +60,18 @@
           name: LTTNG_TOOLS_GIT_BRANCH
           default: '{version}'
       - bool:
+          name: 'RUN_64bit_canary'
+          default: 'true'
+          description: 'Run the 64-bit canary test'
+      - bool:
+          name: 'RUN_32bit_relayd'
+          default: 'true'
+          description: 'Run the tools w/ 32-bit relayd test'
+      - bool:
+          name: 'RUN_32bit_sessiond'
+          default: 'true'
+          description: 'The the tools w/ 32-bit sessiond test'
+      - bool:
           name: 'VERBOSE_BABELTRACE'
           default: 'false'
           description: 'Enable verbose output for babeltrace'
