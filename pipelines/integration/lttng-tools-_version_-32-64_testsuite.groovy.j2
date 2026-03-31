@@ -418,6 +418,39 @@ pipeline {
                  * changing.
                  */
                 sh 'mkdir -p /home/jenkins ; ln -s /root/workspace /home/jenkins/workspace'
+
+                sh(
+                  label: 'allow non-root users to load dep libs',
+                  script: '''#!/usr/bin/bash -eu
+set_execute_traversal_bit()
+{
+  path=$1
+
+  level="$path"
+  if [ ! -d "$path" ]; then
+    echo "Path is not a directory" >&2
+    return
+  fi
+  while level="$(dirname "$level")"
+  do
+    if [ "$level" = / ]; then
+       break
+    fi
+    chmod a+x "$level"
+  done
+  chmod a+x "$path"
+}
+
+for x in "${BASEDIR_BUILD_32}/lib" "${BASEDIR_BUILD_64}/lib"; do
+  if [[ ! -d "${x}" ]]; then
+    continue
+  fi
+
+  set_execute_traversal_bit "$x"
+  chmod a+rwx -R "$x"
+done
+''',
+                )
               }
             }
 
