@@ -20,7 +20,7 @@
     limit: []
   tasks:
     - name: Manage instances
-      when: item.lxd|default(false) and not skip_lxd and inventory_hostname == lxd_host and (not limit or item.lxd.name in limit)
+      when: not skip_lxd and item.lxd is defined and inventory_hostname == lxd_host and (not limit or item.lxd.name in limit)
       include_tasks:
         file: '../roles/incus/tasks/container.yml'
       vars:
@@ -36,14 +36,14 @@
           )}}
       with_items: "{{containers}}"
     - name: Manage Libvirt VMs
-      when: item.vm|default(false) and not skip_libvirt and inventory_hostname == item.vm.host|default(libvirt_host) and (not limit or item.vm.name in limit)
+      when: not skip_libvirt and item.vm is defined and inventory_hostname == item.vm.host|default(libvirt_host) and (not limit or item.vm.name in limit)
       include_tasks:
         file: '../roles/libvirt/tasks/vm.yml'
       vars:
         object: "{{item.vm}}"
       with_items: "{{containers}}"
     - name: Update DNS entries
-      when: not skip_dns and inventory_hostname == 'localhost' and item.meta|default(false) and (not limit or ('vm' in item and item.vm.name in limit) or ('lxd' in item and item.lxd.name in limit) or ('jenkins' in item and item.jenkins.node_name|default('') in limit))
+      when: not skip_dns and inventory_hostname == 'localhost' and item.meta is defined and (not limit or ('vm' in item and item.vm.name in limit) or ('lxd' in item and item.lxd.name in limit) or ('jenkins' in item and item.jenkins.node_name|default('') in limit))
       with_items: "{{containers}}"
       ansible.builtin.command:
         argv: [
@@ -54,7 +54,7 @@
         ]
     - name: Update Jenkins nodes
       throttle: 1
-      when: item.jenkins|default(false) and not skip_jenkins and inventory_hostname == 'localhost' and (not limit or ('vm' in item and item.vm.name in limit) or ('lxd' in item and item.lxd.name in limit) or ('jenkins' in item and item.jenkins.node_name|default('') in limit))
+      when: not skip_jenkins and item.jenkins is defined and inventory_hostname == 'localhost' and (not limit or ('vm' in item and item.vm.name in limit) or ('lxd' in item and item.lxd.name in limit) or ('jenkins' in item and item.jenkins.node_name|default('') in limit))
       with_items: "{{containers}}"
       vars:
         node_name: "{{item.jenkins.node_name|default(item.lxd.name|default(item.vm.name))}}"
