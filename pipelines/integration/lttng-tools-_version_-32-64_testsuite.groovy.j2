@@ -300,6 +300,12 @@ pipeline {
         stage('Testing {{ test_type }}') {
           agent { label '{{test_label_amd64}}' }
 
+          when {
+            expression {
+              env.RUN_{{ test_type | replace('-', '_') }} == "true"
+            }
+          }
+
           environment {
             BASEDIR_32 = "$WORKSPACE/deps-32"
             BASEDIR_BUILD_32 = "$BASEDIR_32/build"
