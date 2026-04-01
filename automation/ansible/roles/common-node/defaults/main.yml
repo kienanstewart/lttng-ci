@@ -1,3 +1,5 @@
 ---
 
 common_node_core_pattern: "/tmp/core.%p"
+common_jenkins_limit_nofile: 'unlimited'
+common_jenkins_limit_core: 'unlimited'

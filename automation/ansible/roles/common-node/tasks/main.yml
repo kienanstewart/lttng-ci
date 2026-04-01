@@ -67,11 +67,11 @@
     domain: 'jenkins'
     limit_item: 'nofile'
     limit_type: '-'
-    value: 'unlimited'
+    value: '{{common_jenkins_limit_nofile}}'
 
 - name: Increase jenkins core dump limit
   community.general.pam_limits:
     domain: 'jenkins'
     limit_item: 'core'
     limit_type: '-'
-    value: 'unlimited'
+    value: '{{common_jenkins_limit_core}}'
