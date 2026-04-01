@@ -1320,7 +1320,7 @@
           buildtype: elbuild
           confs: !!python/tuple [agents]
           java_agents: 'false'
-          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
+          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64, el10-amd64]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_portbuild
           buildtype: portbuild
           platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
@@ -1462,7 +1462,7 @@
           buildtype: elbuild
           confs: !!python/tuple [agents]
           java_agents: 'false'
-          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
+          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64, el10-amd64]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_portbuild
           buildtype: portbuild
           platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
@@ -1615,7 +1615,7 @@
           buildtype: elbuild
           confs: !!python/tuple [agents]
           java_agents: 'false'
-          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
+          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64, el10-amd64]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_yoctobuild
           buildtype: yoctobuild
           timeout: '60'

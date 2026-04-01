@@ -681,7 +681,7 @@
                 test_report_type: junit
       - '{job_prefix}babeltrace_{version}_{buildtype}':
           buildtype: elbuild
-          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64]
+          platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64, el10-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std, prod]
       - '{job_prefix}babeltrace_{version}_{buildtype}':
