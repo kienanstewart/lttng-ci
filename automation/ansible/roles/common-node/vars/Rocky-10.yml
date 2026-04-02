@@ -5,6 +5,7 @@ common_node_packages:
   - bison
   - clang
   - curl
+  - file
   - flex
   - gcc
   - gcc-c++

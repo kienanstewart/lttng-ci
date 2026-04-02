@@ -9,6 +9,7 @@ common_node_packages:
   - cloc
   - coreutils
   - curl
+  - file
   - flex
   - gdb
   - gettext

@@ -12,6 +12,7 @@ common_node_packages:
   - default-jdk
   - openjdk-21-jdk-headless
   - emacs-nox
+  - file
   - flex
   - gdb
   - gettext

@@ -6,6 +6,7 @@ common_node_packages:
   - clang
   - curl
   - emacs-nox
+  - file
   - flex
   - gcc
   - gcc-c++
