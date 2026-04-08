@@ -497,7 +497,7 @@ build_linux_kernel() {
         ;;
 
       Ubuntu*)
-        if [ "${cross_arch}" = "powerpc" ] && vergte "${kversion}" "4.10"; then
+        if [[ "${cross_arch}" =~ powerpc* ]] && vergte "${kversion}" "4.10"; then
           echo "Ubuntu removed big endian powerpc configuration from kernel >= 4.10. Don't try to build it."
           exit 0
         fi
@@ -720,7 +720,7 @@ build_linux_kernel() {
         patch_linux_kernel 6df2a016c0c8a3d0933ef33dd192ea6606b115e3
     fi
 
-    if [ "${cross_arch}" = "powerpc" ] || [ "${cross_arch}" = "ppc64el" ]; then
+    if [[ "${cross_arch}" =~ powerpc* ]] || [ "${cross_arch}" = "ppc64el" ]; then
         if { vergte "${selected_cc_version}" "12";} && { verlt "${kversion}" "5.10"; }; then
             # arch/powerpc/boot/util.S:49: Error: junk at end of line
             patch_linux_kernel 8b14e1dff067195dca7a42321771437cb33a99e9
@@ -1440,6 +1440,13 @@ if [[ "${cross_arch}" != "" ]]; then
             cross_compile="powerpc-linux-gnu-"
             vanilla_config="ppc44x_defconfig"
             ubuntu_config="powerpc-config.flavour.powerpc-smp"
+            ;;
+
+        "powerpc64")
+            karch="powerpc"
+            cross_compile="powerpc64-linux-gnu-"
+            vanilla_config="pseries_defconfig"
+            ubuntu_config="powerpc-config.flavour.powerpc64-smp"
             ;;
 
         "ppc64el")
