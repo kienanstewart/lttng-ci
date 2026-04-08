@@ -1073,7 +1073,7 @@
           platforms: !!python/tuple [el8-amd64]
       - 'lttng-modules_PARAM_crossbuild':
           platforms: !!python/tuple [deb13-amd64]
-          cross_arch: !!python/tuple [armhf, arm64, powerpc, ppc64el, riscv64]
+          cross_arch: !!python/tuple [armhf, arm64, powerpc, powerpc64, ppc64el, riscv64]
 
       # Misc jobs
       - 'lttng-modules_ALL_trigger-vanilla'
