@@ -102,6 +102,7 @@ ci-rootnode-yocto33-amd64-2c-01
 ci-rootnode-yocto33-amd64-2d-01
 ci-rootnode-yocto50-amd64-1d-01
 ci-rootnode-yocto50-amd64-2[a:c]-01
+ci-rootnode-yocto50-arm64-[1:2][a:b]-01
 
 [node_sles]
 ci-node-sles15sp5-amd64-1b-01
@@ -127,6 +128,7 @@ ci-node-yocto50-amd64-2[a:b]-01
 ci-node-yocto50-arm64-[1:2][a:b]-01
 ci-rootnode-yocto50-amd64-1d-01
 ci-rootnode-yocto50-amd64-2[a:c]-01
+ci-rootnode-yocto50-arm64-[1:2][a:b]-01
 
 [node:children]
 node_i386
