@@ -258,8 +258,6 @@ actions:
       set -eux
       suseconnect -d
       umount -l /etc/resolv.conf || true
-      rm /etc/resolv.conf
-      ln -sf /var/run/netconfig/resolv.conf /etc/resolv.conf
 
   - trigger: post-files
     action: |-
