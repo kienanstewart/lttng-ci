@@ -102,6 +102,7 @@ def get_lib_dir():
         pathlib.Path("/etc/products.d/SLES.prod").exists()
         or pathlib.Path("/etc/redhat-release").exists()
         or pathlib.Path("/etc/yocto-release").exists()
+        or "yocto" in platform.uname().release
     ) and "64bit" in platform.architecture():
         lib_dir_arch = "{}64".format(lib_dir)
 
