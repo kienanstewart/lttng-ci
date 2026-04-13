@@ -194,7 +194,6 @@ actions:
       # These services don't run properly in containers
       systemctl disable chronyd.service
       systemctl disable auditd.service
-      systemctl disable klog.service
     types:
       - container
 
