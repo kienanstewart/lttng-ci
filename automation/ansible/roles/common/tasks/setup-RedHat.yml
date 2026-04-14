@@ -1,4 +1,12 @@
 ---
+
+- name: Upgrade packages
+  when: common_upgrade_all_packages
+  ansible.builtin.dnf:
+    state: latest
+    update_cache: true
+    update_only: true
+
 - name: Enable epel-release
   # This provides some extra packages, eg. htop, python3-virtualenv
   ansible.builtin.package:

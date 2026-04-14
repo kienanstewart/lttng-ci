@@ -7,3 +7,4 @@ common_manage_authorized_keys_root: true
 common_prometheus_node_exporter_args: "--log.level=error"
 common_install_promtail: false
 common_promtail_client: 'http://graph:3500/loki/api/v1/push'
+common_upgrade_all_packages: false

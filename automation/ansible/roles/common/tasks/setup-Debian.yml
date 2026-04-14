@@ -1,4 +1,11 @@
 ---
+- name: Upgrade packages
+  when: common_upgrade_all_packages
+  ansible.builtin.apt:
+    state: latest
+    update_cache: true
+    upgrade: yes
+
 - name: Add LTTng-CI PPA
   # This provides gdb with no babeltrace; however, it's only made
   # available for certain releases

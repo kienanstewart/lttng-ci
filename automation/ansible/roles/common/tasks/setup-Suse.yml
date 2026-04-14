@@ -35,6 +35,15 @@
   loop_control:
     loop_var: 'product'
 
+- name: Upgrade packages
+  when: common_upgrade_all_packages
+  ansible.builtin.zypper:
+    name: '*'
+    state: latest
+    update_cache: true
+  register: result
+  failed_when: result.rc != 0 and result.rc != 107
+
 - name: Ensure common patterns are installed.
   zypper: "name={{ common_patterns }} type=pattern state=present update_cache=yes"
 
