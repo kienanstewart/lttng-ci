@@ -181,7 +181,7 @@ LANG=C.UTF-8 ansible-galaxy install -r roles/requirements.yml
 # Run playbook
 cat > fake-inventory <<EOF
 [${PROFILE/-/_}]
-${INSTANCE_NAME} ansible_connection=community.general.incus ansible_incus_remote=ci ansible_python_interpreter=${ANSIBLE_PYTHON_INTERPRETER}
+${INSTANCE_NAME} ansible_connection=community.general.incus ansible_incus_remote=ci ansible_python_interpreter=${ANSIBLE_PYTHON_INTERPRETER} common_upgrade_all_packages=true
 EOF
 cat fake-inventory
 CLEANUP+=(
