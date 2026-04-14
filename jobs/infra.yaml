@@ -134,6 +134,33 @@
           default: 'dev_review_.*'
           description: 'The pattern to use to find jobs that should be cleaned'
 
+- job:
+    name: 'infra_incus_clean_images'
+    defaults: infra
+    dsl: !include-jinja2: pipelines/infra/incus_clean_images.groovy.j2
+    parameters:
+      - string:
+          name: 'INCUS_HOST'
+          default: 'ci-host-amd64-1a.internal.efficios.com'
+      - credentials:
+          name: 'INCUS_CLIENT_CERT_CREDENTIALS_ID'
+          type: secretfile
+          default: 'f3f08275-59ef-42ff-9de5-9beafc7435b8'
+      - credentials:
+          name: 'INCUS_CLIENT_KEY_CREDENTIALS_ID'
+          type: secretfile
+          default: '0debf23b-191b-4cdf-8a25-04e9a7092a67'
+      - bool:
+          name: NOOP
+          default: false
+          description: 'Enable to not actually delete images'
+      - string:
+          name: 'KEEP_YOUNGER_THAN_DAYS'
+          default: '30'
+          description: 'Keep un-aliases imaged if their upload date is more recent than N days ago'
+    triggers:
+      - timed: '@monthly'
+
 - project:
     name: infra
     jobs:

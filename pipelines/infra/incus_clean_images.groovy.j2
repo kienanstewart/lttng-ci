@@ -1,0 +1,88 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+
+pipeline {
+  agent {
+    label 'deb13-amd64-rootnode'
+  }
+
+  options {
+    ansiColor('xterm')
+    skipDefaultCheckout()
+    timestamps()
+  }
+
+  stages {
+    stage('Setup') {
+      steps {
+        sh(
+          label: 'install incus client',
+          script: '''#!/usr/bin/bash -x
+apt-get update -y
+apt-get install -y incus-client
+'''
+        )
+
+        withCredentials([
+          file(credentialsId: "${env.INCUS_CLIENT_CERT_CREDENTIALS_ID}", variable: 'INCUS_CLIENT_CERT'),
+          file(credentialsId: "${env.INCUS_CLIENT_KEY_CREDENTIALS_ID}", variable: 'INCUS_CLIENT_KEY'),
+        ]) {
+          sh(
+            label: 'configure CI incus remote',
+            script: '''#!/usr/bin/bash -x
+mkdir -p ~/.config/incus
+cp "${INCUS_CLIENT_CERT}" ~/.config/incus/client.crt
+cp "${INCUS_CLIENT_KEY}" ~/.config/incus/client.key
+incus remote add ci --accept-certificate --auth-type tls "${INCUS_HOST}"
+incus remote switch ci
+'''
+          )
+        }
+      }
+    }
+
+    stage('Clean-up images') {
+      steps {
+        sh(
+          label: 'list images',
+          script: '''#!/usr/bin/bash -x
+incus image ls ci: -f csv | grep -e '^,' > "${WORKSPACE}/list"
+cat "${WORKSPACE}/list"
+''',
+        )
+
+        sh(
+          label: 'remove old un-aliases images',
+          script: '''#!/usr/bin/bash -x
+TODAY="$(date +%s)"
+NOOP="${NOOP:-false}"
+KEEP_YOUNGER_THAN_DAYS="${KEEP_YOUNGER_THAN_DAYS:-0}"
+
+if [[ "${KEEP_YOUNGER_THAN_DAYS}" -lt "1" ]]; then
+  echo "KEEP_YOUNGER_THAN_DAYS ('${KEEP_YOUNGER_THAN_DAYS}') must be >= 1"
+  exit 1
+fi
+
+while read -r line ; do
+  ID="$(echo "${line}" | cut -d ',' -f 2)"
+  DATE_UPLOADED="$(echo "${line}" | rev | cut -d ',' -f 1 | rev | cut -d ' ' -f 1)"
+  DATE_VALUE="$(date -d "${DATE_UPLOADED}" +%Y/%m/%d)" || continue
+  echo "Image ID '${ID}' uploaded on '${DATE_VALUE}'" >&2
+
+  DATE_DIFF_DAYS=$(( ("${TODAY}" - $(date -d "${DATE_VALUE}" +%s)) / (60*60*24) ))
+  if [[ "${DATE_DIFF_DAYS}" -gt "${KEEP_YOUNGER_THAN_DAYS}" ]]; then
+    echo "Deleting image ID '${ID}': age is '${DATE_DIFF_DAYS}'" >&2
+    if [[ "${NOOP}" == "false" ]]; then
+      incus image delete "ci:${ID}"
+    else
+      echo "Skipped (noop)" >&2
+    fi
+  fi
+done < "${WORKSPACE}/list"
+''',
+        )
+      }
+    }
+  }
+}
