@@ -2,7 +2,9 @@
 lttng_ust_packages:
   - libnuma-devel
   - libuuid-devel
-  - log4j
-  - log4j12
   - python3
   - texinfo
+
+lttng_ust_products:
+  # for texinfo w/ SLES 16.0
+  - PackageHub

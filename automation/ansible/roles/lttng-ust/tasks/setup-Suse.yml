@@ -1,4 +1,13 @@
 ---
+- name: Activate SLES Products
+  when: ansible_distribution == 'SLES'
+  include_role:
+    name: suse
+    tasks_from: product
+  loop: "{{lttng_ust_products|default([])}}"
+  loop_control:
+    loop_var: 'product'
+
 - name: Ensure lttng-ust build dependencies are installed.
   zypper: "name={{ lttng_ust_packages }} state=installed update_cache=yes"
 

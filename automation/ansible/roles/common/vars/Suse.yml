@@ -1,7 +1,6 @@
 ---
 common_patterns:
   - base
-  - Minimal
 
 common_packages:
   - curl

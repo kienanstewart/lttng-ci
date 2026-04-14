@@ -1,4 +1,7 @@
 ---
 
+docker_sles_products:
+  - 'sle-module-containers'
+
 # Docker upstream only supports SLES s390x
 docker_upstream: false

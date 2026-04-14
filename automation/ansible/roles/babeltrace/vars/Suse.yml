@@ -8,11 +8,11 @@ babeltrace_packages:
   - libuuid-devel
   - popt-devel
   - python3-devel
-  - python3-pip  # for pytest, pytest-xdist
+  - python3-pip
+  - python3-pytest
+  - python3-pytest-xdist
   - python3-Sphinx
   - swig
 
 babeltrace_packages_pip:
-  - pytest
-  - pytest-tap  # optional dependency
-  - pytest-xdist  # optional dependency
+  - pytest-tap

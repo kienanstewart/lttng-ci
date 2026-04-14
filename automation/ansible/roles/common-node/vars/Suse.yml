@@ -1,8 +1,7 @@
 ---
 common_node_patterns:
   - base
-  - Minimal
-  - Basis-Devel
+  - devel_basis
 
 common_node_packages:
   - autoconf
@@ -14,18 +13,15 @@ common_node_packages:
   - gdb
   - gettext-runtime
   - git-core
-  - java-1_8_0-openjdk-devel
-  - java-1_8_0-openjdk-headless
-  - java-11-openjdk-devel
-  - java-11-openjdk-headless
-#  - jq
+  - java-21-openjdk-devel
+  - java-21-openjdk-headless
+  - jq
   - libopenssl-devel
-#  - libtap-harness-archive-perl
   - libtool
   - maven
   - openssh
   - psmisc
-#  - python-virtualenv
+  - python3-virtualenv
   - sudo
   - tree
   - vim

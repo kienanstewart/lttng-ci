@@ -15,5 +15,21 @@
 # Install libs from the default package manager
 - ansible.builtin.package:
     name: "{{libs_i386_packages|default([])}}"
-  # RedHat 10+ has removed .i386 packages
-  when: ansible_userspace_architecture|default('') == 'x86_64' and ( ansible_os_family != 'RedHat' or (ansible_os_family == 'RedHat' and ansible_distribution_version is version('10', '<')))
+  # RedHat 10+ has removed .i386 packages; SLES handled separately
+  when: ansible_userspace_architecture|default('') == 'x86_64' and ( ansible_os_family != 'RedHat' or (ansible_os_family == 'RedHat' and ansible_distribution_version is version('10', '<'))) and ansible_os_family != 'Suse'
+
+- ansible.builtin.zypper:
+    name: "{{libs_i386_packages|default([])}}"
+  when: ansible_userspace_architecture|default('') == 'x86_64' and ansible_os_family == 'Suse'
+  register: result
+  failed_when:
+    # Installing the *-32bit packages can fail with code 107, which indicates a
+    # post-installation script had an error but the package is otherwise considered
+    # installed. This happens with -32bit packages in some cases if the exec-format
+    # does not match e.g.
+    #
+    #   /usr/sbin/iconvconfig-32: cannot execute binary file: Exec format error
+    #   warning: %post(glibc-32bit-2.40-160000.4.1.x86_64) scriptlet failed, exit status 126
+    #
+    # @see https://manpages.opensuse.org/Tumbleweed/zypper/zypper.8.en.html
+    - result.rc != 0 and result.rc != 107

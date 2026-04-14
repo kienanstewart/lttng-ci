@@ -12,8 +12,7 @@ docker_Debian_packages:
   - 'docker.io'
   - 'docker-compose'
 
-docker_sles_products:
-  - 'sle-module-containers'
+docker_sles_products: []
 
 docker_SLES_packages:
   - 'docker'
