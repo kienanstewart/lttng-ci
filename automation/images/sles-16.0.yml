@@ -207,7 +207,7 @@ actions:
       zypper --non-interactive --gpg-auto-import-keys install cloud-init-config-suse cloud-init
 
       # Enable the cloud-init systemd service
-      systemctl enable cloud-init.service cloud-config.service cloud-final.service
+      systemctl enable cloud-init.service cloud-config.service cloud-final.service sshd.service
     variants:
       - cloud
 
