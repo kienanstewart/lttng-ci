@@ -629,6 +629,18 @@
                 - shell:
                     !include-raw-verbatim: scripts/lttng-tools/postbuild_clean_processes_coredumps.sh
 
+      # Try to save the src/ directory on built failure
+      - postbuildscript: &lttng-tools_publisher_postbuildscript_collect_srcdir
+          mark-unstable-if-failed: false
+          builders:
+            - role: SLAVE
+              build-on:
+                - ABORTED
+                - FAILURE
+              build-steps:
+                - shell:
+                    !include-raw-verbatim: scripts/common/postbuild_save_srcdir.sh
+
       - tap: &lttng-tools_publisher_tap_defaults
           results: 'tap/**/*.log'
           fail-if-no-results: true
@@ -748,6 +760,7 @@
       - postbuildscript: *lttng-tools_publisher_postbuildscript_wait_10_seconds_on_abort
       - postbuildscript: *lttng-tools_publisher_postbuildscript_collect_tap_on_failure
       - postbuildscript: *lttng-tools_publisher_postbuildscript_clean_processes_coredumps
+      - postbuildscript: *lttng-tools_publisher_postbuildscript_collect_srcdir
       - tap: *lttng-tools_publisher_tap_defaults
       - raw: *lttng-tools_publisher_warnings-ng_defaults
       - archive: *lttng-tools_publisher_archive_defaults
@@ -923,7 +936,7 @@
       # processes, collect the core files, delete them and mark the build
       # unstable.
       - postbuildscript: *lttng-tools_publisher_postbuildscript_clean_processes_coredumps
-
+      - postbuildscript: *lttng-tools_publisher_postbuildscript_collect_srcdir
       - tap: *lttng-tools_publisher_tap_defaults
       - raw: *lttng-tools_publisher_warnings-ng_defaults
       - junit: *lttng-tools_publisher_junit_defaults
@@ -1092,6 +1105,7 @@
     <<: *lttng-tools_builders_review
 
     publishers:
+      - postbuildscript: *lttng-tools_publisher_postbuildscript_collect_srcdir
       - tap: *lttng-tools_publisher_tap_defaults
       - raw: *lttng-tools_publisher_warnings-ng_defaults
       - archive: *lttng-tools_publisher_archive_defaults
@@ -1194,7 +1208,7 @@
       # processes, collect the core files, delete them and mark the build
       # unstable.
       - postbuildscript: *lttng-tools_publisher_postbuildscript_clean_processes_coredumps
-
+      - postbuildscript: *lttng-tools_publisher_postbuildscript_collect_srcdir
       - tap: *lttng-tools_publisher_tap_defaults
       - raw: *lttng-tools_publisher_warnings-ng_defaults
       - archive:
