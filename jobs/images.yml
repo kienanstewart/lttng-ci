@@ -185,12 +185,6 @@
       - shell: !include-raw-verbatim: pipelines/images/imagebuild.sh
 
 
-## Views
-- view-template:
-    name: 'Images'
-    view-type: list
-    regex: 'image.*'
-
 ## Projects
 
 - project:
@@ -363,7 +357,3 @@
     jobs:
       - 'images_imagebuilder'
       - 'images_distrobuilder'
-- project:
-    name: images_imagebuilder_views
-    views:
-      - Images

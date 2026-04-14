@@ -145,4 +145,4 @@
 - view:
     name: 'Infra'
     view-type: list
-    regex: '(infra|meta)[-_].*'
+    regex: '(infra|meta|images)[-_].*'
