@@ -25,6 +25,14 @@
       tags:
         - access
 
+    - name: Remove sles user
+      ansible.builtin.user:
+        name: sles
+        state: absent
+        remove: yes
+      tags:
+        - access
+
     - name: Create jenkins user
       when: jenkins_user | bool
       ansible.builtin.user:
