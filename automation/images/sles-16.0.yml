@@ -288,7 +288,7 @@ actions:
 
       # By default, sles systems don't check authorized_keys2,
       # renable it.
-      echo 'AuthorizedKeysFile .ssh/authorized_key .ssh/authorized_keys2' > /etc/ssh/sshd_config.d/10-distrobuilder.conf
+      echo 'AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2' > /etc/ssh/sshd_config.d/10-distrobuilder.conf
   - trigger: post-files
     action: |-
       #!/bin/sh
