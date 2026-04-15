@@ -1602,6 +1602,54 @@ containers:
       source:
         alias: rockylinux/10/cloud/amd64/ci-node/incus
         type: image
+  - meta:
+      address: 172.18.16.201
+    jenkins:
+      label: 'sles16sp0-amd64'
+      config:
+        <<: *jenkins_ssh_agent_default_config
+    lxd:
+      name: ci-node-sles16sp0-amd64-2a-01
+      target: ci-host-amd64-2a
+      source:
+        alias: sles/16.0/cloud/amd64/ci-node/incus
+        type: image
+  - meta:
+      address: 172.18.16.202
+    jenkins:
+      label: 'sles16sp0-amd64'
+      config:
+        <<: *jenkins_ssh_agent_default_config
+    lxd:
+      name: ci-node-sles16sp0-amd64-2b-01
+      target: ci-host-amd64-2b
+      source:
+        alias: sles/16.0/cloud/amd64/ci-node/incus
+        type: image
+  - meta:
+      address: 172.18.16.203
+    jenkins:
+      label: 'sles16sp0-amd64'
+      config:
+        <<: *jenkins_ssh_agent_default_config
+    lxd:
+      name: ci-node-sles16sp0-amd64-2c-01
+      target: ci-host-amd64-2c
+      source:
+        alias: sles/16.0/cloud/amd64/ci-node/incus
+        type: image
+  - meta:
+      address: 172.18.16.204
+    jenkins:
+      label: 'sles16sp0-amd64'
+      config:
+        <<: *jenkins_ssh_agent_default_config
+    lxd:
+      name: ci-node-sles16sp0-amd64-2d-01
+      target: ci-host-amd64-2d
+      source:
+        alias: sles/16.0/cloud/amd64/ci-node/incus
+        type: image
   # "Root " nodes in libvirt, since Jenkins can use the "libvirt agents" plugin
   # to revert to a specific snapshot before running a job
   #
