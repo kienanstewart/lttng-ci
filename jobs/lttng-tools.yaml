@@ -1346,7 +1346,7 @@
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_slesbuild
           buildtype: slesbuild
           platforms: !!python/tuple [sles16sp0-amd64]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_yoctobuild
           buildtype: yoctobuild
           platforms: !!python/tuple [yocto40-powerpc, yocto50-ppc64]
@@ -1489,7 +1489,7 @@
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_slesbuild
           buildtype: slesbuild
           platforms: !!python/tuple [sles16sp0-amd64]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_yoctobuild
           buildtype: yoctobuild
           timeout: '60'
@@ -1626,7 +1626,7 @@
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_slesbuild
           buildtype: slesbuild
           platforms: !!python/tuple [sles16sp0-amd64]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_elbuild
           buildtype: elbuild
           confs: !!python/tuple [agents]

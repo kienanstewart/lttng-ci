@@ -727,7 +727,7 @@
           version: master
           platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: elbuild
           version: master
@@ -809,7 +809,7 @@
           version: stable-2.15
           platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: elbuild
           version: stable-2.15
@@ -863,9 +863,8 @@
           version: stable-2.14
           platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
-          java_preferred_jdk: '8'
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: elbuild
           version: stable-2.14
@@ -970,7 +969,7 @@
           buildtype: slesbuild
           platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
           babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: master
@@ -1013,7 +1012,7 @@
           buildtype: slesbuild
           platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
           babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: stable-2.15
@@ -1058,7 +1057,7 @@
           buildtype: slesbuild
           platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
+          confs: !!python/tuple [std]
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
           babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_{version}_{buildtype}':
