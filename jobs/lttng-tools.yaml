@@ -1345,7 +1345,7 @@
               value: 'no'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_slesbuild
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           confs: !!python/tuple [agents]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_yoctobuild
           buildtype: yoctobuild
@@ -1488,7 +1488,7 @@
               value: 'no'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_slesbuild
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           confs: !!python/tuple [agents]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_yoctobuild
           buildtype: yoctobuild
@@ -1625,7 +1625,7 @@
               value: 'stable-2.14'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_slesbuild
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           confs: !!python/tuple [agents]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_elbuild
           buildtype: elbuild

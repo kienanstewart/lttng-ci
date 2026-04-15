@@ -725,7 +725,7 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: slesbuild
           version: master
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
@@ -807,7 +807,7 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: slesbuild
           version: stable-2.15
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
@@ -861,7 +861,7 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: slesbuild
           version: stable-2.14
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
@@ -968,7 +968,7 @@
       - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
           version: master
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
           babeltrace_version: stable-2.1
@@ -1011,7 +1011,7 @@
       - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
           version: stable-2.15
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
           babeltrace_version: stable-2.1
@@ -1056,7 +1056,7 @@
       - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
           version: stable-2.14
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]

@@ -397,7 +397,7 @@
           touchstone: '(build == "std") && (conf == "std") && (platform == "deb12-i386")'
       - '{job_prefix}liburcu_{version}_{buildtype}':
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           touchstone: '(build == "std")'

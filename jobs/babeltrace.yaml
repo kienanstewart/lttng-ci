@@ -669,7 +669,7 @@
           touchstone: '(build == "std") && (conf == "std") && (platform == "deb12-i386")'
       - '{job_prefix}babeltrace_{version}_{buildtype}':
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std, prod]
           filter: ''
@@ -771,7 +771,7 @@
       - 'dev_review_babeltrace_{version}_{buildtype}':
           version: master
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           warnings_status: FAILED
@@ -812,7 +812,7 @@
       - 'dev_review_babeltrace_{version}_{buildtype}':
           version: stable-2.1
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           warnings_status: WARNING
@@ -851,7 +851,7 @@
       - 'dev_review_babeltrace_{version}_{buildtype}':
           version: stable-2.0
           buildtype: slesbuild
-          platforms: !!python/tuple [sles16-amd64]
+          platforms: !!python/tuple [sles16sp0-amd64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
           warnings_status: WARNING
