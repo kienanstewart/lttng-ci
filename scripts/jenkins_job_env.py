@@ -58,6 +58,8 @@ def _get_argparser():
         "directory",
         help="The directory",
         type=pathlib.Path,
+        default=None,
+        nargs="?",
     )
     fetch_parser.add_argument(
         "-f",
@@ -391,6 +393,15 @@ if __name__ == "__main__":
             url_components = [urllib.parse.quote_plus(x) for x in components]
             url = "/".join([server] + url_components)
             args.url = url
+
+        if args.directory is None:
+            if sys.version_info.major == 3 and sys.version_info.minor >= 12:
+                temp_dir = tempfile.TemporaryDirectory(delete=False)
+            else:
+                temp_dir = tempfile.TemporaryDirectory()
+
+            logger.info("Created output directory: '{}'".format(temp_dir.name))
+            args.directory = pathlib.Path(temp_dir.name)
 
         fetch(
             destination=args.directory,
