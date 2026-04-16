@@ -11,6 +11,7 @@ import pathlib
 import platform
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -31,6 +32,15 @@ _ENV_VARS = [
     "PYTHONPATH",
     "WORKSPACE",
 ]
+
+
+def fetch_url(url, destination):
+    if shutil.which("wget"):
+        subprocess.run(["wget", url, "-O", destination], check=True)
+    elif shutil.which("curl"):
+        subprocess.run(["curl", "--output", destination, url], check=True)
+    else:
+        raise Exception("No downloaded available")
 
 
 def _get_argparser():
@@ -131,7 +141,7 @@ def fetch(
         logging.info("Fetching archive from '{}'".format(url))
 
         with tempfile.NamedTemporaryFile() as archive:
-            subprocess.run(["wget", url, "-O", archive.name])
+            fetch_url(url, archive.name)
             subprocess.run(["unzip", "-d", str(destination), archive.name])
 
     if archive_file is not None:
