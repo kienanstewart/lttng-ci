@@ -149,7 +149,7 @@ def fetch(
 
     if destination.is_dir():
         # The artifact archive doesn't include symlinks, so the the symlinks for
-        # the ".so" in libdir_arch must be rebuilt
+        # the ".so" in lib_dir_arch must be rebuilt
         lib_dir_arch = get_lib_dir()
         for x in (
             (destination / "archive" / "deps" / "build" / lib_dir_arch),
@@ -244,12 +244,14 @@ def create_activate(destination):
             )
         elif var == "LIBBABELTRACE2_PLUGIN_PROVIDER_DIR":
             if not archive_dir.exists():
-                logging.warning("Assuming '{}' value since archive is not downloaded")
+                logging.warning(
+                    "Assuming '{}' value since archive is not downloaded".format(var)
+                )
                 env["LIBBABELTRACE2_PLUGIN_PROVIDER_DIR"] = str(
                     archive_dir
                     / "deps"
                     / "build"
-                    / libdir_arch
+                    / lib_dir_arch
                     / "babeltrace2"
                     / "plugin-providers"
                 )
@@ -265,7 +267,7 @@ def create_activate(destination):
                 env[var] = str(
                     archive_dir
                     / "build"
-                    / libdir_arch
+                    / lib_dir_arch
                     / "lttng"
                     / "libexec"
                     / "lttng-consumerd"
