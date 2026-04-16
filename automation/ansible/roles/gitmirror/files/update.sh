@@ -57,6 +57,8 @@ update_git ubuntu-jammy.git/ git://git.launchpad.net/~ubuntu-kernel/ubuntu/+sour
 
 update_git ubuntu-noble.git/ git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/noble
 
+update_git ubuntu-resolute.git/ git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/resolute
+
 ##
 # GDB repos
 ##
