@@ -20,4 +20,4 @@
   ansible.builtin.systemd:
     name: "grok-pull@{{name}}"
     state: started
-    enable: true
+    enabled: true
