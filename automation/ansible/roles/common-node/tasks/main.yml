@@ -75,3 +75,16 @@
     limit_item: 'core'
     limit_type: '-'
     value: '{{common_jenkins_limit_core}}'
+
+- ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    mode: '0755'
+
+- name: Deploy jenkins_job_env.py
+  ansible.builtin.copy:
+    src: jenkins_job_env.py
+    dest: /usr/local/bin/jenkins_job_env.py
+    mode: '0755'
+    owner: root
+    group: root
