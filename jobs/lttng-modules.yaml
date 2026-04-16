@@ -997,7 +997,6 @@
             - master
             - stable-2.15
             - stable-2.14
-            - stable-2.13
           uversion:
             - jammy
             - noble
@@ -1057,7 +1056,6 @@
             - master
             - stable-2.15
             - stable-2.14
-            - stable-2.13
           uversion:
             - jammy
             - noble
