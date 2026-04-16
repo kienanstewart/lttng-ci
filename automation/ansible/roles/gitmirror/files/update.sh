@@ -9,7 +9,7 @@ update_git() {
     local origin="$2"
 
     if [ ! -d "${repodir}" ] ; then
-        git clone --mirror "${origin}" "${repodir}"
+        git clone --bare --mirror "${origin}" "${repodir}"
     fi
 
     pushd "$repodir"
@@ -40,7 +40,7 @@ git tag -d v2.6.11-tree || true
 popd
 
 ##
-# EL kernel RPMs
+## EL kernel RPMs
 ##
 update_git rocky.git/ https://git.rockylinux.org/staging/rpms/kernel.git
 
