@@ -1001,6 +1001,7 @@
           uversion:
             - jammy
             - noble
+            - resolute
           buildtype: build
           parambuildtype: build
           kverfloor: ''
@@ -1060,6 +1061,7 @@
           uversion:
             - jammy
             - noble
+            - resolute
           buildtype: crossbuild
           parambuildtype: crossbuild
           kverfloor: ''
