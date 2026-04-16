@@ -24,6 +24,7 @@ common_node_packages:
   - python3-virtualenv
   - sudo
   - tree
+  - unzip
   - vim
 
 # For SLES

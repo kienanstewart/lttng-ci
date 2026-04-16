@@ -30,5 +30,6 @@ common_node_packages:
   - rsync
   - sudo
   - tree
+  - unzip
   - vim
   - virtualenv

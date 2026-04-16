@@ -25,4 +25,5 @@ common_node_packages:
   - shadow
   - sudo
   - tree
+  - unzip
   - vim
