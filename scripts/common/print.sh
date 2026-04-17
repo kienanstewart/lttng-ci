@@ -204,5 +204,10 @@ print_tooling() {
         abidw --version
     fi
 
+    if command -v ruby >/dev/null 2>&1; then
+        print_blue "ruby version"
+        ruby --version
+    fi
+
     set -ex
 }
