@@ -209,5 +209,13 @@ print_tooling() {
         ruby --version
     fi
 
+    if command -v gem >/dev/null 2>&1; then
+        print_blue "gem version"
+        gem --version
+
+        print_blue "gem environment"
+        gem environment
+    fi
+
     set -ex
 }
