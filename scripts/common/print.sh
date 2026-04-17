@@ -162,6 +162,11 @@ print_tooling() {
         asciidoc --version
     fi
 
+    if command -v asciidoctor >/dev/null 2>&1; then
+        print_blue "asciidoctor version"
+        asciidoctor --version
+    fi
+
     if command -v xmlto >/dev/null 2>&1; then
         print_blue "xmlto version"
         xmlto --version
