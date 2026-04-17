@@ -105,10 +105,6 @@ ci-rootnode-yocto50-amd64-2[a:c]-01
 ci-rootnode-yocto50-arm64-[1:2][a:b]-01
 
 [node_sles]
-ci-node-sles15sp5-amd64-1b-01
-ci-node-sles15sp5-amd64-2[a:c]-01
-ci-rootnode-sles15sp5-amd64-1d-01
-ci-rootnode-sles15sp5-amd64-2a-01
 ci-node-sles16sp0-amd64-2[a:d]-01 common_jenkins_limit_nofile=1000000
 
 [node_el]

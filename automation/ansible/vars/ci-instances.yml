@@ -379,42 +379,6 @@ containers:
       config:
         <<: *jenkins_ssh_agent_default_config
   - meta:
-      address: 172.18.16.94
-    lxd:
-      name: ci-node-sles15sp5-amd64-2a-01
-      target: ci-host-amd64-2a
-      source:
-        alias: 'sles/15.5/cloud/amd64/ci-node/lxd'
-        type: image
-    jenkins:
-      label: 'sles15sp5-amd64'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.95
-    lxd:
-      name: ci-node-sles15sp5-amd64-2b-01
-      target: ci-host-amd64-2b
-      source:
-        alias: 'sles/15.5/cloud/amd64/ci-node/lxd'
-        type: image
-    jenkins:
-      label: 'sles15sp5-amd64'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.96
-    lxd:
-      name: ci-node-sles15sp5-amd64-2c-01
-      target: ci-host-amd64-2c
-      source:
-        alias: 'sles/15.5/cloud/amd64/ci-node/lxd'
-        type: image
-    jenkins:
-      label: 'sles15sp5-amd64'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
       address: 172.18.16.104
     jenkins:
       label: 'yocto33-amd64'
@@ -1749,38 +1713,6 @@ containers:
       disk: '/var/lib/libvirt/images/lava-node-amd64-05.qcow'
       disk_capacity: '10G'
       host: 'ci-host-amd64-2d.internal.efficios.com'
-  - jenkins:
-      label: 'sles15sp5-amd64-rootnode'
-      name: 'ci-rootnode-sles15sp5-amd64-1d-01'
-      config:
-        <<: *jenkins_ssh_agent_libvirt_default_config
-        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1d.internal.efficios.com'
-        launcher/virtualMachineName: 'ci-rootnode-sles15sp5-amd64-1d-01'
-        launcher/delegate/host: 'ci-rootnode-sles15sp5-amd64-1d-01.internal.efficios.com'
-        ./hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1d.internal.efficios.com'
-        ./virtualMachineName: 'ci-rootnode-sles15sp5-amd64-1d-01'
-    vm:
-      name: 'ci-rootnode-sles15sp5-amd64-1d-01'
-      disk: '/var/lib/libvirt/images/ci-rootnode-sles15sp5-amd64-1d-01.qcow'
-      host: 'ci-host-amd64-1d.internal.efficios.com'
-    meta:
-      address: 172.18.17.17
-  - jenkins:
-      label: 'sles15sp5-amd64-rootnode'
-      name: 'ci-rootnode-sles15sp5-amd64-2a-01'
-      config:
-        <<: *jenkins_ssh_agent_libvirt_default_config
-        launcher/hypervisorDescription: 'QEMU+ssh - ci-host-amd64-2a.internal.efficios.com'
-        launcher/virtualMachineName: 'ci-rootnode-sles15sp5-amd64-2a-01'
-        launcher/delegate/host: 'ci-rootnode-sles15sp5-amd64-2a-01.internal.efficios.com'
-        ./hypervisorDescription: 'QEMU+ssh - ci-host-amd64-2a.internal.efficios.com'
-        ./virtualMachineName: 'ci-rootnode-sles15sp5-amd64-2a-01'
-    vm:
-      name: 'ci-rootnode-sles15sp5-amd64-2a-01'
-      disk: '/var/lib/libvirt/images/ci-rootnode-sles15sp5-amd64-2a-01.qcow'
-      host: 'ci-host-amd64-2a.internal.efficios.com'
-    meta:
-      address: 172.18.17.19
   - jenkins:
       label: 'yocto33-amd64-rootnode'
       name: 'ci-rootnode-yocto33-amd64-2c-01'
