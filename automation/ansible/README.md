@@ -2,7 +2,7 @@
 
 1. Install system requirements
 
-    apt install python3-pip
+    apt install python3-pip sshpass
 
 2. Install project dependencies
 
@@ -193,3 +193,14 @@ To automatically provision instances, perform certain operations, and update DNS
 2. On one cluster member, start the `lxd-to-incus` script, and follow the prompts
 3. On each other cluster member, start `lxd-to-incus --cluster-member`
 4. When prompted on each cluster member, uninstall `lxd`.
+
+# Windows nodes
+
+To start a cygwin shell from SSH:
+
+    C:\cygwin64\usr\bin\bash.exe --login
+
+To start a ucrt64 msys2 shell from SSH:
+
+    [System.Environment]::SetEnvironmentVariable('MSYSTEM', 'UCRT64')
+    C:\msys64\usr\bin\bash.exe --login

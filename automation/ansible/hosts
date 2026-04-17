@@ -47,6 +47,7 @@ cluster_ci
 
 [windows]
 ci-host-win11-arm64-01.internal.efficios.com
+ci-node-win11-amd64-1[b:c]-[01:02] ansible_user=jenkins
 
 [infra_lava]
 lava-master-03.internal.efficios.com
