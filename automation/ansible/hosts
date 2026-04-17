@@ -45,6 +45,9 @@ cloud02.internal.efficios.com
 cluster_ci_dev
 cluster_ci
 
+[macos]
+ci-node-macos-arm64-[01:02] ansible_user=admin
+
 [windows]
 ci-host-win11-arm64-01.internal.efficios.com
 ci-node-win11-amd64-1[b:c]-[01:02] ansible_user=jenkins
