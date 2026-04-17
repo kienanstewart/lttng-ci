@@ -22,6 +22,12 @@
         group: 'root'
         mode: '0644'
         content: "kernel.core_pattern = /tmp/core.%p\n"
+    - name: 'Disable Debian core pattern'
+      when: ansible_distribution == "Debian"
+      ansible.builtin.file:
+        src: /dev/null
+        path: /etc/sysctl.d/10-coredump-debian.conf
+        state: link
     - name: 'Check current core pattern'
       ansible.builtin.command:
         argv: ['cat', '/proc/sys/kernel/core_pattern']
