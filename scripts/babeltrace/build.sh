@@ -245,6 +245,17 @@ freebsd*)
     export PYTHON_CONFIG="${PYTHON:-python3}-config"
     ;;
 
+cygwin*)
+    RUBY_API_VERSION="$(ruby -e 'require "rbconfig"; puts RbConfig::CONFIG["RUBY_API_VERSION"]').0"
+    export GEM_PATH="/cygdrive/c/Users/Jenkins/.local/share/gem/ruby/${RUBY_API_VERSION}/:/usr/local/share/gems:/usr/share/gems"
+    export MAKE=make
+    export TAR=tar
+    export NPROC=nproc
+    export PATH="/cygdrive/c/Users/Jenkins/bin:${PATH}"
+    export PYTHON="${PYTHON:-python3}"
+    export PYTHON_CONFIG="${PYTHON:-python3}-config"
+    ;;
+
 *)
     export MAKE=make
     export TAR=tar
