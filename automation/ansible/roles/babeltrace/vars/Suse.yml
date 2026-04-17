@@ -1,6 +1,7 @@
 ---
 babeltrace_packages:
   - chrpath
+  - docbook5-xsl-stylesheets
   - glib2-devel
   - glib2-devel-static
   - libdw-devel
@@ -12,6 +13,7 @@ babeltrace_packages:
   - python3-pytest
   - python3-pytest-xdist
   - python3-Sphinx
+  - ruby3.4-rubygem-asciidoctor
   - swig
 
 babeltrace_packages_pip:

@@ -1,6 +1,8 @@
 ---
 babeltrace_packages:
+  - asciidoctor
   - chrpath
+  - docbook-xsl-ns
   - glib-dev
   - libdwarf-dev
   - libelf-dev

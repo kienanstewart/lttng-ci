@@ -1,6 +1,7 @@
 ---
 babeltrace_packages:
   - chrpath
+  - docbook5-style-xsl
   - elfutils-devel
   - glib2-devel
   - libuuid-devel
@@ -8,6 +9,7 @@ babeltrace_packages:
   - python36-devel
   - python3-pip
   - python3-sphinx
+  - rubygem-asciidoctor
   - swig
 
 babeltrace_packages_pip:
