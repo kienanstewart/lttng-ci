@@ -51,7 +51,7 @@ PYTHON_CONFIG=python3-config
 export PYTHON_CONFIG="${PYTHON_CONFIG}"
 
 print_header "Install babeltrace build dependencies"
-apt-get install -y asciidoc xmlto libdw-dev libelf-dev elfutils autoconf automake libglib2.0-dev make doxygen flex bison
+apt-get install -y asciidoc asciidoctor docbook-xsl-ns xmlto libdw-dev libelf-dev elfutils autoconf automake libglib2.0-dev make doxygen flex bison
 
 print_header "Install NPM stuff"
 npm install
