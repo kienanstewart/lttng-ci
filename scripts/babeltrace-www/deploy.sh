@@ -62,6 +62,11 @@ python3 -m venv build_venv
 source build_venv/bin/activate
 pip install -r requirements.txt
 
+# lxml in the virtual environment doesn't know where the XML catalogs
+# are: tell it to use the system ones. This is needed for a DocBook 4.5
+# document to resolve entities such as `&nbsp;` through the DTD.
+export XML_CATALOG_FILES=/etc/xml/catalog
+
 # Setting TERM avoids spurious warnings when configure is checking TPUT, as
 # $TERM is not set in the build environment.
 # As we've already opened a venv, set SKIP_VENV so the python job doesn't
