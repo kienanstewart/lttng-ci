@@ -47,7 +47,7 @@ apt-get update
 
 print_header "Install web tooling dependencies"
 apt-get install -y jekyll npm grunt python3 python3-pip python3-venv linkchecker
-PYTHON_CONFIG=$(realpath python3-config)
+PYTHON_CONFIG=python3-config
 export PYTHON_CONFIG="${PYTHON_CONFIG}"
 
 print_header "Install babeltrace build dependencies"
