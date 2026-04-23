@@ -30,6 +30,7 @@ def compress(filename):
 
 
 packages = [
+    "asciidoctor",
     "autoconf",
     "automake",
     "bash-completion",
@@ -40,6 +41,7 @@ packages = [
     "cloc",
     "curl",
     "dmsetup",
+    "docbook-xsl-ns",
     "elfutils",
     "flex",
     "gdb",
