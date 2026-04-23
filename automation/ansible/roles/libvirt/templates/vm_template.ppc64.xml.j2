@@ -1,0 +1,59 @@
+<domain type="qemu">
+  <name>{{ vm.name }}</name>
+  {% if 'uuid' in vm %}
+  <uuid>{{ vm.uuid }}</uuid>
+  {% endif %}
+  <memory unit="KiB">{{ vm.memory }}</memory>
+  <vcpu placement="static">{{ vm.vcpu }}</vcpu>
+  <os>
+    <type arch="ppc64" machine='{{ vm.machine|default("ppce500") }}'>hvm</type>
+    <kernel>{{ vm.kernel_path }}</kernel>
+    <cmdline>{{ vm.kernel_cmdline }}</cmdline>
+    <boot dev="hd"/>
+  </os>
+  <cpu mode="custom" match="exact" check="none">
+    <model fallback="forbid">{{ vm.cpu_model|default("e6500") }}</model>
+  </cpu>
+  <clock offset="utc"/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/bin/qemu-system-ppc64</emulator>
+    {% if 'disk' in vm %}
+    <disk type="file" device="disk">
+      <driver name="qemu" type="raw"/>
+      <source file="{{ vm.disk }}"/>
+      <target dev='{{ vm.disk_target_dev|default("vda") }}' bus='{{ vm.disk_target_bus|default("virtio") }}'/>
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x04" function="0x0"/>
+    </disk>
+    {% endif %}
+    <controller type="usb" index="0" model="qemu-xhci">
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x02" function="0x0"/>
+    </controller>
+    <controller type="pci" index="0" model="pci-root"/>
+    <controller type="virtio-serial" index="0">
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x03" function="0x0"/>
+    </controller>
+    <interface type="bridge">
+      <mac/>
+      <source bridge="{{vm.net_bridge}}"/>
+      <model type="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x01" function="0x0"/>
+    </interface>
+    <serial type="pty">
+      <target port="0"/>
+    </serial>
+    <console type="pty">
+      <target type="serial" port="0"/>
+    </console>
+    <channel type="unix">
+      <target type="virtio" name="org.qemu.guest_agent.0"/>
+      <address type="virtio-serial" controller="0" bus="0" port="1"/>
+    </channel>
+    <audio id="1" type="none"/>
+    <memballoon model="virtio">
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x05" function="0x0"/>
+    </memballoon>
+  </devices>
+</domain>
