@@ -54,6 +54,14 @@ print_os() {
     print_blue "Current character map"
     locale -c charmap
     set -ex
+
+    if command -v sysctl > /dev/null 2>&1 ; then
+        print_blue "Sysctl kernel.core settings"
+        sysctl -a | grep kernel.core
+    fi
+
+    print_blue "ulimits"
+    ulimit -a || true
 }
 
 print_pkgconfig_mod() {
