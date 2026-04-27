@@ -7,8 +7,3 @@
 - name: Ensure babeltrace test dependencies are installed
   ansible.builtin.pip:
     name: "{{babeltrace_packages_pip|default([])}}"
-
-- name: Ensure pytest-tap version is correct
-  when: babeltrace_pytest_tap_version|default(false) and 'pytest-tap' in babeltrace_packages_pip|default([])
-  ansible.builtin.pip:
-    name: "pytest-tap=={{babeltrace_pytest_tap_version}}"

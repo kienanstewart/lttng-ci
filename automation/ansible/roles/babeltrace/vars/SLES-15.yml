@@ -13,5 +13,4 @@ babeltrace_packages:
 
 babeltrace_packages_pip:
   - pytest
-  - pytest-tap
   - pytest-xdist

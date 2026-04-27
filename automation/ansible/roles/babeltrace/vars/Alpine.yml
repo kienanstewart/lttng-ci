@@ -15,6 +15,3 @@ babeltrace_packages:
   - py3-tap
   - swig
   - util-linux-dev
-
-babeltrace_packages_pip:
-  - pytest-tap  # optional dependency

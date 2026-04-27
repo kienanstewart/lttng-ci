@@ -18,8 +18,3 @@ babeltrace_packages:
   - shellcheck
   - swig
   - uuid-dev
-
-# Hopefully pytest-tap will be available natively in Debian forky
-# @see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1094475
-babeltrace_packages_pip:
-  - pytest-tap  # optional dependency

@@ -13,6 +13,3 @@ babeltrace_packages:
   - python3-sphinx
   - rubygem-asciidoctor
   - swig
-
-babeltrace_packages_pip:
-  - pytest-tap  # optional dependency
