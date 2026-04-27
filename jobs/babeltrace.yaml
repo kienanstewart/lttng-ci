@@ -195,26 +195,54 @@
       {% endif %}
 
 # Use - in version number since yaml anchor do not support dot
-- job-template: &babeltrace_builders_glib-2-28-6
-    name: 'babeltrace_builders_glib-2-28-6'
+- job-template: &babeltrace_builders_glib
+    name: 'babeltrace_builders_glib'
     builders:
       - inject:
           properties-content: |
-            LD_LIBRARY_PATH=$WORKSPACE/glib-2.28.6/BUILD_RESULT/lib
-            PKG_CONFIG_PATH=$WORKSPACE/glib-2.28.6/BUILD_RESULT/lib/pkgconfig
+            LD_LIBRARY_PATH=$WORKSPACE/glib-{glib_version}/BUILD_RESULT/lib
+            PKG_CONFIG_PATH=$WORKSPACE/glib-{glib_version}/BUILD_RESULT/lib/pkgconfig
             platform=deb13-amd64
             conf=std
             build=std
             PYTHON={python}
             WITH_VENDOR_PYTEST={vendor_pytest}
       - shell: |
-          curl -OL 'https://ftp.gnome.org/pub/gnome/sources/glib/2.28/glib-2.28.6.tar.gz'
-          tar xf glib-2.28.6.tar.gz
-          cd glib-2.28.6
-          sed -i 's/sys\/types\.h/sys\/sysmacros\.h/' gio/gdbusmessage.c # Fix build failure with recent glibc
+          GLIB_VERSION='{glib_version}'
+          GLIB_MAJOR_MINOR="$(echo "$GLIB_VERSION" | cut -d '.' -f 1,2)"
+          COMPRESSION_FORMAT="xz"
+          TAR_ARG="-xf"
+          GLIB_CONF_ARGS="--with-pcre=internal --disable-installed-tests --disable-maintainer-mode"
+          export CFLAGS='-Wno-error'
+
+          if [ "$GLIB_MAJOR_MINOR" = "2.56" ]; then
+            virtualenv "$WORKSPACE/src/glib-venv"
+            . "$WORKSPACE/src/glib-venv/bin/activate"
+            # 2.56 doesn't work with Python 3.12+ (which removed the imp module)
+            pip3 install zombie-imp
+            # distutils is required
+            pip3 install setuptools
+          fi
+
+          if [ "$GLIB_MAJOR_MINOR = '2.28' ]; then
+            COMPRESSION_FORMAT="gz"
+            TAR_ARG="-xzf"
+            GLIB_CONF_ARGS=""
+          fi
+
+          curl -OL "https://download.gnome.org/sources/glib/$GLIB_MAJOR_MINOR/glib-$GLIB_VERSION.tar.$COMPRESSION_FORMAT"
+          tar "$TAR_ARG" "glib-$GLIB_VERSION.tar.$COMPRESSION_FORMAT"
+          cd "glib-$GLIB_VERSION"
+          if [ "$GLIB_VERSION" = '2.28.6' ]; then
+            sed -i 's/sys\/types\.h/sys\/sysmacros\.h/' gio/gdbusmessage.c # Fix build failure with recent glibc
+          fi
+
           mkdir BUILD_RESULT
-          ./configure --prefix=$WORKSPACE/glib-2.28.6/BUILD_RESULT
-          make -j `nproc` >/dev/null 2>&1 # Hide warnings
+          echo '### Configure glib ###'
+          ./configure --prefix="$WORKSPACE/glib-$GLIB_VERSION/BUILD_RESULT" $GLIB_CONF_ARGS
+          echo '### Build glib ###'
+          make -j$(nproc)
+          echo '### Install glib ###'
           make install
       - shell:
           !include-raw-verbatim:
@@ -618,11 +646,12 @@
       - email-ext: *babeltrace_publisher_email-ext_defaults
 
 - job-template:
-    name: '{job_prefix}babeltrace_{version}_glib-2.28.6'
+    name: '{job_prefix}babeltrace_{version}_glib-{glib_version}'
     defaults: babeltrace
     node: 'deb13-amd64'
+    glib_version: '2.56.0'
 
-    <<: *babeltrace_builders_glib-2-28-6
+    <<: *babeltrace_builders_glib
     <<: *babeltrace_publishers_defaults
 
 
@@ -727,9 +756,15 @@
       - 'babeltrace_{version}_coverity':
           version: master
           test_report_type: junit
-      - '{job_prefix}babeltrace_{version}_glib-2.28.6':
+      - '{job_prefix}babeltrace_{version}_glib-{glib_version}':
           version: master
           test_report_type: junit
+      - '{job_prefix}babeltrace_{version}_glib-{glib_version}':
+          version:
+            - stable-2.1
+            - stable-2.0
+          glib_version: '2.28.6'
+          test_report_type: tap
 
 - project:
     name: review-babeltrace
