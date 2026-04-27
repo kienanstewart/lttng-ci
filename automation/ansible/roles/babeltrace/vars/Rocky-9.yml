@@ -6,16 +6,17 @@ babeltrace_packages:
   - glib2-devel
   - libuuid-devel
   - popt-devel
-  - python36-devel
+  - python3-devel
   - python3-pip
+  - python3-pytest
+  - python3-pytest-xdist
   - python3-sphinx
   - rubygem-asciidoctor
   - swig
 
 babeltrace_packages_pip:
-  # Use pytest vendored in the source tree
   - pytest-tap  # optional dependency
 
 # 3.4+ requires pytest with the Config object,
-# which isn't in the vendored pytest 6.1.2.
+# which isn't in pytest 6.2.2 from the system package.
 babeltrace_pytest_tap_version: '3.3'
