@@ -92,9 +92,7 @@ ci-node-deb13-amd64-2c-[01:10]
 ci-node-deb13-amd64-2d-01
 
 [node_standalone]
-ci-rootnode-deb12-amd64-1c-02
 ci-rootnode-deb13-amd64-[1:2][a:d]-01
-ci-rootnode-deb13-amd64-2a-02-linux5
 ci-rootnode-deb12-i386-1[a:c]-01
 ci-rootnode-deb13-arm64-[1:2][a:b]-01
 ci-rootnode-deb13-armhf-1[a:b]-01
