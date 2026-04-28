@@ -28,6 +28,12 @@
         src: /dev/null
         path: /etc/sysctl.d/10-coredump-debian.conf
         state: link
+    - name: 'Disable EL core pattern'
+      when: ansible_os_family in ['RedHat', 'Rocky']
+      ansible.builtin.file:
+        src: /dev/null
+        path: /etc/sysctl.d/50-coredump.conf'
+        state: link
     - name: 'Check current core pattern'
       ansible.builtin.command:
         argv: ['cat', '/proc/sys/kernel/core_pattern']
