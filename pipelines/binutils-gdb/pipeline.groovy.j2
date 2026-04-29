@@ -2329,10 +2329,9 @@ cp -t \$WORKSPACE/results/${TARGET_BOARD} gdb/testsuite/gdb.log gdb/testsuite/gd
               }
 
               // Filter out known results from gdb.sum, produce gdb.fail.sum (and known-failures-not-found.sum)
-              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                sh(
-                  label: 'filter results',
-                  script: """#!/usr/bin/bash -x
+              sh(
+                label: 'filter results',
+                script: """#!/usr/bin/bash -x
 results_dir="\$WORKSPACE/results/${TARGET_BOARD}"
 grep --invert-match --fixed-strings --file=\$results_dir/known_failures \$results_dir/gdb.sum | \
     grep --invert-match --extended-regexp --file=\$results_dir/known_failures_re > \$results_dir/gdb.filtered.sum
@@ -2344,21 +2343,24 @@ while read -r line; do
     fi
 done < "\$results_dir/known_failures" > "\$results_dir/known-failures-not-found.sum"
 
-if [ -s "\$results_dir/gdb.fail.sum" ]; then
+exit 0
+"""
+              )
+
+              // Print gdb.fail.sum, fail if there are any failures
+              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                sh(
+                  label: 'gdb.fail.sum',
+                  script: """#!/usr/bin/bash
+fail_sum_file="\$WORKSPACE/results/${TARGET_BOARD}/gdb.fail.sum"
+cat "\$fail_sum_file"
+if [ -s "\$fail_sum_file" ]; then
   exit 1
 fi
 exit 0
 """
                 )
               }
-
-              // Print gdb.fail.sum
-              sh(
-                label: 'gdb.fail.sum',
-                script: """#!/usr/bin/bash
-cat "\${WORKSPACE}/results/${TARGET_BOARD}/gdb.fail.sum"
-"""
-              )
 
               // Print known-failures-not-found.sum
               sh(
