@@ -276,6 +276,13 @@ def main(args):
     if args.base64_message:
         message = base64.b64decode(args.base64_message, validate=True).decode("utf-8")
 
+    # Undo the `"` → `\"` escaping that the Jenkins Gerrit Trigger plugin
+    # applies to `GERRIT_CHANGE_SUBJECT` (and other string parameters).
+    subject = args.subject
+
+    if subject is not None:
+        subject = subject.replace('\\"', '"')
+
     return run_hooks(
         HOOKS,
         args.project,
@@ -283,7 +290,7 @@ def main(args):
         args.url,
         args.branch,
         message,
-        subject=args.subject,
+        subject=subject,
         number=args.number,
         noop=args.noop,
     )
