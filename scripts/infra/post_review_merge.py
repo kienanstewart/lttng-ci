@@ -105,16 +105,16 @@ MESSAGES = {
     "change-merged:resolves": """
 Automatically closing this issue because the following commit is now merged:
 
-  * *Commit*: {subject}
-  * *Gerrit change*: "{number}":{gerrit_url}
-  * *Branch*: {branch}
+* *Commit*: <code>{subject}</code>
+* *Gerrit change*: "{number}":{gerrit_url}
+* *Branch*: <code>{branch}</code>
 """,
     "change-merged:references": """
 The following merged commit references this issue:
 
-  * *Commit*: {subject}
-  * *Gerrit change*: "{number}":{gerrit_url}
-  * *Branch*: {branch}
+* *Commit*: <code>{subject}</code>
+* *Gerrit change*: "{number}":{gerrit_url}
+* *Branch*: <code>{branch}</code>
 """,
 }
 
