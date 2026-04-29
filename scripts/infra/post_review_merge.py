@@ -105,14 +105,14 @@ MESSAGES = {
     "change-merged:resolves": """
 Automatically closing this issue because the following commit is now merged:
 
-* *Commit*: <code>{subject}</code>
+* *Commit*: <code>{subject}</code> ({commit_id_short})
 * *Gerrit change*: "{number}":{gerrit_url}
 * *Branch*: <code>{branch}</code>
 """,
     "change-merged:references": """
 The following merged commit references this issue:
 
-* *Commit*: <code>{subject}</code>
+* *Commit*: <code>{subject}</code> ({commit_id_short})
 * *Gerrit change*: "{number}":{gerrit_url}
 * *Branch*: <code>{branch}</code>
 """,
@@ -166,6 +166,7 @@ def run_hooks(
     commit_message,
     subject=None,
     number=None,
+    commit_id=None,
     noop=False,
 ):
     logging.debug(
@@ -192,6 +193,8 @@ def run_hooks(
                 "commit_message": commit_message,
                 "subject": subject,
                 "number": number,
+                "commit_id": commit_id,
+                "commit_id_short": commit_id[:8] if commit_id else "",
                 "noop": noop,
             }
             logging.debug(
@@ -255,6 +258,7 @@ def get_parser():
     parser.add_argument("-p", "--project", help="Gerrit project")
     parser.add_argument("--subject", help="Change subject")
     parser.add_argument("--number", help="Change number")
+    parser.add_argument("--commit-id", help="Merged commit ID (SHA1)")
     return parser
 
 
@@ -292,6 +296,7 @@ def main(args):
         message,
         subject=subject,
         number=args.number,
+        commit_id=args.commit_id,
         noop=args.noop,
     )
 

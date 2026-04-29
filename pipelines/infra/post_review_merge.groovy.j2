@@ -60,6 +60,7 @@ ARGS=(
     --base64-message "$GERRIT_CHANGE_COMMIT_MESSAGE"
     --subject "${GERRIT_CHANGE_SUBJECT}"
     --number "${GERRIT_CHANGE_NUMBER}"
+    --commit-id "${GERRIT_PATCHSET_REVISION}"
 )
 
 if [[ "${NOOP}" == "true" ]]; then
