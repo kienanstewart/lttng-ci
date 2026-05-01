@@ -1057,11 +1057,7 @@
     <<: *lttng-tools_matrix_axes_rootbuild
     <<: *lttng-tools_builders_review
 
-    publishers:
-      - tap: *lttng-tools_publisher_tap_defaults
-      - raw: *lttng-tools_publisher_warnings-ng_defaults
-      - archive: *lttng-tools_publisher_archive_defaults
-      - workspace-cleanup: *lttng-tools_publisher_workspace-cleanup_defaults
+    publishers: *lttng-tools_publishers_review_defaults
 
 - job-template:
     name: 'dev_review_lttng-modules_with_lttng-tools_{version}_root_{buildtype}'
@@ -1104,13 +1100,7 @@
     <<: *lttng-tools_matrix_axes_rootbuild
     <<: *lttng-tools_builders_review
 
-    publishers:
-      - postbuildscript: *lttng-tools_publisher_postbuildscript_collect_srcdir
-      - tap: *lttng-tools_publisher_tap_defaults
-      - raw: *lttng-tools_publisher_warnings-ng_defaults
-      - archive: *lttng-tools_publisher_archive_defaults
-      - html-publisher: *lttng-tools_publisher_html_code_coverage_defaults
-      - workspace-cleanup: *lttng-tools_publisher_workspace-cleanup_defaults
+    publishers: *lttng-tools_publishers_review_defaults
 
 - job-template:
     name: 'dev_review_lttng-tools_{version}_root_{cctype}'
