@@ -105,18 +105,36 @@ MESSAGES = {
     "change-merged:resolves": """
 Automatically closing this issue because the following commit is now merged:
 
-* *Commit*: <code>{subject}</code> ({commit_id_short})
+* *Commit*: <code>{subject}</code>{commit_part}
 * *Gerrit change*: "{number}":{gerrit_url}
 * *Branch*: <code>{branch}</code>
 """,
     "change-merged:references": """
 The following merged commit references this issue:
 
-* *Commit*: <code>{subject}</code> ({commit_id_short})
+* *Commit*: <code>{subject}</code>{commit_part}
 * *Gerrit change*: "{number}":{gerrit_url}
 * *Branch*: <code>{branch}</code>
 """,
 }
+
+GERRIT_PROJECT_TO_GITHUB = {
+    "lttng-tools": "lttng/lttng-tools",
+    "lttng-ust": "lttng/lttng-ust",
+    "lttng-modules": "lttng/lttng-modules",
+    "lttng-docs": "lttng/lttng-docs",
+    "lttng-ci": "lttng/lttng-ci",
+    "lttng-ivc": "lttng/lttng-ivc",
+    "lttng-ust-benchmarks": "lttng/lttng-ust-benchmarks",
+    "babeltrace": "efficios/babeltrace",
+    "barectf": "efficios/barectf",
+    "normand": "efficios/normand",
+    "argpar": "efficios/argpar",
+    "libside": "efficios/libside",
+    "userspace-rcu": "urcu/userspace-rcu",
+    "librseq": "compudj/librseq",
+}
+
 
 TRACKERS = {
     "bugs": {
@@ -179,6 +197,19 @@ def run_hooks(
         logging.warning("No hooks defined for event '{}'".format(event))
         return
 
+    if commit_id:
+        short_commit_id = commit_id[:8]
+        github_repo = GERRIT_PROJECT_TO_GITHUB.get(project)
+
+        if github_repo:
+            commit_part = ' ("{}":https://github.com/{}/commit/{})'.format(
+                short_commit_id, github_repo, commit_id
+            )
+        else:
+            commit_part = " ({})".format(short_commit_id)
+    else:
+        commit_part = ""
+
     errors = False
     for hook in hooks[event]:
         try:
@@ -193,8 +224,7 @@ def run_hooks(
                 "commit_message": commit_message,
                 "subject": subject,
                 "number": number,
-                "commit_id": commit_id,
-                "commit_id_short": commit_id[:8] if commit_id else "",
+                "commit_part": commit_part,
                 "noop": noop,
             }
             logging.debug(
