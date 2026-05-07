@@ -385,13 +385,13 @@ if __name__ == "__main__":
                 "job",
                 args.job,
                 args.job_configuration or "",
-                args.build_,
+                args.build_id,
                 "artifact",
                 "*zip*",
                 "archive.zip",
             ]
             url_components = [urllib.parse.quote_plus(x) for x in components]
-            url = "/".join([server] + url_components)
+            url = "/".join([args.server] + url_components)
             args.url = url
 
         if args.directory is None:
