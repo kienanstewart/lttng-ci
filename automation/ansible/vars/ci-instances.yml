@@ -42,7 +42,7 @@ _anchors:
       shutdownMethod: 'destroy'
 
 # @see https://docs.ansible.com/ansible/latest/collections/community/general/lxd_container_module.html#ansible-collections-community-general-lxd-container-module
-# @example a container instance with the default image (deb12 amd64)
+# @example a container instance with the default image (deb13 amd64)
 #   - meta:
 #      address: 192.168.1.2
 #     lxd:
@@ -263,121 +263,6 @@ containers:
           #   zfs create -o mountpoint=/storage/git-mirror tank/lxd/custom/git-mirror
           source: /storage/git-mirror
           type: disk
-  - meta:
-      address: 172.18.16.69
-    lxd:
-      name: ci-node-deb12-amd64-2c-01
-      target: ci-host-amd64-2c
-    jenkins:
-      label: 'deb12-amd64 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.70
-    lxd:
-      name: ci-node-deb12-amd64-2c-02
-      target: ci-host-amd64-2c
-    jenkins:
-      label: 'deb12-amd64 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.71
-    lxd:
-      name: ci-node-deb12-amd64-2c-03
-      target: ci-host-amd64-2c
-    jenkins:
-      label: 'deb12-amd64 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.72
-    lxd:
-      name: ci-node-deb12-amd64-2c-04
-      target: ci-host-amd64-2c
-    jenkins:
-      label: 'deb12-amd64 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  # @NOTE: debian/bookworm/cloud/i386 isn't an image
-  # available from images.linuxcontainers.org since they
-  # reduced architecture to save storage space. The instances
-  # below were produced from copies which weren't installed with
-  # cloud-init.
-  - meta:
-      address: 172.18.16.79
-    lxd:
-      name: ci-node-deb12-i386-1a-01
-      target: ci-host-amd64-1a
-      source:
-        alias: debian/bookworm/cloud/i386
-    jenkins:
-      label: 'deb12-i386 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.80
-    lxd:
-      name: ci-node-deb12-i386-1b-01
-      target: ci-host-amd64-1b
-    jenkins:
-      label: 'deb12-i386 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.81
-    lxd:
-      name: ci-node-deb12-i386-1c-01
-      target: ci-host-amd64-1c
-    jenkins:
-      label: 'deb12-i386 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.82
-    lxd:
-      name: ci-node-deb12-i386-1d-01
-      target: ci-host-amd64-1d
-    jenkins:
-      label: 'deb12-i386 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.83
-    lxd:
-      name: ci-node-deb12-i386-2a-01
-      target: ci-host-amd64-2a
-    jenkins:
-      label: 'deb12-i386 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.84
-    lxd:
-      name: ci-node-deb12-i386-2b-01
-      target: ci-host-amd64-2b
-    jenkins:
-      label: 'deb12-i386 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.85
-    lxd:
-      name: ci-node-deb12-i386-2c-01
-      target: ci-host-amd64-2c
-    jenkins:
-      label: 'deb12-i386 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
-  - meta:
-      address: 172.18.16.86
-    lxd:
-      name: ci-node-deb12-i386-2d-01
-      target: ci-host-amd64-2d
-    jenkins:
-      label: 'deb12-i386 deb12'
-      config:
-        <<: *jenkins_ssh_agent_default_config
   - meta:
       address: 172.18.16.104
     jenkins:
