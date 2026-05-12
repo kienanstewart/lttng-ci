@@ -1624,18 +1624,18 @@ containers:
   # the current structure.
   #
   - jenkins:
-      name: 'ci-rootnode-deb12-i386-1a-01'
-      label: 'deb12 deb12-i386-rootnode'
+      name: 'ci-rootnode-deb13-i386-1a-01'
+      label: 'deb13 deb13-i386-rootnode'
       config:
         <<: *jenkins_ssh_agent_libvirt_default_config
         launcher/hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1a.internal.efficios.com'
-        launcher/virtualMachineName: 'ci-rootnode-deb12-i386-1a-01'
-        launcher/delegate/host: 'ci-rootnode-deb12-i386-1a-01.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-i386-1a-01'
+        launcher/delegate/host: 'ci-rootnode-deb13-i386-1a-01.internal.efficios.com'
         ./hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1a.internal.efficios.com'
-        ./virtualMachineName: 'ci-rootnode-deb12-i386-1a-01'
+        ./virtualMachineName: 'ci-rootnode-deb13-i386-1a-01'
     vm:
-      name: 'ci-rootnode-deb12-i386-1a-01'
-      disk: '/var/lib/libvirt/images/ci-rootnode-deb12-i386-1a-01.qcow'
+      name: 'ci-rootnode-deb13-i386-1a-01'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-i386-1a-01.qcow'
       host: 'ci-host-amd64-1a.internal.efficios.com'
       # Work-around for the following guest error in bookworm-backports:
       #   virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
@@ -1732,18 +1732,18 @@ containers:
     meta:
       address: 172.18.17.21
   - jenkins:
-      name: 'ci-rootnode-deb12-i386-1b-01'
-      label: 'deb12 deb12-i386-rootnode'
+      name: 'ci-rootnode-deb13-i386-1b-01'
+      label: 'deb13 deb13-i386-rootnode'
       config:
         <<: *jenkins_ssh_agent_libvirt_default_config
         launcher/hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1b.internal.efficios.com'
-        launcher/virtualMachineName: 'ci-rootnode-deb12-i386-1b-01'
-        launcher/delegate/host: 'ci-rootnode-deb12-i386-1b-01.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-i386-1b-01'
+        launcher/delegate/host: 'ci-rootnode-deb13-i386-1b-01.internal.efficios.com'
         ./hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1b.internal.efficios.com'
-        ./virtualMachineName: 'ci-rootnode-deb12-i386-1b-01'
+        ./virtualMachineName: 'ci-rootnode-deb13-i386-1b-01'
     vm:
-      name: 'ci-rootnode-deb12-i386-1b-01'
-      disk: '/var/lib/libvirt/images/ci-rootnode-deb12-i386-1b-01.qcow'
+      name: 'ci-rootnode-deb13-i386-1b-01'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-i386-1b-01.qcow'
       host: 'ci-host-amd64-1b.internal.efficios.com'
       # Work-around for the following guest error in bookworm-backports:
       #   virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
@@ -1752,18 +1752,18 @@ containers:
     meta:
       address: 172.18.17.22
   - jenkins:
-      name: 'ci-rootnode-deb12-i386-1c-01'
-      label: 'deb12 deb12-i386-rootnode'
+      name: 'ci-rootnode-deb13-i386-1c-01'
+      label: 'deb13 deb13-i386-rootnode'
       config:
         <<: *jenkins_ssh_agent_libvirt_default_config
         launcher/hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1c.internal.efficios.com'
-        launcher/virtualMachineName: 'ci-rootnode-deb12-i386-1c-01'
-        launcher/delegate/host: 'ci-rootnode-deb12-i386-1c-01.internal.efficios.com'
+        launcher/virtualMachineName: 'ci-rootnode-deb13-i386-1c-01'
+        launcher/delegate/host: 'ci-rootnode-deb13-i386-1c-01.internal.efficios.com'
         ./hypervisorDescription: 'QEMU+ssh - ci-host-amd64-1c.internal.efficios.com'
-        ./virtualMachineName: 'ci-rootnode-deb12-i386-1c-01'
+        ./virtualMachineName: 'ci-rootnode-deb13-i386-1c-01'
     vm:
-      name: 'ci-rootnode-deb12-i386-1c-01'
-      disk: '/var/lib/libvirt/images/ci-rootnode-deb12-i386-1c-01.qcow'
+      name: 'ci-rootnode-deb13-i386-1c-01'
+      disk: '/var/lib/libvirt/images/ci-rootnode-deb13-i386-1c-01.qcow'
       host: 'ci-host-amd64-1c.internal.efficios.com'
       # Work-around for the following guest error in bookworm-backports:
       #   virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
