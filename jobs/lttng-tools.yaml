@@ -1327,7 +1327,7 @@
           platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64, el10-amd64]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_master_portbuild
           buildtype: portbuild
-          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
+          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb13-armhf, deb13-arm64, deb13-i386]
           confs: !!python/tuple [std, no-ust, agents]
           timeout: '45'
           job_properties:
@@ -1395,10 +1395,10 @@
           filter: '(node=="el8-amd64-rootnode" && platform=="el8-amd64")'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_master_root_portbuild
           buildtype: portbuild
-          platforms: !!python/tuple [deb12-i386, deb13-armhf, deb13-arm64]
-          nodes: !!python/tuple [deb12-i386-rootnode, deb13-armhf-rootnode, deb13-arm64-rootnode]
+          platforms: !!python/tuple [deb13-armhf, deb13-arm64]
+          nodes: !!python/tuple [deb13-armhf-rootnode, deb13-arm64-rootnode]
           confs: !!python/tuple [agents]
-          filter: '((node=="deb12-i386-rootnode" && platform=="deb12-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
+          filter: '((node=="deb13-i386-rootnode" && platform=="deb13-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
           timeout: '90'
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
@@ -1470,7 +1470,7 @@
           platforms: !!python/tuple [el8-amd64, el9-amd64, el8-arm64, el9-arm64, el10-amd64]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-15_portbuild
           buildtype: portbuild
-          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
+          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb13-armhf, deb13-arm64, deb13-i386]
           confs: !!python/tuple [std, no-ust, agents]
           timeout: '45'
           job_properties:
@@ -1538,10 +1538,10 @@
           filter: '(node=="el8-amd64-rootnode" && platform=="el8-amd64")'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-15_root_portbuild
           buildtype: portbuild
-          platforms: !!python/tuple [deb12-i386, deb13-armhf, deb13-arm64]
-          nodes: !!python/tuple [deb12-i386-rootnode, deb13-armhf-rootnode, deb13-arm64-rootnode]
+          platforms: !!python/tuple [deb13-armhf, deb13-arm64]
+          nodes: !!python/tuple [deb13-armhf-rootnode, deb13-arm64-rootnode]
           confs: !!python/tuple [agents]
-          filter: '((node=="deb12-i386-rootnode" && platform=="deb12-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
+          filter: '((node=="deb13-i386-rootnode" && platform=="deb13-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
           timeout: '90'
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
@@ -1605,7 +1605,7 @@
           filter: '(build=="std") || ((babeltrace_version=="master" && (conf=="std" || conf=="agents" || conf=="no-ust") && liburcu_version=="stable-2.14"))'
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-14_portbuild
           buildtype: portbuild
-          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
+          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb13-armhf, deb13-arm64, deb13-i386]
           confs: !!python/tuple [std, no-ust, agents]
           timeout: '45'
           job_properties:
@@ -1668,10 +1668,10 @@
           modules_aligned_access: !!python/tuple ['default', 'force']
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-14_root_portbuild
           buildtype: portbuild
-          platforms: !!python/tuple [deb12-i386, deb13-armhf, deb13-arm64]
-          nodes: !!python/tuple [deb12-i386-rootnode, deb13-armhf-rootnode, deb13-arm64-rootnode]
+          platforms: !!python/tuple [deb13-armhf, deb13-arm64]
+          nodes: !!python/tuple [deb13-armhf-rootnode, deb13-arm64-rootnode]
           confs: !!python/tuple [agents]
-          filter: '((node=="deb12-i386-rootnode" && platform=="deb12-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
+          filter: '((node=="deb13-i386-rootnode" && platform=="deb13-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
           timeout: '90'
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
@@ -1731,7 +1731,7 @@
           urcuversions: !!python/tuple [stable-0.13, stable-0.14, stable-0.15, master]
       - '{job_prefix}lttng-tools_{version}_{buildtype}': &job_lttng-tools_stable-2-13_portbuild
           buildtype: portbuild
-          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb12-i386, deb13-armhf, deb13-arm64, deb13-i386]
+          platforms: !!python/tuple [deb13-ppc64el, deb13-riscv64, deb13-s390x, deb13-armhf, deb13-arm64, deb13-i386]
           confs: !!python/tuple [std, no-ust, agents]
           urcuversions: !!python/tuple [stable-0.15, master]
           timeout: '45'
@@ -1786,10 +1786,10 @@
           filter: '(node=="deb13-amd64-rootnode" && platform == "deb13-amd64")'
       - '{job_prefix}lttng-tools_{version}_root_{buildtype}': &job_lttng-tools_stable-2-13_root_portbuild
           buildtype: portbuild
-          platforms: !!python/tuple [deb12-i386, deb13-armhf, deb13-arm64]
-          nodes: !!python/tuple [deb12-i386-rootnode, deb13-armhf-rootnode, deb13-arm64-rootnode]
+          platforms: !!python/tuple [deb13-armhf, deb13-arm64]
+          nodes: !!python/tuple [deb13-armhf-rootnode, deb13-arm64-rootnode]
           confs: !!python/tuple [agents]
-          filter: '((node=="deb12-i386-rootnode" && platform=="deb12-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
+          filter: '((node=="deb13-i386-rootnode" && platform=="deb13-i386") || (node=="deb13-arm64-rootnode" && platform=="deb13-arm64") || (node=="deb13-armhf-rootnode" && platform=="deb13-armhf"))'
           timeout: '90'
           job_properties:
             - name: LTTNG_TOOLS_PARALLEL_TESTS
