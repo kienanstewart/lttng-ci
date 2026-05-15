@@ -336,7 +336,7 @@ static)
     CONF_OPTS+=("--enable-static")
 
     if vergte "$PACKAGE_VERSION" "2.0"; then
-        CONF_OPTS+=("--enable-built-in-plugins" "--enable-built-in-python-plugin-support")
+        CONF_OPTS+=("--enable-built-in-plugins" "$PY_PLUGINS_OPT" "--enable-built-in-python-plugin-support")
 
         if verlt "$PACKAGE_VERSION" "2.2"; then
             # `--disable-shared` not required with Babeltrace 2.2+
