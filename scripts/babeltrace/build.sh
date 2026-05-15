@@ -318,7 +318,7 @@ fi
 #
 # `--enable-vendor-pytest` is only available with Babeltrace 2.2+.
 if [[ $WITH_VENDOR_PYTEST = auto ]]; then
-    if [[ $platform = el8* ]] && vergte "$PACKAGE_VERSION" "2.2"; then
+    if [[ $platform =~ el[8-9].* ]] && vergte "$PACKAGE_VERSION" "2.2"; then
         WITH_VENDOR_PYTEST=1
     else
         WITH_VENDOR_PYTEST=0
