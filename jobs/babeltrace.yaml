@@ -224,7 +224,7 @@
             pip3 install setuptools
           fi
 
-          if [ "$GLIB_MAJOR_MINOR = '2.28' ]; then
+          if [ "$GLIB_MAJOR_MINOR" = '2.28' ]; then
             COMPRESSION_FORMAT="gz"
             TAR_ARG="-xzf"
             GLIB_CONF_ARGS=""
