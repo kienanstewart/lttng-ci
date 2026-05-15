@@ -26,6 +26,7 @@ from minio.error import NoSuchKey, ResponseError
 
 sys.path.insert(0, str((pathlib.Path(__file__).parents[1] / "common").absolute()))
 import lava_submit
+import s3conf
 
 
 class EvaluationException(Exception):
@@ -43,23 +44,16 @@ BENCHMARK_TYPES = [
     "text-tools_2_14",
 ]
 
-# Get S3 config from environment
-S3_HOST = os.getenv("S3_HOST")
-S3_BUCKET = os.getenv("S3_BUCKET")
-S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", os.getenv("S3_KEY_USR"))
-S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", os.getenv("S3_KEY_PSW"))
-S3_HTTP_BUCKET_URL = os.environ.get("S3_HTTP_BUCKET_URL")
-
 TRACE_DEFAULT_LOCATION = (
     "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace.tar.gz".format(
-        S3_HTTP_BUCKET_URL
+        s3conf.S3_HTTP_BUCKET_URL
     )
 )
 TRACE_TOOLS_2_10_LOCATION = "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.10.tar.gz".format(
-    S3_HTTP_BUCKET_URL
+    s3conf.S3_HTTP_BUCKET_URL
 )
 TRACE_TOOLS_2_14_LOCATION = "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.14.tar.gz".format(
-    S3_HTTP_BUCKET_URL
+    s3conf.S3_HTTP_BUCKET_URL
 )
 
 invalid_commits = {
@@ -166,7 +160,9 @@ def get_client():
     """
     Return minio client configured.
     """
-    return Minio(S3_HOST, access_key=S3_ACCESS_KEY, secret_key=S3_SECRET_KEY)
+    return Minio(
+        s3conf.S3_HOST, access_key=s3conf.S3_ACCESS_KEY, secret_key=s3conf.S3_SECRET_KEY
+    )
 
 
 def get_file(client, object_path, destination_path):
@@ -175,13 +171,13 @@ def get_file(client, object_path, destination_path):
     Return None on error
     """
     try:
-        client.fget_object(S3_BUCKET, object_path, destination_path)
+        client.fget_object(s3conf.S3_BUCKET, object_path, destination_path)
     except NoSuchKey:
         destination_path = None
 
     logging.debug(
         "Bucket '{}' object '{}' {}downloaded".format(
-            S3_BUCKET, object_path, "" if destination_path else "not "
+            s3conf.S3_BUCKET, object_path, "" if destination_path else "not "
         )
     )
     return destination_path
@@ -193,7 +189,7 @@ def delete_file(client, prefix, file_name):
     """
     object_name = "{}/{}".format(prefix, file_name)
     try:
-        client.remove_object(S3_BUCKET, object_name)
+        client.remove_object(s3conf.S3_BUCKET, object_name)
     except ResponseError as err:
         logging.error(err)
     except NoSuchKey:

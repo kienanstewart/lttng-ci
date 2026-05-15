@@ -10,6 +10,7 @@ import time
 import xmlrpc.client
 
 import jinja2
+import s3conf
 import yaml
 
 # 4.4.194
@@ -17,7 +18,6 @@ DEFAULT_KERNEL_COMMIT = "a227f8436f2b21146fc024d84e6875907475ace2"
 LAVA_USERNAME = os.environ.get("LAVA_USERNAME")
 LAVA_HOST = os.environ.get("LAVA_HOST", "lava-master-03.internal.efficios.com")
 LAVA_PROTO = os.environ.get("LAVA_PROTO", "https")
-S3_HTTP_BUCKET_URL = os.environ.get("S3_HTTP_BUCKET_URL")
 
 
 def wait_on(server, jobid):
@@ -60,15 +60,11 @@ def wait_on(server, jobid):
 def get_default_context():
     context = dict()
 
-    context["s3_access_key"] = os.environ.get(
-        "S3_ACCESS_KEY", os.environ.get("S3_KEY_USR")
-    )
-    context["s3_secret_key"] = os.environ.get(
-        "S3_SECRET_KEY", os.environ.get("S3_KEY_PSW")
-    )
-    context["s3_host"] = os.environ.get("S3_HOST")
-    context["s3_bucket"] = os.environ.get("S3_BUCKET")
-    context["s3_base_dir"] = os.environ.get("S3_BASE_DIR")
+    context["s3_access_key"] = s3conf.S3_ACCESS_KEY
+    context["s3_secret_key"] = s3conf.S3_SECRET_KEY
+    context["s3_host"] = s3conf.S3_HOST
+    context["s3_bucket"] = s3conf.S3_BUCKET
+    context["s3_base_dir"] = s3conf.S3_BASE_DIR
     context["job_timeout_hours"] = 2
 
     return context
@@ -154,7 +150,7 @@ if __name__ == "__main__":
         "--kernel-url",
         required=False,
         default="{}/system-tests/kernel/{}.baremetal.bzImage".format(
-            S3_HTTP_BUCKET_URL, DEFAULT_KERNEL_COMMIT
+            s3conf.S3_HTTP_BUCKET_URL, DEFAULT_KERNEL_COMMIT
         ),
     )
     parser.add_argument("-d", "--debug", required=False, action="store_true")
@@ -168,13 +164,13 @@ if __name__ == "__main__":
         "ci_branch": "master",
         "bt_repo": "https://github.com/efficios/babeltrace.git",
         "trace_default_location": "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace.tar.gz".format(
-            S3_HTTP_BUCKET_URL
+            s3conf.S3_HTTP_BUCKET_URL
         ),
         "trace_tools_2_10_location": "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.10.tar.gz".format(
-            S3_HTTP_BUCKET_URL
+            s3conf.S3_HTTP_BUCKET_URL
         ),
         "trace_tools_2_14_location": "{}/traces/benchmark/babeltrace/babeltrace_benchmark_trace-tools-2.14.tar.gz".format(
-            S3_HTTP_BUCKET_URL
+            s3conf.S3_HTTP_BUCKET_URL
         ),
     }
     sys.exit(submit("bt_benchmark.yaml.j2", extra_context=context, debug=args.debug))

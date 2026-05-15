@@ -19,16 +19,9 @@ import requests
 
 sys.path.insert(0, str((pathlib.Path(__file__).parents[1] / "common").absolute()))
 import lava_submit
+import s3conf
 
-# Get S3 config from environment
-S3_HOST = os.getenv("S3_HOST")
-S3_BUCKET = os.getenv("S3_BUCKET", "lava")
-S3_ANONYMOUS_URL = os.getenv(
-    "S3_HTTP_BUCKET_URL", "https://obj-lava.internal.efficios.com"
-)
-S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", os.getenv("S3_KEY_USR"))
-S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", os.getenv("S3_KEY_PSW"))
-S3_STORAGE_PATH = "/system-tests/results/benchmarks/lttng-ust"
+s3conf.S3_STORAGE_PATH = "/system-tests/results/benchmarks/lttng-ust"
 
 
 class BenchmarkState(enum.Enum):
@@ -48,7 +41,7 @@ def get_environment_context():
         "kernel_url": os.getenv(
             "LAVA_KERNEL_URL",
             "{}/system-tests/kernel/{}.baremetal.bzImage".format(
-                S3_ANONYMOUS_URL,
+                s3conf.S3_ANONYMOUS_URL,
                 os.getenv(
                     "KERNEL_COMMIT_ID", "f6044d1fd846ed1ae457975738267214b538a222"
                 ),
@@ -56,7 +49,9 @@ def get_environment_context():
         ),
         "nfsrootfs_url": os.getenv(
             "NFS_ROOT_URL",
-            "{}/rootfs/rootfs_amd64_trixie_2026-02-06.tar.xz".format(S3_ANONYMOUS_URL),
+            "{}/rootfs/rootfs_amd64_trixie_2026-02-06.tar.xz".format(
+                s3conf.S3_ANONYMOUS_URL
+            ),
         ),
         "lttng_modules_repo": os.getenv(
             "LTTNG_MODULES_REPO", "https://github.com/lttng/lttng-modules.git"
@@ -146,17 +141,17 @@ def get_commit_list(
 
 
 def get_benchmark_state(commit):
-    path = os.path.join(S3_STORAGE_PATH, commit)
+    path = os.path.join(s3conf.S3_STORAGE_PATH, commit)
     fail_path = os.path.join(path, "failed")
     result_path = os.path.join(path, "benchmarks.json")
 
     # Check if the benchmark failed
-    resp = requests.head("{}/{}".format(S3_ANONYMOUS_URL, fail_path))
+    resp = requests.head("{}/{}".format(s3conf.S3_ANONYMOUS_URL, fail_path))
     if resp.status_code == 200:
         return BenchmarkState.BUILD_FAILURE
 
     # Check if the results are there
-    resp = requests.head("{}/{}".format(S3_ANONYMOUS_URL, result_path))
+    resp = requests.head("{}/{}".format(s3conf.S3_ANONYMOUS_URL, result_path))
     if resp.status_code != 200:
         return BenchmarkState.MISSING_BENCHMARK_RESULTS
 
@@ -165,9 +160,9 @@ def get_benchmark_state(commit):
 
 
 def get_benchmark_results(commit):
-    path = os.path.join(S3_STORAGE_PATH, commit)
+    path = os.path.join(s3conf.S3_STORAGE_PATH, commit)
     result_path = os.path.join(path, "benchmarks.json")
-    response = requests.get("{}/{}".format(S3_ANONYMOUS_URL, result_path))
+    response = requests.get("{}/{}".format(s3conf.S3_ANONYMOUS_URL, result_path))
     if response.status_code != 200:
         raise Exception("No data available for '{}'".format(result_path))
 
