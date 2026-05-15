@@ -18,17 +18,11 @@ import git
 import requests
 
 sys.path.insert(0, str((pathlib.Path(__file__).parents[1] / "common").absolute()))
+import benchmark
 import lava_submit
 import s3conf
 
 s3conf.S3_STORAGE_PATH = "/system-tests/results/benchmarks/lttng-ust"
-
-
-class BenchmarkState(enum.Enum):
-    BUILD_FAILURE = -1
-    COMPLETE = 0
-    CONTAINS_RUN_FAILURES = 1
-    MISSING_BENCHMARK_RESULTS = 2
 
 
 def get_environment_context():
@@ -148,15 +142,15 @@ def get_benchmark_state(commit):
     # Check if the benchmark failed
     resp = requests.head("{}/{}".format(s3conf.S3_ANONYMOUS_URL, fail_path))
     if resp.status_code == 200:
-        return BenchmarkState.BUILD_FAILURE
+        return benchmark.BenchmarkState.BUILD_FAILURE
 
     # Check if the results are there
     resp = requests.head("{}/{}".format(s3conf.S3_ANONYMOUS_URL, result_path))
     if resp.status_code != 200:
-        return BenchmarkState.MISSING_BENCHMARK_RESULTS
+        return benchmark.BenchmarkState.MISSING_BENCHMARK_RESULTS
 
     # @TODO: Should the result file be validated?
-    return BenchmarkState.COMPLETE
+    return benchmark.BenchmarkState.COMPLETE
 
 
 def get_benchmark_results(commit):
@@ -238,7 +232,7 @@ def cmd_generate_asv(args):
             tags_only=args.tags_only,
         )
         for commit in commits:
-            if get_benchmark_state(commit) == BenchmarkState.COMPLETE:
+            if get_benchmark_state(commit) == benchmark.BenchmarkState.COMPLETE:
                 benchmark_data.append(get_benchmark_results(commit))
             else:
                 logging.warning("Results for commit '{}' not available".format(commit))
@@ -395,7 +389,8 @@ def cmd_generate_jobs(args):
         commits = [
             commit
             for commit in commits
-            if get_benchmark_state(commit) == BenchmarkState.MISSING_BENCHMARK_RESULTS
+            if get_benchmark_state(commit)
+            == benchmark.BenchmarkState.MISSING_BENCHMARK_RESULTS
         ]
 
     logging.info("{} commits to run benchmarks for".format(len(commits)))
@@ -429,7 +424,7 @@ def cmd_regression_check(args):
             tags_only=False,
         )
         for commit in commits:
-            if get_benchmark_state(commit) == BenchmarkState.COMPLETE:
+            if get_benchmark_state(commit) == benchmark.BenchmarkState.COMPLETE:
                 benchmark_data.append(get_benchmark_results(commit))
             else:
                 logging.warning("Results for commit '{}' not available".format(commit))

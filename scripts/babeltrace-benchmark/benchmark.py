@@ -25,6 +25,7 @@ from minio import Minio
 from minio.error import NoSuchKey, ResponseError
 
 sys.path.insert(0, str((pathlib.Path(__file__).parents[1] / "common").absolute()))
+import benchmark
 import lava_submit
 import s3conf
 
@@ -108,13 +109,6 @@ invalid_commits = {
     "8b130e7f1d6a41fb5c64a014c15246ba74b79470",
     "f4f8f79893b18199b38edc3330093a9403c4c737",
 }
-
-
-class BenchmarkState(enum.Enum):
-    BUILD_FAILURE = -1
-    COMPLETE = 0
-    CONTAINS_RUN_FAILURES = 1
-    MISSING_BENCHMARK_RESULTS = 2
 
 
 def json_type(string):
@@ -241,7 +235,7 @@ def get_benchmark_results(client, commit, workdir):
     Fetch the benchmark result from a certain commit across all benchmark type.
     """
     results = {}
-    state = BenchmarkState.COMPLETE
+    state = benchmark.BenchmarkState.COMPLETE
 
     # Check if the commit was marked as failed
     path = "/system-tests/results/benchmarks/babeltrace/{}/failed".format(commit)
@@ -249,9 +243,11 @@ def get_benchmark_results(client, commit, workdir):
     if fail_path is not None:
         os.unlink(os.path.join(workdir, "failed"))
         logging.info(
-            "Benchmarks for '{}' state: {}".format(commit, BenchmarkState.BUILD_FAILURE)
+            "Benchmarks for '{}' state: {}".format(
+                commit, benchmark.BenchmarkState.BUILD_FAILURE
+            )
         )
-        return results, BenchmarkState.BUILD_FAILURE
+        return results, benchmark.BenchmarkState.BUILD_FAILURE
 
     for b_type in BENCHMARK_TYPES:
         path = "/system-tests/results/benchmarks/babeltrace/{}/{}".format(
@@ -267,7 +263,7 @@ def get_benchmark_results(client, commit, workdir):
                     commit, b_type
                 )
             )
-            state = BenchmarkState.MISSING_BENCHMARK_RESULTS
+            state = benchmark.BenchmarkState.MISSING_BENCHMARK_RESULTS
             continue
 
         results[b_type], returncodes = parse_result(result_file)
@@ -277,9 +273,9 @@ def get_benchmark_results(client, commit, workdir):
                     b_type, commit
                 )
             )
-            if state == BenchmarkState.COMPLETE:
+            if state == benchmark.BenchmarkState.COMPLETE:
                 # Don't override the MISSING_BENCHMARK_RESULTS state
-                state = BenchmarkState.CONTAINS_RUN_FAILURES
+                state = benchmark.BenchmarkState.CONTAINS_RUN_FAILURES
 
     logging.info("Benchmarks for '{}' state: {}".format(commit, state))
     return results, state
@@ -585,7 +581,7 @@ def get_branch_results(client, branches, git_path, tags_only=False):
         with tempfile.TemporaryDirectory() as workdir:
             for commit in commits:
                 b_results, state = get_benchmark_results(client, commit, workdir)
-                if not b_results or state != BenchmarkState.COMPLETE:
+                if not b_results or state != benchmark.BenchmarkState.COMPLETE:
                     continue
                 results.append((commit, b_results))
         branch_results[branch] = results
@@ -665,7 +661,7 @@ def evaluate_benchmark_regression(
     with tempfile.TemporaryDirectory() as workdir:
         for commit in commits:
             r, state = get_benchmark_results(client, commit, workdir)
-            if not r or state != BenchmarkState.COMPLETE:
+            if not r or state != benchmark.BenchmarkState.COMPLETE:
                 continue
 
             results[commit] = r
@@ -804,9 +800,9 @@ def get_regression_commits_to_test(bt_repo_path, force=False):
         for commit in commits:
             res, state = get_benchmark_results(client, commit, workdir)
             if force or state not in [
-                BenchmarkState.COMPLETE,
-                BenchmarkState.CONTAINS_RUN_FAILURES,
-                BenchmarkState.BUILD_FAILURE,
+                benchmark.BenchmarkState.COMPLETE,
+                benchmark.BenchmarkState.CONTAINS_RUN_FAILURES,
+                benchmark.BenchmarkState.BUILD_FAILURE,
             ]:
                 commits_to_test.add(commit)
 
@@ -826,9 +822,9 @@ def get_commits_to_test(branches, bt_repo_path, force=False, tags_only=False):
             for commit in commits:
                 res, state = get_benchmark_results(client, commit, workdir)
                 if force or state not in [
-                    BenchmarkState.COMPLETE,
-                    BenchmarkState.CONTAINS_RUN_FAILURES,
-                    BenchmarkState.BUILD_FAILURE,
+                    benchmark.BenchmarkState.COMPLETE,
+                    benchmark.BenchmarkState.CONTAINS_RUN_FAILURES,
+                    benchmark.BenchmarkState.BUILD_FAILURE,
                 ]:
                     commits_to_test.add(commit)
 
