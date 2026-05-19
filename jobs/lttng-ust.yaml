@@ -933,16 +933,6 @@
       - 'lttng-ust_{version}_scan-build':
           version: stable-2.13
 
-      ## Stable 2.12 ##
-      - '{job_prefix}lttng-ust_{version}_{buildtype}':
-          buildtype: elbuild_extended
-          version: stable-2.12
-          java_agents: 'false'
-          platforms: !!python/tuple [el8-amd64, el9-amd64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [agents]
-          liburcu_versions: !!python/tuple [stable-0.12, stable-0.13]
-
 - project:
     name: review-lttng-ust
     job_prefix: ''

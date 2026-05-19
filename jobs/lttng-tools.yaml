@@ -1828,24 +1828,6 @@
           babelversion: stable-2.1
 
 - project:
-    name: lttng-tools-stable-2.12
-    email_to: 'ci-notification@lists.lttng.org, cc:jgalar@efficios.com'
-    urcuversions: !!python/tuple [stable-0.12]
-    babelversions: !!python/tuple [stable-2.1]
-    version: 'stable-2.12'
-    job_properties:
-      - name: LTTNG_UST_JAVA_TESTS_GIT_BRANCH
-        value: 'stable-2.14'
-    jobs:
-      - '{job_prefix}lttng-tools_{version}_{buildtype}':
-          buildtype: elbuild_extended
-          babeltrace_buildtype: elbuild
-          confs: !!python/tuple [agents]
-          java_agents: 'false'
-          platforms: !!python/tuple [el8-amd64, el9-amd64]
-
-
-- project:
     name: review-lttng-tools-master
     version: master
     platforms: !!python/tuple [deb13-amd64]
