@@ -23,6 +23,13 @@ ansible-lint = "^26.1.1"
 yamllint = "^1.38.0"
 pytest = "^9.0.3"
 pytest-httpserver = "^1.1.5"
+gitpython = "^3.1.50"
+matplotlib = "^3.10.9"
+minio = "5"
+asv = "^0.6.5"
+bs4 = "^0.0.2"
+scipy = "^1.17.1"
+numpy = "^2.4.6"
 
 [build-system]
 requires = ["poetry-core"]
