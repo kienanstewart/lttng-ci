@@ -343,8 +343,6 @@
         naming_rule: 'Stable 0.14'
       - group_regex: '.*_stable-0.13_.*'
         naming_rule: 'Stable 0.13'
-      - group_regex: '.*_stable-0.12_.*'
-        naming_rule: 'Stable 0.12'
 
 
 ## Projects
