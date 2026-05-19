@@ -1,0 +1,9 @@
+apache-otava
+asv
+bs4
+GitPython
+jinja2
+numpy
+pyyaml
+requests
+scipy
