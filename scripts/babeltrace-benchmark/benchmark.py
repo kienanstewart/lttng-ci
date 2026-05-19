@@ -870,32 +870,32 @@ def launch_jobs(
                 " (not submitted)" if dry_run else "",
             )
         )
-        if not dry_run:
-            submitted_jobs += 1
-            result = lava_submit.submit(
-                "bt_benchmark.yaml.j2",
-                extra_context={
-                    "kernel_url": kernel_url,
-                    "nfsrootfs_url": nfs_root_url,
-                    "commit_hashes": " ".join(commits),
-                    "ci_repo": ci_repo,
-                    "ci_branch": ci_branch,
-                    "bt_repo": bt_repo,
-                    "job_timeout_hours": max(6, math.ceil(len(commits) * 2)),
-                    "trace_default_location": TRACE_DEFAULT_LOCATION,
-                    "trace_tools_2_10_location": TRACE_TOOLS_2_10_LOCATION,
-                    "trace_tools_2_14_location": TRACE_TOOLS_2_14_LOCATION,
-                },
-                wait_for_completion=wait_for_completion,
-                debug=debug,
-            )
 
-            if wait_for_completion:
-                job_state, job_health, has_failures = result
-                if job_state != "Finished" or job_health != "Complete" or has_failures:
-                    failed_jobs += 1
-                else:
-                    passed_jobs += 1
+        submitted_jobs += 1
+        result = lava_submit.submit(
+            "bt_benchmark.yaml.j2",
+            extra_context={
+                "kernel_url": kernel_url,
+                "nfsrootfs_url": nfs_root_url,
+                "commit_hashes": " ".join(commits),
+                "ci_repo": ci_repo,
+                "ci_branch": ci_branch,
+                "bt_repo": bt_repo,
+                "job_timeout_hours": max(6, math.ceil(len(commits) * 2)),
+                "trace_default_location": TRACE_DEFAULT_LOCATION,
+                "trace_tools_2_10_location": TRACE_TOOLS_2_10_LOCATION,
+                "trace_tools_2_14_location": TRACE_TOOLS_2_14_LOCATION,
+            },
+            wait_for_completion=wait_for_completion,
+            debug=debug or dry_run,
+        )
+
+        if wait_for_completion and not (debug or dry_run):
+            job_state, job_health, has_failures = result
+            if job_state != "Finished" or job_health != "Complete" or has_failures:
+                failed_jobs += 1
+            else:
+                passed_jobs += 1
 
         batches_run += 1
         if max_batches > 0 and batches_run >= max_batches:
