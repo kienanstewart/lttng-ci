@@ -1294,8 +1294,6 @@
         naming_rule: 'Stable 2.14'
       - group_regex: '.*[_-]stable-2.13.*'
         naming_rule: 'Stable 2.13'
-      - group_regex: '.*[_-]stable-2.12.*'
-        naming_rule: 'Stable 2.12'
 
 ## Projects
 - project:
