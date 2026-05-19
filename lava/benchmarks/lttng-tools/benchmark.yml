@@ -1,0 +1,10 @@
+---
+
+metadata:
+  format: Lava-Test Test Definition 1.0
+  name: lttng-tools benchmark
+  description: "Run benchmark(s) for LTTng-tols"
+
+run:
+  steps:
+    - lava/benchmarks/lttng-tools/benchmark.sh
