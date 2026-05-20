@@ -156,7 +156,7 @@ function build_modules()
     if [[ "${commit}" == "$(git -C "${MODULES_SRC_DIR}" rev-parse HEAD)" ]] || [[ "${commit}" == "${tag}" ]] ; then
         echo "lttng-modules already on commit '${commit}'" >&2
         make -C "${MODULES_SRC_DIR}" modules_install INSTALL_MOD_PATH="$PREFIX/usr" > install.log 2>&1
-        depmod --all --base-dir="$PREFIX/usr" > depmod.log 2>&1
+        depmod --all --basedir="$PREFIX/usr" > depmod.log 2>&1
         return $ret
     fi
 
@@ -168,7 +168,7 @@ function build_modules()
             git checkout "${commit}"
             make -j"$(nproc)" > "${LOG_DIR}/make.log" 2>&1
             make modules_install INSTALL_MOD_PATH="$PREFIX/usr" > "${LOG_DIR}/install.log" 2>&1
-            depmod --all --base-dir="$PREFIX/usr" > "${LOG_DIR}/depmod.log" 2>&1
+            depmod --all --basedir="$PREFIX/usr" > "${LOG_DIR}/depmod.log" 2>&1
     ); then
         # It's okay if lttng-modules fails
         ret=0
