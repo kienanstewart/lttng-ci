@@ -48,6 +48,15 @@ def get_environment_context():
                 ),
             ),
         ),
+        "kernel_headers_url": os.getenv(
+            "LAVA_KERNEL_HEADERS_URL",
+            "{}/system-tests/kernel/{}.baremetal.headers.tar.xz".format(
+                s3conf.S3_ANONYMOUS_URL,
+                os.getenv(
+                    "KERNEL_COMMIT_ID", "f6044d1fd846ed1ae457975738267214b538a222"
+                ),
+            ),
+        ),
         "nfsrootfs_url": os.getenv(
             "NFS_ROOT_URL",
             "{}/rootfs/rootfs_amd64_trixie_2026-02-06.tar.xz".format(
