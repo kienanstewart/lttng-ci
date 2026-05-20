@@ -71,6 +71,7 @@ packages = [
     "python3-dev",
     "python3-numpy",
     "python3-pandas",
+    "python3-poetry",
     "python3-pip",
     "python3-pytest",
     "python3-pytest-xdist",
