@@ -153,12 +153,20 @@ if __name__ == "__main__":
             s3conf.S3_HTTP_BUCKET_URL, DEFAULT_KERNEL_COMMIT
         ),
     )
+    parser.add_argument(
+        "--kernel-headers-url",
+        required=False,
+        default="{}/system-tests/kernel/{}.baremetal.headers.tar.xz".format(
+            s3conf.S3_HTTP_BUCKET_URL, DEFAULT_KERNEL_COMMIT
+        ),
+    )
     parser.add_argument("-d", "--debug", required=False, action="store_true")
     args = parser.parse_args()
 
     context = {
         "commit_hashes": " ".join(args.commit),
         "kernel_url": args.kernel_url,
+        "kernel_headers_url": args.kernel_headers_url,
         "nfsrootfs_url": "https://obj-lava.internal.efficios.com/rootfs/rootfs_amd64_trixie_2026-02-06.tar.xz",
         "ci_repo": "https://github.com/lttng/lttng-ci.git",
         "ci_branch": "master",
