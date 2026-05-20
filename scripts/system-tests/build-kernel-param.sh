@@ -116,6 +116,7 @@ MODULES_INSTALL_DIR="$OUTPUTDIR/modules"
 BUILD_NAME="$KERNEL_COMMIT_ID-$LTTNG_MODULES_COMMIT_ID"
 
 S3_KERNEL_MODULE_SYMVERS=$S3_BUCKET/$S3_BASE_DIR/kernel/$KERNEL_COMMIT_ID.$BUILD_DEVICE.symvers
+S3_KERNEL_HEADERS=$S3_BUCKET/$S3_BASE_DIR/kernel/$KERNEL_COMMIT_ID.$BUILD_DEVICE.headers.tar.xz
 S3_KERNEL_CONFIG=$S3_BUCKET/$S3_BASE_DIR/kernel/$KERNEL_COMMIT_ID.$BUILD_DEVICE.config
 S3_KERNEL_IMAGE=$S3_BUCKET/$S3_BASE_DIR/kernel/$KERNEL_COMMIT_ID.$BUILD_DEVICE.bzImage
 S3_LINUX_MODULES=$S3_BUCKET/$S3_BASE_DIR/modules/$KERNEL_COMMIT_ID.$BUILD_DEVICE.linux.modules.tar.xz
@@ -141,7 +142,7 @@ signature_v2 = False" > "$S3CMD_CONFIG"
 
 print_header "Check for pre-built artifacts"
 
-if ! s3cmd -c "$S3CMD_CONFIG" info "s3://$S3_KERNEL_IMAGE"; then
+if ! s3cmd -c "$S3CMD_CONFIG" info "s3://$S3_KERNEL_IMAGE" || ! s3cmd -c "$S3CMD_CONFIG" info "s3://$S3_KERNEL_HEADERS" ; then
   NEED_KERNEL_BUILD=1
   # We need to build the lttng modules if the kernel has changed.
   NEED_MODULES_BUILD=1
@@ -151,6 +152,88 @@ fi
 
 # Create the temporary output dir
 mkdir -p "$OUTPUTDIR"
+
+function extract_distro_headers() {
+    # @see scripts/lttng-modules/param-build.sh
+    local SRC_DIR="${1}"
+    local DEST="${2}"
+    local LINUX_HDROBJ_DIR
+    LINUX_HDROBJ_DIR="$(mktemp -d)"
+
+    pushd "${SRC_DIR}"
+    # For RT kernels, copy version file
+    if [ -s localversion-rt ]; then
+        cp -a localversion-rt "${LINUX_HDROBJ_DIR}"
+    fi
+
+    # Copy all Makefile related stuff
+    find . -path './include/*' -prune \
+        -o -path './scripts/*' -prune -o -type f \
+        \( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
+            -name '*.sh' -o -name '*.pl' -o -name '*.lds' \) \
+        -print | cpio -pd --preserve-modification-time "${LINUX_HDROBJ_DIR}"
+
+    # Copy base scripts and include dirs
+    cp -a scripts include "${LINUX_HDROBJ_DIR}"
+
+    # Copy arch includes
+    (find arch -name include -type d -print0 | \
+        xargs -0 -n1 -I '{}' find '{}' -type f) | \
+        cpio -pd --preserve-modification-time "${LINUX_HDROBJ_DIR}"
+
+    # Copy arch scripts
+    (find arch -name scripts -type d -print0 | \
+        xargs -0 -n1 -I '{}' find '{}' -type f) | \
+        cpio -pd --preserve-modification-time "${LINUX_HDROBJ_DIR}"
+
+    # Cleanup scripts
+    rm -f "${LINUX_HDROBJ_DIR}/scripts/*.o"
+    rm -f "${LINUX_HDROBJ_DIR}/scripts/*/*.o"
+    # Newer kernels need objtool to build modules when CONFIG_STACK_VALIDATION=y
+    if [ -f tools/objtool/objtool ]; then
+      cp -a --parents tools/objtool/objtool "${LINUX_HDROBJ_DIR}/"
+    fi
+
+    if [ -f "arch/x86/kernel/macros.s" ]; then
+      cp -a --parents arch/x86/kernel/macros.s "${LINUX_HDROBJ_DIR}/"
+    fi
+
+    # Copy modules related stuff, if available
+    if [ -s Module.symvers ]; then
+        cp Module.symvers "${LINUX_HDROBJ_DIR}"
+    fi
+
+    if [ -s System.map ]; then
+        cp System.map "${LINUX_HDROBJ_DIR}"
+    fi
+
+    if [ -s Module.markers ]; then
+        cp Module.markers "${LINUX_HDROBJ_DIR}"
+    fi
+
+    # Copy config file
+    cp .config "${LINUX_HDROBJ_DIR}"
+
+    # Make sure the Makefile and version.h have a matching timestamp so that
+    # external modules can be built
+    if [ -s "${LINUX_HDROBJ_DIR}/include/generated/uapi/linux/version.h" ]; then
+        touch -r "${LINUX_HDROBJ_DIR}/Makefile" "${LINUX_HDROBJ_DIR}/include/generated/uapi/linux/version.h"
+    elif [ -s "${LINUX_HDROBJ_DIR}/include/linux/version.h" ]; then
+        touch -r "${LINUX_HDROBJ_DIR}/Makefile" "${LINUX_HDROBJ_DIR}/include/linux/version.h"
+    else
+        echo "Missing version.h" >&2
+    fi
+
+    touch -r "${LINUX_HDROBJ_DIR}/.config" "${LINUX_HDROBJ_DIR}/include/generated/autoconf.h"
+    # Copy .config to include/config/auto.conf so "make prepare" is unnecessary.
+    if [ ! -f "${LINUX_HDROBJ_DIR}/include/config/auto.conf" ]; then
+        cp "${LINUX_HDROBJ_DIR}/.config" "${LINUX_HDROBJ_DIR}/include/config/auto.conf"
+    fi
+
+    tar -cJf "${DEST}" -C "${LINUX_HDROBJ_DIR}" ./
+    rm -rf "${LINUX_HDROBJ_DIR}"
+    popd
+}
 
 # We need to fetch the kernel source and lttng-modules to build either the
 # kernel or modules
@@ -197,11 +280,15 @@ if [ $NEED_KERNEL_BUILD -eq 1 ] ; then
 
     tar -cJf "$OUTPUTDIR/$KERNEL_COMMIT_ID.linux.modules.tar.xz" -C "$MODULES_INSTALL_DIR/" lib/
 
+    print_header "Extracting distro headers"
+    extract_distro_headers "${LINUX_GIT_DIR}" "${OUTPUTDIR}/${KERNEL_COMMIT_ID}.headers.tar.xz"
+
     print_header "Upload the kernel to object storage"
 
     s3cmd -c "$S3CMD_CONFIG" put "$OUTPUTDIR/$KERNEL_COMMIT_ID.bzImage" s3://"$S3_KERNEL_IMAGE"
     s3cmd -c "$S3CMD_CONFIG" put "$OUTPUTDIR/$KERNEL_COMMIT_ID.config" s3://"$S3_KERNEL_CONFIG"
     s3cmd -c "$S3CMD_CONFIG" put "$OUTPUTDIR/$KERNEL_COMMIT_ID.linux.modules.tar.xz" s3://"$S3_LINUX_MODULES"
+    s3cmd -c "$S3CMD_CONFIG" put "$OUTPUTDIR/$KERNEL_COMMIT_ID.headers.tar.xz" "s3://${S3_KERNEL_HEADERS}"
     s3cmd -c "$S3CMD_CONFIG" put "$LINUX_GIT_DIR/Module.symvers" s3://"$S3_KERNEL_MODULE_SYMVERS"
 fi
 
