@@ -224,6 +224,8 @@ function build_ust()
     if ! (
             set -e
             cd "${UST_SRC_DIR}"
+            git clean -dxf >/dev/null
+            git checkout "${commit}"
             ./bootstrap > "${LOG_DIR}/bootstrap.log" 2>&1
             ./configure \
                 --disable-examples \
@@ -266,6 +268,8 @@ function build_tools()
     if ! (
             set -e
             cd "${TOOLS_SRC_DIR}"
+            git clean -dxf >/dev/null
+            git checkout "${commit}"
             ./bootstrap > "${LOG_DIR}/bootstrap.log" 2>&1
             ./configure \
                 --disable-doxygen-doc \
