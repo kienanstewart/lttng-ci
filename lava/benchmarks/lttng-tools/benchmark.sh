@@ -201,7 +201,10 @@ function build_modules()
             cd "${MODULES_SRC_DIR}"
             git clean -dxf >/dev/null
             git checkout "${commit}"
-            make -j"$(nproc)" KERNELDIR="${KERNELDIR}" > "${LOG_DIR}/make.log" 2>&1
+            # The KERNELDIR is added to the include search path explicitly, since
+            # the rootfs does not have /usr/include/linux, and if added would not
+            # be from the same kernel version as the downloaded headers.
+            make -j"$(nproc)" KCPPFLAGS="-I${KERNELDIR}" KERNELDIR="${KERNELDIR}" > "${LOG_DIR}/make.log" 2>&1
             make modules_install INSTALL_MOD_PATH="$PREFIX/usr" KERNELDIR="${KERNELDIR}" > "${LOG_DIR}/install.log" 2>&1
             depmod --all --basedir="$PREFIX/usr" > "${LOG_DIR}/depmod.log" 2>&1
     ); then
