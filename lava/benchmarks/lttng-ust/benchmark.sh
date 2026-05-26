@@ -26,6 +26,14 @@ UST_BENCHMARKS_SRC_DIR="${SRC_DIR}/lttng-ust-benchmarks"
 UST_SRC_DIR="${SRC_DIR}/lttng-ust"
 URCU_SRC_DIR="${SRC_DIR}/urcu"
 
+if [ -n "${KERNEL_HEADERS_URL:-}" ]; then
+    export KERNELDIR="$(mktemp -d)"
+    OUTPUT_FILE="$(mktemp)"
+    curl --output "${OUTPUT_FILE}" "${KERNEL_HEADERS_URL}"
+    tar -xf "${OUTPUT_FILE}" -C "${KERNELDIR}"
+    rm "${OUTPUT_FILE}"
+fi
+
 git clone --quiet "${BABELTRACE_REPO}" "${BABELTRACE_SRC_DIR}"
 git clone --quiet "${LTTNG_MODULES_REPO}" "${MODULES_SRC_DIR}"
 git clone --quiet "${LTTNG_TOOLS_REPO}" "${TOOLS_SRC_DIR}"
@@ -40,6 +48,20 @@ fi
 
 git clone --quiet "${URCU_REPO}" "${URCU_SRC_DIR}"
 
+function find_highest_major_minor_tag()
+{
+    local vmajor_minor="${1}"
+    local git_dir="${2}"
+    local major
+    local minor
+
+    major="$(echo "${vmajor_minor}" | cut -d '.' -f 1 | tr -d 'v')"
+    minor="$(echo "${vmajor_minor}" | cut -d '.' -f 2 | tr -d 'v')"
+
+    tag="$(git -C "${git_dir}" tag | grep -E "v$major\.$minor\..*" | sort -V | tail -n 1)"
+    echo "$tag"
+}
+
 function set_commits_from_ust_commit()
 {
     local commit="${1:-${UST_COMMIT}}"
@@ -51,9 +73,11 @@ function set_commits_from_ust_commit()
 
     # Use the .0 release of the major.minor
     tools_commit="${vmajor_minor}.0"
-    modules_commit="${vmajor_minor}.0"
     urcu_commit="v0.15.0"
     babeltrace_commit="v2.1.0"
+    # For modules, take the latest available since otherwise many kernels
+    # may not be enabled for older stable branches.
+    modules_commit="$(find_highest_major_minor_tag "${vmajor_minor}" "${MODULES_SRC_DIR}")"
 }
 
 function mark_commit_failure()
@@ -153,10 +177,11 @@ function build_modules()
     commit="${1}"
     ret=0
     tag="$(git -C "${MODULES_SRC_DIR}" describe)" || true
+    export MODPROBE_OPTIONS="-d '${PREFIX}/usr'"
     if [[ "${commit}" == "$(git -C "${MODULES_SRC_DIR}" rev-parse HEAD)" ]] || [[ "${commit}" == "${tag}" ]] ; then
         echo "lttng-modules already on commit '${commit}'" >&2
-        make -C "${MODULES_SRC_DIR}" modules_install INSTALL_MOD_PATH="$PREFIX/usr" > install.log 2>&1
-        depmod --all --basedir="$PREFIX/usr" > depmod.log 2>&1
+        make -C "${MODULES_SRC_DIR}" modules_install INSTALL_MOD_PATH="$PREFIX/usr" KERNELDIR="${KERNELDIR}" > install.log 2>&1
+        depmod --all --basedir="$PREFIX/usr" > "{LOG_DIR}/depmod.log" 2>&1
         return $ret
     fi
 
@@ -167,7 +192,7 @@ function build_modules()
             git clean -dxf >/dev/null
             git checkout "${commit}"
             make -j"$(nproc)" > "${LOG_DIR}/make.log" 2>&1
-            make modules_install INSTALL_MOD_PATH="$PREFIX/usr" > "${LOG_DIR}/install.log" 2>&1
+            make modules_install INSTALL_MOD_PATH="$PREFIX/usr" KERNELDIR="${KERNELDIR}" > "${LOG_DIR}/install.log" 2>&1
             depmod --all --basedir="$PREFIX/usr" > "${LOG_DIR}/depmod.log" 2>&1
     ); then
         # It's okay if lttng-modules fails
@@ -246,6 +271,7 @@ function build_tools()
                 --disable-doxygen-doc \
                 --disable-man-pages \
                 --enable-python-bindings \
+                --with-kmod=no \
                 CFLAGS="${DEFAULT_CFLAGS}" \
                 CPPFLAGS="${DEFAULT_CPPFLAGS}" \
                 CXXFLAGS="${DEFAULT_CXXFLAGS}" \
@@ -360,10 +386,12 @@ while read -d ' ' -r commit; do
                 --urcu-commit "${urcu_commit}" > "${BENCHMARK_LOG}" 2>&1
         ) ; then
         mark_commit_failure "benchmarks run failure"
+        upload_artifact "${BENCHMARK_LOG}" "${RESULTS_DIR}/benchmarks.log"
         cat "${BENCHMARK_LOG}"
     else
         # Save results
         upload_artifact "${UST_BENCHMARKS_SRC_DIR}/benchmarks.json" "${RESULTS_DIR}/benchmarks.json"
+        upload_artifact "${BENCHMARK_LOG}" "${RESULTS_DIR}/benchmarks.log"
         delete_artifact "${RESULTS_DIR}/failed" || true
         delete_artifact "${RESULTS_DIR}/logs.tgz" || true
     fi
