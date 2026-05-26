@@ -81,6 +81,7 @@ packages = [
     "rsync",
     "stress",
     "swig",
+    "sysbench",
     "systemd-timesyncd",
     "systemtap-sdt-dev",
     "time",
