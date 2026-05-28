@@ -129,6 +129,10 @@ def launch_jobs(commits, batch_size=0, max_batches=0, wait=True, dry_run=False):
     failed = 0
     passed = 0
     for index, commits in enumerate(chunks):
+        if len(commits) == 0:
+            logging.debug("No commits to submit for chunk index {}".format(index))
+            continue
+
         logging.info(
             "Job {}/{}{}".format(
                 index + 1,
