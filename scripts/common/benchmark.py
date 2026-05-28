@@ -119,6 +119,43 @@ def cmd_generate_jobs(args, get_commit_state_func, launch_func):
     return 0
 
 
+def cmd_get_benchmark_data(args, get_commit_state_func, get_commit_result_func):
+    if not callable(get_commit_state_func):
+        raise RuntimeError("get_commit_state_func must be callable")
+
+    if not callable(get_commit_result_func):
+        raise RuntimeError("get_commit_result_func must be callable")
+
+    benchmark_data = dict()
+    # Fetch from storage
+    repo = git.Repo(args.repo_path)
+    commits = get_commit_list(
+        repo,
+        args.branches,
+        current_commit=args.commits[0] if len(args.commits) > 0 else None,
+        other_commits=args.commits[1:],
+        regression=args.regression,
+        tags_only=args.tags_only,
+    )
+    for commit in commits:
+        if get_commit_state_func(commit) == BenchmarkState.COMPLETE:
+            benchmark_data[commit] = get_commit_result_func(commit)
+        else:
+            logging.warning("Results for commit '{}' not available".format(commit))
+
+    if args.output_directory is not None and args.output_directory.is_dir():
+        for commit, data in benchmark_data.items():
+            try:
+                with open(args.output_directory / "{}.json".format(commit), "w") as f:
+                    json.dump(data, f)
+            except Exception as e:
+                logging.exception(
+                    "Failed to write data for commit {}: {}".format(commit, e)
+                )
+    else:
+        json.dumps(benchmark_data)
+
+
 def cmd_regression_check(
     args, get_commit_state_func, get_commit_result_func, regression_check_func
 ):
@@ -342,6 +379,33 @@ def add_gen_jobs_parser(subparsers, func):
         help="Do not wait for LAVA jobs to complete before returning",
     )
     gen_jobs_parser.set_defaults(func=func)
+
+
+def add_get_benchmark_data_parser(subparsers, func):
+    parser = subparsers.add_parser(
+        "get-benchmark-data",
+        help="Download the benchmark data",
+    )
+    parser.add_argument(*_commits_args[0], **_commits_args[1])
+    parser.add_argument(*_regression_args[0], **_regression_args[1])
+    parser.add_argument(*_tags_only_args[0], **_tags_only_args[1])
+    parser.set_defaults(func=func)
+    parser.add_argument(
+        "-i",
+        "--input-files",
+        type=pathlib.Path,
+        default=list(),
+        action="append",
+        help="Input benchmark JSON results files to use, instead of downloading from object storage. The first file is considered the 'current commit' when checking for regressions. This argument may be specified multiple times.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-directory",
+        type=pathlib.Path,
+        default=None,
+        help="The output directory to save the data files to. If not specified, the data will be dumped to stdout",
+    )
+    return parser
 
 
 def add_regression_check_parser(subparsers, func):
