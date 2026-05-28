@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import pathlib
+import sys
 
 import git
 
@@ -154,6 +155,73 @@ def cmd_get_benchmark_data(args, get_commit_state_func, get_commit_result_func):
                 )
     else:
         json.dumps(benchmark_data)
+
+
+def cmd_changepoint_analysis(
+    args, get_commit_state_func, get_commit_result_func, changepoint_analysis_func
+):
+    if not callable(get_commit_state_func):
+        raise RuntimeError("get_commit_state_func must be callable")
+
+    if not callable(get_commit_result_func):
+        raise RuntimeError("get_commit_result_func must be callable")
+
+    if not callable(changepoint_analysis_func):
+        raise RuntimeError("changepoint_analysis_func must be callable")
+
+    benchmark_data = list()
+    if "input_files" not in args or len(args.input_files) == 0:
+        # Fetch from storage
+        repo = git.Repo(args.repo_path)
+        commits = get_commit_list(
+            repo,
+            args.branches,
+            current_commit=args.commits[0] if len(args.commits) > 0 else None,
+            other_commits=args.commits[1:],
+            regression=args.regression,
+            tags_only=args.tags_only,
+        )
+
+        for commit in commits:
+            if get_commit_state_func(commit) == BenchmarkState.COMPLETE:
+                benchmark_data.append(get_commit_result_func(commit))
+            else:
+                logging.warning("Results for commit '{}' not available".format(commit))
+    else:
+        for f in args.input_files:
+            if not f.exists():
+                raise Exception("Input file '{}' does not exist".format(f))
+
+            with open(f, "r") as fp:
+                benchmark_data.append(json.load(fp))
+
+    if len(benchmark_data) < 2:
+        raise Exception(
+            "Not enough data to compare, only {} results available".format(
+                len(benchmark_data)
+            )
+        )
+
+    output_fd = sys.stdout
+    if args.output_path is not None:
+        output_fd = open(args.output_path, "w")
+
+    try:
+        changepoints = changepoint_analysis_func(
+            benchmark_data, output_fd=output_fd, output_format=args.output_format
+        )
+    finally:
+        if output_fd != sys.stdout:
+            output_fd.close()
+
+    exit_code = 0
+    if not args.ignore_regression_state:
+        for c in changepoints:
+            if getattr(c, "is_regression", False):
+                exit_code = 1
+                break
+
+    return exit_code
 
 
 def cmd_regression_check(
@@ -317,6 +385,33 @@ _tags_only_args = (
         "help": "Limit generated jobs to tagged commits",
     },
 )
+
+
+def add_changepoint_analysis_parser(subparsers, func):
+    parser = subparsers.add_parser("changepoints", help="Changepoints")
+    parser.add_argument(*_commits_args[0], **_commits_args[1])
+    parser.add_argument(*_regression_args[0], **_regression_args[1])
+    parser.add_argument(*_tags_only_args[0], **_tags_only_args[1])
+    parser.add_argument(
+        "--output-format",
+        default="tsv",
+        help="The output format. E.g., tsv, tsv:no_changepoint, json",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-path",
+        type=pathlib.Path,
+        help="Write the output to this file",
+        default=None,
+    )
+    parser.add_argument(
+        "--ignore-regression-state",
+        action="store_true",
+        default=False,
+        help="When set, the exit code will be 0 even if regressions are detected",
+    )
+    parser.set_defaults(func=func)
+    return parser
 
 
 def add_gen_asv_parser(subparsers, func):
