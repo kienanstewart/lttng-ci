@@ -149,7 +149,9 @@ def cmd_regression_check(
             else:
                 logging.warning("Results for commit '{}' not available".format(commit))
     else:
-        for f in args.input_files:
+        # The first input_file is supposed to be "current" commit, so reverse
+        # other of of args.input_files so that it's the last data loaded
+        for f in reversed(args.input_files):
             if not f.exists():
                 raise Exception("Input file '{}' does not exist".format(f))
 
@@ -165,8 +167,8 @@ def cmd_regression_check(
 
     benchmark_filter = args.benchmarks.split(",")
     regressions = regression_check_func(
-        benchmark_data[0],
-        benchmark_data[1:],
+        benchmark_data[-1],
+        benchmark_data[0:-1],
         args.significance_level,
         args.failure_threshold,
         (
@@ -188,23 +190,14 @@ def get_commit_list(
 ):
     repo.git.fetch()
 
-    commits = set()
+    commits = list()
     if regression and len(other_commits) == 0:
         if current_commit is None:
             current_commit = repo.head.commit
         else:
             current_commit = repo.commit(current_commit)
 
-        commits.add(str(current_commit))
-        logging.debug("Adding current commit '{}'".format(str(current_commit)))
-        for parent in current_commit.parents:
-            logging.debug(
-                "Adding commit '{}' as parent of commit '{}'".format(
-                    str(parent), str(current_commit)
-                )
-            )
-            commits.add(str(parent))
-
+        # Commits from old -> new
         # This is relative to the current state, not the current_commit
         tag = repo.git().describe(str(current_commit), abbrev=0)
         if tag:
@@ -213,11 +206,22 @@ def get_commit_list(
                     str(current_commit), tag, str(repo.tag(tag).commit)
                 )
             )
-            commits.add(str(repo.tag(tag).commit))
+            commits.append(str(repo.tag(tag).commit))
+
+        for parent in current_commit.parents:
+            logging.debug(
+                "Adding commit '{}' as parent of commit '{}'".format(
+                    str(parent), str(current_commit)
+                )
+            )
+            commits.append(str(parent))
 
     if current_commit is None and len(other_commits) == 0:
         if len(branches) == 0:
             branches = {"master": None}
+
+        if len(branches) > 1:
+            logging.warning("Commit ordering with multiple branches is not meaningful")
 
         for branch, cutoff in branches.items():
             target = "origin/{}".format(branch)
@@ -227,20 +231,25 @@ def get_commit_list(
             for commit in repo.git.log(target, pretty="format:%H", reverse=True).split(
                 "\n"
             ):
-                commits.add(commit)
+                if commit not in commits:
+                    commits.append(commit)
 
-    if current_commit is not None:
-        commits.add(str(current_commit))
+    for commit in other_commits:
+        if commit not in commits:
+            commits.append(commit)
 
-    if len(other_commits) > 0:
-        commits = commits.union(other_commits)
-        commits.add(current_commit)
+    if current_commit is not None and str(current_commit) not in commits:
+        logging.debug("Adding current commit '{}'".format(str(current_commit)))
+        commits.append(str(current_commit))
 
     if tags_only:
         tagged_commits = {str(x.commit) for x in repo.tags}
-        commits = commits.intersection(tagged_commits)
+        commits = set(commits).intersection(tagged_commits)
+        logging.debug("Sorting commits by tag name")
+        commits = list(commits)
+        commits.sort(key=lambda c: repo.git().describe(c))
 
-    return list(commits)
+    return commits
 
 
 def get_parser(description, default_branches=dict()):
