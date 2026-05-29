@@ -94,6 +94,12 @@ def cmd_generate_jobs(args, get_commit_state_func, launch_func):
         tags_only=args.tags_only,
     )
 
+    if args.stride is not None and args.stride >= 1:
+        logging.debug(
+            "Using stride '{}' to run a subset of possible commits".format(args.stride)
+        )
+        commits = commits[:: args.stride]
+
     logging.debug("{} commits to potentially run benchmarks for".format(len(commits)))
     if not args.force_jobs:
         # Filter out commits whose benchmarks are complete or failed
@@ -450,6 +456,9 @@ def add_gen_jobs_parser(subparsers, func):
     gen_jobs_parser.add_argument(*_commits_args[0], **_commits_args[1])
     gen_jobs_parser.add_argument(*_regression_args[0], **_regression_args[1])
     gen_jobs_parser.add_argument(*_tags_only_args[0], **_tags_only_args[1])
+    gen_jobs_parser.add_argument(
+        "--stride", type=int, default=1, help="Run every N commits"
+    )
     gen_jobs_parser.add_argument(
         "--batch-size",
         default=10,
