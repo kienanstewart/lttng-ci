@@ -751,16 +751,6 @@
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: yoctobuild_extended
           version:
-            - stable-2.15
-          platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std, agents]
-          liburcu_versions: !!python/tuple [stable-0.15, master]
-          java_preferred_jdk: '8'
-          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
-      - '{job_prefix}lttng-ust_{version}_{buildtype}':
-          buildtype: yoctobuild_extended
-          version:
             - stable-2.13
             - stable-2.14
           platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
@@ -821,6 +811,15 @@
           platforms: !!python/tuple [yocto40-powerpc, yocto50-ppc64]
           builds: !!python/tuple [std]
           confs: !!python/tuple [std]
+      - '{job_prefix}lttng-ust_{version}_{buildtype}':
+          buildtype: yoctobuild_extended
+          version: stable-2.15
+          platforms: !!python/tuple [yocto33-amd64, yocto33-arm64, yocto50-amd64, yocto50-arm64]
+          builds: !!python/tuple [std]
+          confs: !!python/tuple [std, agents]
+          liburcu_versions: !!python/tuple [stable-0.15, master]
+          java_preferred_jdk: '8'
+          filter: '(conf == "std" && (platform == "yocto50-amd64" || platform == "yocto50-arm64")) || (conf == "agents" && (platform == "yocto33-amd64" || platform == "yocto33-arm64"))'
       - '{job_prefix}lttng-ust_{version}_{buildtype}':
           buildtype: freebsdbuild
           version: stable-2.15
@@ -920,16 +919,6 @@
           builds: !!python/tuple [std]
           confs: !!python/tuple [agents]
           java_agents: 'false'
-      - '{job_prefix}lttng-ust_{version}_{cctype}':
-          buildtype: linuxbuild
-          cctype: clangbuild
-          ccs: !!python/tuple [clang-17, clang-18, clang-19]
-          filter: '(platform == "deb13-amd64" && cc ==~ /clang-1[7-9]/)'
-          version: stable-2.13
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std, agents]
-      - 'lttng-ust_{version}_scan-build':
-          version: stable-2.13
 
 - project:
     name: review-lttng-ust
