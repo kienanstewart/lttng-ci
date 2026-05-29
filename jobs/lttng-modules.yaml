@@ -948,7 +948,7 @@
             - stable-2.13
           buildtype: build
           parambuildtype: build
-          kverfloor: v3.0
+          kverfloor: v4.4
           kverceil: v6.19
           kverfilter: lts-head
       - 'lttng-modules_{mversion}_{buildtype}-vanilla': &job_lttng-modules_stable-2-13_nocompat
@@ -957,7 +957,7 @@
           buildtype: nocompat
           kconfig_profile: nocompat
           parambuildtype: build
-          kverfloor: v3.0
+          kverfloor: v4.4
           kverceil: v6.19
           kverfilter: lts-head
 
@@ -1028,7 +1028,7 @@
             - stable-2.13
           buildtype: crossbuild
           parambuildtype: crossbuild
-          kverfloor: v3.18
+          kverfloor: v4.4
           kverceil: v6.19
           kverfilter: lts-head
 
@@ -1038,7 +1038,7 @@
           buildtype: crossbuild_nocompat
           kconfig_profile: nocompat
           parambuildtype: crossbuild
-          kverfloor: v3.18
+          kverfloor: v4.4
           kverceil: v6.19
           kverfilter: lts-head
 
