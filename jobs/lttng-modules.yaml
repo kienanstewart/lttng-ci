@@ -949,8 +949,8 @@
           buildtype: build
           parambuildtype: build
           kverfloor: v3.0
-          kverceil: ''
-          kverfilter: stable-head
+          kverceil: v6.19
+          kverfilter: lts-head
       - 'lttng-modules_{mversion}_{buildtype}-vanilla': &job_lttng-modules_stable-2-13_nocompat
           mversion:
             - stable-2.13
@@ -958,16 +958,8 @@
           kconfig_profile: nocompat
           parambuildtype: build
           kverfloor: v3.0
-          kverceil: ''
-          kverfilter: stable-head
-      - 'lttng-modules_{mversion}_fullbuild-vanilla':
-          mversion:
-            - stable-2.13
-          buildtype: build
-          parambuildtype: build
-          kverfloor: v3.0
-          kverceil: ''
-          kverfilter: none
+          kverceil: v6.19
+          kverfilter: lts-head
 
       # EL normal builds
       - 'lttng-modules_{mversion}_{buildtype}-{elversion}': &job_lttng-modules_el
@@ -1037,8 +1029,8 @@
           buildtype: crossbuild
           parambuildtype: crossbuild
           kverfloor: v3.18
-          kverceil: ''
-          kverfilter: stable-head
+          kverceil: v6.19
+          kverfilter: lts-head
 
       - 'lttng-modules_{mversion}_{buildtype}-vanilla':
           mversion:
@@ -1047,8 +1039,8 @@
           kconfig_profile: nocompat
           parambuildtype: crossbuild
           kverfloor: v3.18
-          kverceil: ''
-          kverfilter: stable-head
+          kverceil: v6.19
+          kverfilter: lts-head
 
       # Ubuntu cross builds
       - 'lttng-modules_{mversion}_{buildtype}-{uversion}': &job_lttng-modules_master_ubuntu_crossbuild
