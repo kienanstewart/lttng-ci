@@ -1,0 +1,19 @@
+---
+
+# SPDX-FileCopyrightText: 2021 Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+# SPDX-FileCopyrightText: 2025 Michael Jeanson <mjeanson@efficios.com>
+# SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+metadata:
+  format: Lava-Test Test Definition 1.0
+  name: setup-membench
+  description: "Build and install sc-membench"
+  os:
+    - debian
+  devices:
+    - x86
+
+run:
+  steps:
+    - lava/system-tests/setup-membench.sh || lava-test-raise "setup-membench"
