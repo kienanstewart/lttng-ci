@@ -146,6 +146,7 @@ def launch_jobs(commits, batch_size=0, max_batches=0, wait=True, dry_run=False):
             "lttng-ust_benchmark.yaml.j2",
             extra_context={
                 "commits": " ".join(commits),
+                "job_timeout_hours": max(2, len(commits) / 2),
             }
             | get_environment_context(),
             wait_for_completion=wait,
