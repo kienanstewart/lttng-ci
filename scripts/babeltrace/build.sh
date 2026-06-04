@@ -294,12 +294,12 @@ MANDATORY_VENDOR_CONF_OPTS=(--enable-vendor-catch2 --enable-vendor-fmt)
 
 # With Babeltrace 2.2+, `--enable-python-bindings` and
 # `--enable-python-plugins` are the default.
-PY_BINDINGS_OPT=
-PY_PLUGINS_OPT=
+PY_BINDINGS_OPT=()
+PY_PLUGINS_OPT=()
 
 if verlt "$PACKAGE_VERSION" "2.2"; then
-    PY_BINDINGS_OPT=--enable-python-bindings
-    PY_PLUGINS_OPT=--enable-python-plugins
+    PY_BINDINGS_OPT=("--enable-python-bindings")
+    PY_PLUGINS_OPT=("--enable-python-plugins")
 else
     # Always use the in-tree Catch2 v3 and {fmt} libraries because
     # they're not easily available on all systems.
@@ -308,9 +308,7 @@ fi
 
 # -Werror is enabled by default in stable-2.0 but won't be in 2.1
 # Explicitly disable it for consistency.
-if vergte "$PACKAGE_VERSION" "2.0"; then
-    CONF_OPTS+=("--disable-Werror")
-fi
+CONF_OPTS+=("--disable-Werror")
 
 # Use an in-tree pytest for EL8 to test this feature with Python 3.6,
 # which means selecting pytest 6.1.2. This in turn tests the shims for
@@ -333,21 +331,15 @@ case "$conf" in
 static)
     print_header "Conf: Static lib only"
 
-    CONF_OPTS+=("--enable-static")
+    CONF_OPTS+=("--enable-static" "--enable-built-in-plugins")
 
-    if vergte "$PACKAGE_VERSION" "2.0"; then
-        CONF_OPTS+=("--enable-built-in-plugins")
-
-        if vergte "$PACKAGE_VERSION" "2.2"; then
-            # `--enable-built-in-python-plugin-support` is broken with
-            # Babeltrace 2.0 and 2.1, not worth fixing at this point.
-            CONF_OPTS+=($PY_PLUGINS_OPT "--enable-built-in-python-plugin-support")
-        fi
-
-        if verlt "$PACKAGE_VERSION" "2.2"; then
-            # `--disable-shared` not required with Babeltrace 2.2+
-            CONF_OPTS+=("--disable-shared")
-        fi
+    if vergte "$PACKAGE_VERSION" "2.2"; then
+        # `--enable-built-in-python-plugin-support` is broken with
+        # Babeltrace 2.0 and 2.1; not worth fixing at this point.
+        CONF_OPTS+=("${PY_PLUGINS_OPT[@]}" "--enable-built-in-python-plugin-support")
+    else
+        # `--disable-shared` not required with Babeltrace 2.2+
+        CONF_OPTS+=("--disable-shared")
     fi
     ;;
 
@@ -360,15 +352,19 @@ prod)
     unset BABELTRACE_MINIMAL_LOG_LEVEL
 
     # Enable the python bindings
-    # shellcheck disable=SC2206
-    CONF_OPTS+=($PY_BINDINGS_OPT $PY_PLUGINS_OPT)
+    CONF_OPTS+=("${PY_BINDINGS_OPT[@]}" "${PY_PLUGINS_OPT[@]}")
     ;;
 
 doc)
     print_header "Conf: Documentation"
 
-    # shellcheck disable=SC2206
-    CONF_OPTS+=($PY_BINDINGS_OPT "--enable-python-bindings-doc" $PY_PLUGINS_OPT "--enable-api-doc" "--enable-internal-doc")
+    CONF_OPTS+=(
+        "${PY_BINDINGS_OPT[@]}"
+        "--enable-python-bindings-doc"
+        "${PY_PLUGINS_OPT[@]}"
+        "--enable-api-doc"
+        "--enable-internal-doc"
+    )
     ;;
 
 asan)
@@ -376,8 +372,7 @@ asan)
 
     # --enable-asan was introduced after 2.0 but don't check the version, we
     # want this configuration to fail if ASAN is unavailable.
-    # shellcheck disable=SC2206
-    CONF_OPTS+=("--enable-asan" $PY_BINDINGS_OPT $PY_PLUGINS_OPT)
+    CONF_OPTS+=("--enable-asan" "${PY_BINDINGS_OPT[@]}" "${PY_PLUGINS_OPT[@]}")
     ;;
 
 min)
@@ -389,10 +384,7 @@ min)
 
     # Enable the python bindings / plugins by default with babeltrace2,
     # the test suite is mostly useless without it.
-    if vergte "$PACKAGE_VERSION" "2.0"; then
-        # shellcheck disable=SC2206
-        CONF_OPTS+=($PY_BINDINGS_OPT $PY_PLUGINS_OPT)
-    fi
+    CONF_OPTS+=("${PY_BINDINGS_OPT[@]}" "${PY_PLUGINS_OPT[@]}")
 
     # Something is broken in docbook-xml on yocto
     if [[ "$platform" = yocto* ]]; then
