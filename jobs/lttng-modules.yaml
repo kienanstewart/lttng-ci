@@ -874,6 +874,7 @@
       - stable-2.13
       - stable-2.14
       - stable-2.15
+      - stable-2.16
       - master
     kverrc: false
     kconfig_profile: default
@@ -903,11 +904,29 @@
             - master
             - stable-2.14
             - stable-2.15
+            - stable-2.16
           buildtype: build
           parambuildtype: build
           kverfloor: v4.4
           kverceil: ''
           kverfilter: none
+      - 'lttng-modules_{mversion}_{buildtype}-vanilla': &job_lttng-modules_stable-2-16
+          mversion:
+            - stable-2.16
+          buildtype: build
+          parambuildtype: build
+          kverfloor: v4.4
+          kverceil: ''
+          kverfilter: stable-head
+      - 'lttng-modules_{mversion}_{buildtype}-vanilla': &job_lttng-modules_stable-2-16_nocompat
+          mversion:
+            - stable-2.16
+          buildtype: nocompat
+          kconfig_profile: nocompat
+          parambuildtype: build
+          kverfloor: v4.4
+          kverceil: ''
+          kverfilter: stable-head
       - 'lttng-modules_{mversion}_{buildtype}-vanilla': &job_lttng-modules_stable-2-15
           mversion:
             - stable-2.15
@@ -965,6 +984,7 @@
       - 'lttng-modules_{mversion}_{buildtype}-{elversion}': &job_lttng-modules_el
           mversion:
             - master
+            - stable-2.16
             - stable-2.15
             - stable-2.14
             - stable-2.13
@@ -987,6 +1007,7 @@
       - 'lttng-modules_{mversion}_{buildtype}-{uversion}': &job_lttng-modules_master_ubuntu
           mversion:
             - master
+            - stable-2.16
             - stable-2.15
             - stable-2.14
           uversion:
@@ -1003,6 +1024,7 @@
       - 'lttng-modules_{mversion}_{buildtype}-vanilla':
           mversion:
             - master
+            - stable-2.16
             - stable-2.15
             - stable-2.14
           buildtype: crossbuild
@@ -1014,6 +1036,7 @@
       - 'lttng-modules_{mversion}_{buildtype}-vanilla': &job_lttng-modules_crossbuild_nocompat
           mversion:
             - master
+            - stable-2.16
             - stable-2.15
             - stable-2.14
           buildtype: crossbuild_nocompat
@@ -1046,6 +1069,7 @@
       - 'lttng-modules_{mversion}_{buildtype}-{uversion}': &job_lttng-modules_master_ubuntu_crossbuild
           mversion:
             - master
+            - stable-2.16
             - stable-2.15
             - stable-2.14
           uversion:
@@ -1082,6 +1106,10 @@
       - 'dev_review_lttng-modules_{mversion}_{buildtype}':
           <<: *job_lttng-modules_master_nocompat
       - 'dev_review_lttng-modules_{mversion}_{buildtype}':
+          <<: *job_lttng-modules_stable-2-16
+      - 'dev_review_lttng-modules_{mversion}_{buildtype}':
+          <<: *job_lttng-modules_stable-2-16_nocompat
+      - 'dev_review_lttng-modules_{mversion}_{buildtype}':
           <<: *job_lttng-modules_stable-2-15
       - 'dev_review_lttng-modules_{mversion}_{buildtype}':
           <<: *job_lttng-modules_stable-2-15_nocompat
@@ -1108,6 +1136,8 @@
     categorization_criteria:
       - group_regex: '.*_master_.*'
         naming_rule: 'Master'
+      - group_regex: '.*_stable-2.16_.*'
+        naming_rule: 'Stable 2.16'
       - group_regex: '.*_stable-2.15_.*'
         naming_rule: 'Stable 2.15'
       - group_regex: '.*_stable-2.14_.*'
