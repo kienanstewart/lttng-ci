@@ -1004,13 +1004,6 @@
           builds: !!python/tuple [std, oot, dist, oot-dist]
           confs: !!python/tuple [std, agents]
           babeltrace_version: stable-2.1
-      - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
-          version: master
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles16sp0-amd64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std]
-          babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: master
           buildtype: portbuild
@@ -1047,13 +1040,6 @@
           builds: !!python/tuple [std, oot, dist, oot-dist]
           confs: !!python/tuple [std, agents]
           babeltrace_version: stable-2.1
-      - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
-          version: stable-2.16
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles16sp0-amd64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std]
-          babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: stable-2.16
           buildtype: portbuild
@@ -1089,13 +1075,6 @@
           buildtype: linuxbuild
           builds: !!python/tuple [std, oot, dist, oot-dist]
           confs: !!python/tuple [std, agents]
-          babeltrace_version: stable-2.1
-      - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
-          version: stable-2.15
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles16sp0-amd64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std]
           babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: stable-2.15
@@ -1135,14 +1114,6 @@
           confs: !!python/tuple [std, agents]
           babeltrace_version: stable-2.1
           liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
-      - 'dev_review_lttng-ust_lttng-tools_{version}_{buildtype}':
-          version: stable-2.14
-          buildtype: slesbuild
-          platforms: !!python/tuple [sles16sp0-amd64]
-          builds: !!python/tuple [std]
-          confs: !!python/tuple [std]
-          liburcu_versions: !!python/tuple [stable-0.14, stable-0.15, master]
-          babeltrace_version: stable-2.1
       - 'dev_review_lttng-ust_{version}_{buildtype}':
           version: stable-2.14
           buildtype: portbuild
