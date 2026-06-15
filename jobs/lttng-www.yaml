@@ -65,10 +65,9 @@
             - '{version}'
           skip-tag: true
 
-    triggers:
-      - !j2-yaml: |
-        {% if review %}
-        gerrit:
+    triggers: !j2-yaml: |
+      {% if review %}
+      - gerrit:
           trigger-on:
             - comment-added-event:
                 approval-category: 'CI-Build'
@@ -79,10 +78,11 @@
               branches:
                 - branch-compare-type: 'ANT'
                   branch-pattern: '{version}'
-        {% else %}
-        pollscm:
+      {% else %}
+      - pollscm:
           cron: '@hourly'
-        {% endif %}
+      - timed: '@daily'
+      {% endif %}
 
     wrappers:
       - ansicolor
