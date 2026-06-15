@@ -176,7 +176,7 @@
             liburcu_version=master
             ;;
             *)
-            liburcu_version={liburcu_versions}
+            liburcu_version={liburcu_versions[0]}
             ;;
           esac
           echo "liburcu_version=$liburcu_version" >> env.properties
