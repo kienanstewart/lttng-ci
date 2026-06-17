@@ -27,7 +27,12 @@ print_hardware() {
     fi
 
     print_blue "Storage Details"
-    df -H -T
+    if ! command -v sw_vers >/dev/null 2>&1; then
+        df -H -T
+    else
+        # MacOS
+        df -H
+    fi
 }
 
 print_os() {
