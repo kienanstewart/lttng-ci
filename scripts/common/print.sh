@@ -110,6 +110,9 @@ print_tooling() {
     print_blue "bash version"
     bash --version | head -n1
 
+    print_blue "bash version from environment variable"
+    echo "${BASH_VERSION:-<none>}"
+
     print_blue "make version"
     ${MAKE:-make} --version | head -n1
 
