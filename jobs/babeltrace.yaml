@@ -187,6 +187,9 @@
       {% else %}
       - shell:
          !include-raw-verbatim:
+      {% if buildtype is defined and buildtype == 'macosbuild' %}
+           - scripts/common/macos-shebang.sh
+      {% endif %}
       {% if gerrit|default(false) %}
            - scripts/common/gerrit-fetch.sh
       {% endif %}
