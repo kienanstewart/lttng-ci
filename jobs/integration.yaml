@@ -67,13 +67,55 @@
             {% include 'common/default_discarder.yaml.inc' %}
             {% endif %}
 
+    # For the pollscm trigger when the pipeline has never been run before
+    scm:
+      - git: !j2-yaml: |
+          url: https://github.com/{github_user}/lttng-tools.git
+          browser: githubweb
+          browser-url: https://github.com/{github_user}/lttng-tools
+          branches:
+            - '{version}'
+          basedir: src/lttng-tools
+          skip-tag: true
+          {% if review %}
+          shallow-clone: true
+          do-not-fetch-tags: true
+          {% endif %}
+
+    triggers: !j2-yaml: |
+      {% if review and enable_gerrit_trigger %}
+      - gerrit:
+          {% if gerrit_approval_values %}
+          trigger-on:
+            {% for value in gerrit_approval_values %}
+            - comment-added-event:
+                approval-category: 'CI-Build'
+                approval-value: '{{ value }}'
+            {% endfor %}
+          {% endif %}
+          projects:
+            - project-compare-type: 'PLAIN'
+              project-pattern: 'lttng-tools'
+              branches:
+                - branch-compare-type: 'PLAIN'
+                  branch-pattern: '{version}'
+      {% elif review %}[]
+      {%- else -%}
+      - pollscm:
+          cron: '@hourly'
+      - timed: '@monthly'
+      {%- endif -%}
+
     # Job variables
     checkout_label: 'deb13-amd64'
     build_label_amd64: 'deb13-amd64'
     build_label_i386: 'deb13-i386'
+    github_user: lttng
     prefix: ''
     test_label_amd64: 'deb13-amd64-rootnode'
     review: false
+    enable_gerrit_trigger: true
+    gerrit_approval_values: !!python/tuple [2, 3]  # fast and more
 
 
 ## Projects

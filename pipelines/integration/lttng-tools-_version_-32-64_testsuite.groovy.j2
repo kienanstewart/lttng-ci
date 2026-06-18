@@ -26,10 +26,6 @@ pipeline {
     skipDefaultCheckout()
   }
 
-  triggers {
-    pollSCM('@hourly')
-  }
-
   /* Default environment for the pipeline */
   environment {
     PREFIX = '/build'
