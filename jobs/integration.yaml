@@ -1,7 +1,7 @@
 ---
 
 - job-template:
-    name: '{prefix}integration_lttng-tools-{version}-32-64_testsuite'
+    name: '{prefix}lttng-tools-{version}-32-64_testsuite'
     concurrent: '{review}'
     description: |
       Integration pipeline for multi-bitness scenario (32/64).
@@ -76,30 +76,23 @@
     review: false
 
 
-## Views
-- view-template:
-    name: 'Integration'
-    view-type: list
-    regex: 'integration[-_].*'
-
-
 ## Projects
 - project:
     name: integration-32-64
     jobs:
-      - '{prefix}integration_lttng-tools-{version}-32-64_testsuite': &tools_32_64_master
+      - '{prefix}lttng-tools-{version}-32-64_testsuite': &tools_32_64_master
           version: master
           babelversion: stable-2.1
           urcu_version: master
-      - '{prefix}integration_lttng-tools-{version}-32-64_testsuite': &tools_32_64_stable_2_16
+      - '{prefix}lttng-tools-{version}-32-64_testsuite': &tools_32_64_stable_2_16
           version: stable-2.16
           babelversion: stable-2.1
           urcu_version: stable-0.15
-      - '{prefix}integration_lttng-tools-{version}-32-64_testsuite':
+      - '{prefix}lttng-tools-{version}-32-64_testsuite':
           <<: *tools_32_64_master
           prefix: 'dev_review_'
           review: true
-      - '{prefix}integration_lttng-tools-{version}-32-64_testsuite':
+      - '{prefix}lttng-tools-{version}-32-64_testsuite':
           <<: *tools_32_64_stable_2_16
           prefix: 'dev_review_'
           review: true
