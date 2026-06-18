@@ -1,29 +1,6 @@
 ---
 
 - job-template:
-    name: 'lttng-tools-{version}-64bit_with_32bit_traced_application'
-    description: |
-      Multi-bitness (32/64) test scenario for traced applications only.
-
-      <p>Job is managed by Jenkins Job Builder.</p>
-    project-type: pipeline
-    sandbox: true
-    dsl:
-      !include-jinja2: pipelines/integration/32_64_traced_application.groovy.j2
-    triggers:
-      - reverse:
-          jobs:
-            - 'lttng-tools_{version}_linuxbuild'
-            - 'lttng-ust_{version}_portbuild'
-          results: 'success'
-    # Job variables
-    agent_label: 'deb13-amd64-rootnode'
-    build_label_amd64: 'deb13-amd64'
-    build_label_i386: 'deb13-i386'
-    urcu_version: 'master'
-    babeltrace_version: 'master'
-
-- job-template:
     name: '{prefix}integration_lttng-tools-{version}-32-64_testsuite'
     concurrent: '{review}'
     description: |
@@ -64,18 +41,6 @@
         - string:
             name: LTTNG_TOOLS_GIT_BRANCH
             default: '{version}'
-        - bool:
-            name: 'RUN_64bit_canary'
-            default: 'true'
-            description: 'Run the 64-bit canary test'
-        - bool:
-            name: 'RUN_32bit_relayd'
-            default: 'true'
-            description: 'Run the tools w/ 32-bit relayd test'
-        - bool:
-            name: 'RUN_32bit_sessiond'
-            default: 'true'
-            description: 'The the tools w/ 32-bit sessiond test'
         - bool:
             name: 'VERBOSE_BABELTRACE'
             default: 'false'
@@ -126,35 +91,15 @@
           version: master
           babelversion: stable-2.1
           urcu_version: master
-      - '{prefix}integration_lttng-tools-{version}-32-64_testsuite': &tools_32_64_stable_2_15_and_2_14
-          version:
-            - stable-2.15
-            - stable-2.14
+      - '{prefix}integration_lttng-tools-{version}-32-64_testsuite': &tools_32_64_stable_2_16
+          version: stable-2.16
           babelversion: stable-2.1
           urcu_version: stable-0.15
-      - '{prefix}integration_lttng-tools-{version}-32-64_testsuite': &tools_32_64_stable_2_13
-          version: stable-2.13
-          babelversion: stable-2.0
-          urcu_version: stable-0.13
       - '{prefix}integration_lttng-tools-{version}-32-64_testsuite':
           <<: *tools_32_64_master
           prefix: 'dev_review_'
           review: true
       - '{prefix}integration_lttng-tools-{version}-32-64_testsuite':
-          <<: *tools_32_64_stable_2_15_and_2_14
+          <<: *tools_32_64_stable_2_16
           prefix: 'dev_review_'
           review: true
-      - '{prefix}integration_lttng-tools-{version}-32-64_testsuite':
-          <<: *tools_32_64_stable_2_13
-          prefix: 'dev_review_'
-          review: true
-      - 'lttng-tools-{version}-64bit_with_32bit_traced_application':
-          version: master
-          babeltrace_version: stable-2.1
-      - 'lttng-tools-{version}-64bit_with_32bit_traced_application':
-          version:
-            - stable-2.15
-            - stable-2.14
-            - stable-2.13
-          babeltrace_version: stable-2.1
-          urcu_version: stable-0.15

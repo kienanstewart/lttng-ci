@@ -187,19 +187,6 @@ pipeline {
                 dir("src/lttng-tools") {
                   sh './bootstrap'
                   sh './configure --prefix="$PREFIX" --enable-test-java-agent-all --enable-test-python3-agent'
-                  // Deativate health test, simply because there is little value
-                  // for this integration testing and because the ld_preloaded
-                  // object is for both lttng-sessiond/consumer leading to
-                  // difficult ld_preloading Deactivate clock plugin test since
-                  // the app must load the correct bitness so and the sessiond its
-                  // bitness so, this is simply not feasible from outside the
-                  // script. There is little value for this test in this testing
-                  // context.
-                  dir("tests/regression") {
-                    sh 'sed -i "#tools/health/test_thread_ok#d" Makefile.am'
-                    sh 'sed -i "#ust/clock-override/test_clock_override#d" Makefile.am'
-                  }
-
                   sh 'make -j$(nproc) V=1'
                 }
               }
@@ -297,6 +284,7 @@ pipeline {
                   sh './configure --prefix="$PREFIX"'
                   sh 'make -j$(nproc) V=1'
                   sh 'make install DESTDIR="$WORKSPACE"'
+                  sh 'cp -r tests/utils/testapp $WORKSPACE/build/bin/lttng-testapp'
                   sh 'find "$WORKSPACE/build/bin" -type f -perm -0500 -exec chrpath --delete {} \\;'
                   sh 'find "$WORKSPACE/build/lib" -name "*.so" -exec chrpath --delete {} \\;'
                   sh 'find "$WORKSPACE/build/lib" -name "*.la" -exec rm -vf {} \\;'
@@ -311,9 +299,6 @@ pipeline {
             stage('Stash i386 artifacts') {
               steps {
                 stash name: "i386-deps-lttng-tools", includes: 'deps-32/**'
-
-                /* Save the i386 ld_preloaded libraries for sessiond pausing */
-                stash name: "i386-deps-sessiond-notification-pause-lib", includes: 'src/lttng-tools/tests/regression/tools/notification/.libs/libpause_sessiond.so'
               }
             }
           } /* stages */
@@ -328,16 +313,9 @@ pipeline {
     } /* stage('Parallel build of all artifacts') */
 
     stage('Testing on rootnodes') {
-      parallel {
-        {% for test_type in ["64bit-canary", "32bit-sessiond", "32bit-relayd" ] %}
-        stage('Testing {{ test_type }}') {
+      stages {
+        stage('Testing') {
           agent { label '{{test_label_amd64}}' }
-
-          when {
-            expression {
-              env.RUN_{{ test_type | replace('-', '_') }} == "true"
-            }
-          }
 
           environment {
             BASEDIR_32 = "$WORKSPACE/deps-32"
@@ -402,14 +380,6 @@ pipeline {
                 unstash name: "amd64-lttng-tools"
                 sh 'tar xf amd64-lttng-tools.tgz'
 
-                dir('testing-overlay/sessiond') {
-                  /* Save the i386 LD_PRELOAD libraries for sessiond pausing */
-                  unstash name: "i386-deps-sessiond-notification-pause-lib"
-                }
-
-                /* Stable 2.12 and 2.13 still look for "babeltrace" */
-                sh 'ln -s "$BASEDIR_BUILD_64/bin/babeltrace2" "$BASEDIR_BUILD_64/bin/babeltrace"'
-
                 /*
                  * Since lttng-tools is built on a non-root node, the CPPFLAGS
                  * in the Makefile references /home/jenkins/workspace/x of
@@ -419,6 +389,31 @@ pipeline {
                  */
                 sh 'mkdir -p /home/jenkins ; ln -s /root/workspace /home/jenkins/workspace'
 
+                sh(
+                  label: 'Setup build profiles',
+                  script: '''#!/usr/bin/bash -x
+mkdir -p $WORKSPACE/build-profiles/
+cat > $WORKSPACE/build-profiles/i386.json <<EOF
+{
+        "abi": {
+                "name": "i386",
+                "description": "Built on i386 nodes",
+                "word_size_bits": 32
+        },
+        "binaries": {
+                "sessiond": "$WORKSPACE/deps-32/build/bin/lttng-sessiond",
+                "relayd": "$WORKSPACE/deps-32/build/bin/lttng-relayd",
+                "consumerd": "$WORKSPACE/deps-32/build/lib/lttng/libexec/lttng-consumerd",
+                "lttng_client": "$WORKSPACE/deps-32/build/bin/lttng"
+        },
+        "testapp_dir": "$WORKSPACE/deps-32/build/bin/lttng-testapp",
+        "library_dirs": [
+          "$WORKSPACE/deps-32/lib"
+        ]
+}
+EOF
+''',
+                )
                 sh(
                   label: 'allow non-root users to load dep libs',
                   script: '''#!/usr/bin/bash -eu
@@ -470,37 +465,6 @@ done
               }
 
               steps {
-                {% if test_type == '64bit-canary' %}
-                /* Nothing to do for 64bit-canary */
-
-                {% elif test_type == '32bit-sessiond' %}
-
-                /* Replace the lttng cli binary with the 32-bit version */
-                dir("src/lttng-tools/src/bin/lttng") {
-                  sh 'rm lttng'
-                  sh 'ln -s "$BASEDIR_BUILD_32/bin/lttng" lttng'
-                }
-
-                /* Replace the lttng-sessiond binary with the 32-bit version */
-                dir("src/lttng-tools/src/bin/lttng-sessiond") {
-                  sh 'rm -f lttng-sessiond'
-                  sh 'ln -s "$BASEDIR_BUILD_32/bin/lttng-sessiond" lttng-sessiond'
-                }
-
-                sh 'cp -rv "testing-overlay/sessiond/"* ./'
-
-                {% elif test_type == '32bit-relayd' %}
-
-                /* Replace the lttng-relayd binary with the 32-bit version */
-                dir("src/lttng-tools/src/bin/lttng-relayd") {
-                  sh 'rm -f lttng-relayd'
-                  sh 'ln -s "$BASEDIR_BUILD_32/bin/lttng-relayd" lttng-relayd'
-                }
-
-                {% else %}
-                {% include 'error: invalid test_type' %}
-                {% endif %}
-
                 /* Run the test suite */
                 dir("src/lttng-tools/tests") {
                   /*
@@ -510,7 +474,7 @@ done
                   catchError(stageResult: 'FAILURE') {
                     sh(
                       label: 'test',
-                      script: '''#!/usr/bin/bash
+                      script: '''#!/usr/bin/bash -x
 systemctl stop systemd-timesyncd.service || true
 if [[ "${VERBOSE_BABELTRACE}" == "true" ]]; then
   export LTTNG_TEST_VERBOSE_BABELTRACE=1
@@ -528,7 +492,8 @@ if [[ "${VERBOSE_SESSIOND}" == "true" ]]; then
    export LTTNG_TEST_VERBOSE_SESSIOND=1
 fi
 
-make --keep-going check
+set +x
+LTTNG_TOOLS_BUILD_PROFILE_DIR=$WORKSPACE/build-profiles make -j$(nproc) --keep-going check
 '''
                     )
                   }
@@ -541,13 +506,13 @@ make --keep-going check
             unsuccessful {
               sh(
                 label: 'save source',
-                script: 'tar -czf "${WORKSPACE}/src-{{ test_type }}.tgz" src/',
+                script: 'tar -czf "${WORKSPACE}/src.tgz" src/',
               )
               sh(
                 label: 'save build artifacts',
-                script: 'tar -czf "${WORKSPACE}/artifacts-{{ test_type }}.tgz" deps*',
+                script: 'tar -czf "${WORKSPACE}/artifacts.tgz" deps*',
               )
-              archiveArtifacts(artifacts: '*{{test_type}}.tgz', fingerprint: false)
+              archiveArtifacts(artifacts: 'artifacts.tgz', fingerprint: false)
             }
 
             always {
@@ -555,21 +520,21 @@ make --keep-going check
               dir("src/lttng-tools/tests") {
                 /* Gather the TAP logs */
                 sh '''
-                  mkdir -p "$WORKSPACE/tap/{{ test_type }}"
-                  rsync -a --exclude 'test-suite.log' --include '*/' --include '*.log' --include '**log.d/*' --exclude='*' ./ "$WORKSPACE/tap/{{ test_type }}"
+                  mkdir -p "$WORKSPACE/tap"
+                  rsync -a --exclude 'test-suite.log' --include '*/' --include '*.log' --include '**log.d/*' --exclude='*' ./ "$WORKSPACE/tap"
                 '''
 
                 /* Gather the test suites top-level log which includes all tests failures */
                 sh '''
-                  mkdir -p "$WORKSPACE/log/{{ test_type }}"
-                  rsync -a --include 'test-suite.log' --include '*/' --exclude='*' ./ "$WORKSPACE/log/{{ test_type }}"
+                  mkdir -p "$WORKSPACE/log"
+                  rsync -a --include 'test-suite.log' --include '*/' --exclude='*' ./ "$WORKSPACE/log"
                 '''
               }
 
               step([$class: 'TapPublisher', testResults: 'tap/**/*.log', verbose: true, failIfNoResults: true, failedTestsMarkBuildAsFailure: true, planRequired: true])
               archiveArtifacts artifacts: 'tap/**,log/**', fingerprint: false
 
-              recordIssues skipBlames: true, tools: [gcc(id: "{{ test_type }}")]
+              recordIssues skipBlames: true, tools: [gcc()]
             }
 
             cleanup {
@@ -577,8 +542,7 @@ make --keep-going check
             }
           }
         }
-        {% endfor %}
-      } /* parallel */
+      }
     } /* stage('Testing on rootnodes') */
   }
 }
