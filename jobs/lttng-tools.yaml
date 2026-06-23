@@ -1558,9 +1558,6 @@
       - 'lttng-tools_{version}_scan-build': &job_lttng-tools_stable-2-16_scan-build
           urcuversion: master
           babelversion: master
-      - 'lttng-tools_{version}_coverity': &job_lttng-tools_stable-2-16_coverity
-          urcuversion: master
-          babelversion: master
       - 'lttng-tools_{version}_release':
           version: v2.16
           ustversion: stable-2.16
@@ -1704,9 +1701,6 @@
       - 'lttng-tools_{version}_scan-build': &job_lttng-tools_stable-2-15_scan-build
           urcuversion: master
           babelversion: master
-      - 'lttng-tools_{version}_coverity': &job_lttng-tools_stable-2-15_coverity
-          urcuversion: master
-          babelversion: master
       - 'lttng-tools_{version}_release':
           version: v2.15
           ustversion: stable-2.15
@@ -1848,9 +1842,6 @@
           confs: !!python/tuple [agents]
           filter: '(node=="deb13-amd64-rootnode" && platform=="deb13-amd64" && cc == "clang-19")'
       - 'lttng-tools_{version}_scan-build':
-          urcuversion: master
-          babelversion: master
-      - 'lttng-tools_{version}_coverity':
           urcuversion: master
           babelversion: master
       - 'lttng-tools_{version}_release':
