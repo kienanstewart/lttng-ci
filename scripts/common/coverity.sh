@@ -57,7 +57,7 @@ export TMPDIR
 
 case "$COVERITY_SCAN_PROJECT_NAME" in
 babeltrace)
-    CONF_OPTS=("--enable-python-bindings" "--enable-python-bindings-doc" "--enable-python-plugins")
+    CONF_OPTS=("--enable-python-bindings" "--enable-python-bindings-doc" "--enable-python-plugins" "--enable-vendor-catch2" "--enable-vendor-fmt")
     BUILD_TYPE="autotools"
     ;;
 liburcu)
