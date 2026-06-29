@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+@Library('lttng-ci@test-lttng_ci_lib')
+
 def gerrit_fetch_script(project) {
   return  """#!/usr/bin/bash -x
 if [[ "\${GERRIT_PROJECT:-}" == "${project}" ]] && [[ -n "\$GERRIT_REFSPEC" ]]; then
@@ -403,6 +405,7 @@ cat > $WORKSPACE/build-profiles/i386.json <<EOF
         ]
 }
 EOF
+cat $WORKSPACE/build-profiles/i386.json || true
 ''',
                 )
                 sh(
@@ -490,6 +493,17 @@ LTTNG_TOOLS_BUILD_PROFILE_DIR=$WORKSPACE/build-profiles make -j$(nproc) --keep-g
                   }
                 }
               }
+
+              post {
+                always {
+                  catchError(stageResult: 'UNSTABLE') {
+                    sh(
+                      label: "Archive coredumps",
+                      script: library('lttng-ci').libraryResource(resource: "collect_coredumps.sh"),
+                    )
+                  }
+                }
+              }
             } /* stage('Build amd64 artifacts') */
           } /* stages */
 
@@ -523,7 +537,7 @@ LTTNG_TOOLS_BUILD_PROFILE_DIR=$WORKSPACE/build-profiles make -j$(nproc) --keep-g
               }
 
               step([$class: 'TapPublisher', testResults: 'tap/**/*.log', verbose: true, failIfNoResults: true, failedTestsMarkBuildAsFailure: true, planRequired: true])
-              archiveArtifacts artifacts: 'tap/**,log/**', fingerprint: false
+              archiveArtifacts artifacts: 'tap/**,log/**,core.tar.xz', fingerprint: false
 
               recordIssues skipBlames: true, tools: [gcc()]
             }
