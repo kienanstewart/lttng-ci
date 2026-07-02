@@ -89,34 +89,23 @@ rm -f ~/.ssh/id_rsa
             script: '''#!/usr/bin/bash -x
 apt-get update -y
 apt-get install -y \
-  doclifter \
   doxygen \
-  graphviz \
   linkchecker \
-  nodejs \
-  node-grunt-cli \
   npm \
-  python3-pip \
-  python3-venv \
   ruby-bundler \
   ruby-dev \
   xmlto
+
+wget https://releases.astral.sh/github/uv/releases/download/0.11.26/uv-x86_64-unknown-linux-gnu.tar.gz -O - | tar -xzf - -C /usr/local/share
+ln -s /usr/local/share/uv-x86_64-unknown-linux-gnu/uv /usr/local/bin/uv
+ln -s /usr/local/share/uv-x86_64-unknown-linux-gnu/uvx /usr/local/bin/uvx
 ''',
           )
 
           sh(
-            label: 'bootstrap virtualenv',
+            label: 'bootstrap',
             script: '''#!/usr/bin/bash -x
-python3 -m virtualenv venv/
-source venv/bin/activate
-bundle config set --local path vendor/bundle
-bundle install
-pip install -r requirements.txt
-npm install
-(
-  cd sass
-  bundle exec bourbon install
-)
+./bootstrap.sh
 '''
           )
         }
@@ -129,12 +118,11 @@ npm install
           sh(
             label: 'build',
             script: '''#!/usr/bin/bash -x
-source venv/bin/activate
-bundle exec grunt build:${BUILD_TARGET}
+uv run doit build:${BUILD_TARGET}
 '''
           )
 
-          archiveArtifacts(artifacts: "${params.BUILD_TARGET}/**")
+          archiveArtifacts(artifacts: "build/${params.BUILD_TARGET}/**")
         }
       }
     }
@@ -145,10 +133,9 @@ bundle exec grunt build:${BUILD_TARGET}
           sh(
             label: 'check links',
             script: '''#!/usr/bin/bash -x
-source venv/bin/activate
 touch link_report.csv
 chown nobody: link_report.csv
-bundle exec grunt check_links:${BUILD_TARGET} --no-network
+uv run doit check-links:${BUILD_TARGET}
 ret=$?
 cat link_report.csv
 exit $ret
@@ -184,8 +171,7 @@ cp "${DEPLOY_CREDS}" ~/.ssh/id_rsa
           sh(
             label: 'deploy',
             script: '''#!/usr/bin/bash -x
-source venv/bin/activate
-bundle exec grunt "deploy:${DEPLOY_TARGET}" --no-network
+uv run doit "deploy-${DEPLOY_TARGET}"
 ''',
           )
         }
