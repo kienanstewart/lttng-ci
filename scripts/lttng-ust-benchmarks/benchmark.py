@@ -26,6 +26,7 @@ s3conf.S3_STORAGE_PATH = "/system-tests/results/benchmarks/lttng-ust"
 
 default_branches = {
     "master": "871e256dcc4c2799a5386f7d9f6e9e78307ee688",
+    "stable-2.16": "e45dbc2f9d48520a7d7dd6bb42c0121798f737b0",
     "stable-2.15": "871e256dcc4c2799a5386f7d9f6e9e78307ee688",
     "stable-2.14": "d40d5e5e6af9fce8608ef3ba85a92f601a26b867",
     "stable-2.13": "06f280fd4452f88ce67e622c4961e11ad376f469",
