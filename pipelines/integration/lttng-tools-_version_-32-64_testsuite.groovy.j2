@@ -22,7 +22,7 @@ pipeline {
   /* Global options for the pipeline */
   options {
     preserveStashes()
-    timeout(time: 2, unit: 'HOURS')
+    timeout(time: 2, activity: true, unit: 'HOURS')
     disableConcurrentBuilds()
     timestamps()
     skipDefaultCheckout()
