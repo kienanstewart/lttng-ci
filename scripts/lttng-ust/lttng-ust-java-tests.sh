@@ -138,6 +138,7 @@ LTTNG_UST_JAVA_TESTS_ENV=(
     LTTNG_CONSUMERD64_BIN="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/lttng/libexec/lttng-consumerd"
     LTTNG_SESSION_CONFIG_XSD_PATH="${WORKSPACE}/deps/build/share/xml/lttng"
     BABELTRACE_PLUGIN_PATH="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugins"
+    BABELTRACE_PLUGIN_PROVIDER_PATH="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugin-providers"
     LIBBABELTRACE2_PLUGIN_PROVIDER_DIR="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugin-providers"
 )
 LTTNG_UST_JAVA_TESTS_MAVEN_OPTS=(

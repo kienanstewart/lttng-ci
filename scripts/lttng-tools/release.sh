@@ -126,6 +126,7 @@ fi
 # When using babeltrace2 make sure that it finds its plugins and
 # plugin-providers.
 export BABELTRACE_PLUGIN_PATH="$DEPS_LIB/babeltrace2/plugins/"
+export BABELTRACE_PLUGIN_PROVIDER_PATH="$DEPS_LIB/babeltrace2/plugin-providers/"
 export LIBBABELTRACE2_PLUGIN_PROVIDER_DIR="$DEPS_LIB/babeltrace2/plugin-providers/"
 
 PYTHON3=python3

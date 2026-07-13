@@ -231,6 +231,9 @@ if [ -d "$DEPSDIR" ]; then
     # When using babeltrace2 make sure that it finds its plugins and
     # plugin-providers.
     export BABELTRACE_PLUGIN_PATH="$DEPS_LIB/babeltrace2/plugins/"
+    # Bt 2.2+
+    export BABELTRACE_PLUGIN_PROVIDER_PATH="$DEPS_LIB/babeltrace2/plugin-providers/"
+    # For Bt 2.1 and earlier
     export LIBBABELTRACE2_PLUGIN_PROVIDER_DIR="$DEPS_LIB/babeltrace2/plugin-providers/"
 fi
 
@@ -725,6 +728,7 @@ if [ "$LTTNG_TOOLS_RUN_TESTS" = "yes" ] && [[ ! "$conf" =~ (no-ust|relayd-only) 
             LTTNG_CONSUMERD64_BIN="${WORKSPACE}/build/${LIBDIR_ARCH}/lttng/libexec/lttng-consumerd"
             LTTNG_SESSION_CONFIG_XSD_PATH="${WORKSPACE}/build/share/xml/lttng"
             BABELTRACE_PLUGIN_PATH="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugins"
+            BABELTRACE_PLUGIN_PROVIDER_PATH="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugin-providers"
             LIBBABELTRACE2_PLUGIN_PROVIDER_DIR="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugin-providers"
         )
         LTTNG_UST_JAVA_TESTS_MAVEN_OPTS=(

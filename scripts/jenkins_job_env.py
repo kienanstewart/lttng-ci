@@ -20,6 +20,7 @@ import urllib.parse
 
 _ENV_VARS = [
     "BABELTRACE_PLUGIN_PATH",
+    "BABELTRACE_PLUGIN_PROVIDER_PATH",
     "CPPFLAGS",
     "LD_LIBRARY_PATH",
     "LDFLAGS",
@@ -244,12 +245,15 @@ def create_activate(destination):
                     ).absolute()
                 ),
             )
-        elif var == "LIBBABELTRACE2_PLUGIN_PROVIDER_DIR":
+        elif var in [
+            "LIBBABELTRACE2_PLUGIN_PROVIDER_DIR",
+            "BABELTRACE_PLUGIN_PROVIDER_PATH",
+        ]:
             if not archive_dir.exists():
                 logging.warning(
                     "Assuming '{}' value since archive is not downloaded".format(var)
                 )
-                env["LIBBABELTRACE2_PLUGIN_PROVIDER_DIR"] = str(
+                env[var] = str(
                     archive_dir
                     / "deps"
                     / "build"
