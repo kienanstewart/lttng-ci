@@ -167,6 +167,7 @@ LTTNG_TOOLS_COVERAGE="${LTTNG_TOOLS_COVERAGE:-no}"
 LTTNG_TOOLS_MAKE_INSTALL="${LTTNG_TOOLS_MAKE_INSTALL:-yes}"
 LTTNG_TOOLS_MAKE_CLEAN="${LTTNG_TOOLS_MAKE_CLEAN:-yes}"
 LTTNG_TOOLS_GEN_COMPILE_COMMANDS="${LTTNG_TOOLS_GEN_COMPILE_COMMANDS:-no}"
+LTTNG_TOOLS_INSTALL_VERMIN="${LTTNG_TOOLS_INSTALL_VERMIN:-}"
 LTTNG_TOOLS_PARALLEL_TESTS="${LTTNG_TOOLS_PARALLEL_TESTS:-no}"
 LTTNG_TOOLS_RUN_TESTS="${LTTNG_TOOLS_RUN_TESTS:-yes}"
 LTTNG_TOOLS_RUN_TESTS_LONG_REGRESSION="${LTTNG_TOOLS_RUN_TESTS_LONG_REGRESSION:-no}"
@@ -329,6 +330,14 @@ cygwin|cygwin64|msys32|msys64)
     fi
     ;;
 esac
+
+if [[ "${LTTNG_TOOLS_INSTALL_VERMIN}" == "True" ]]; then
+    VIRTUALENV_DIR="$(mktemp -d)"
+    # Use system-site-packages to avoid having to re-install all other dependencies.
+    $PYTHON -m virtualenv "${VIRTUALENV_DIR}" --system-site-packages
+    source "${VIRTUALENV_DIR}/bin/activate"
+    $PYTHON -m pip install vermin
+fi
 
 # If we have modules, build them
 if [ -d "$WORKSPACE/src/lttng-modules" ]; then

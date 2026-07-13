@@ -116,6 +116,7 @@
     ust_job_prefix: ''
     ust_platform: '${{platform}}'
     ustversion: '{version}'
+    vermin: false
     wrapper_proc_cleaner: true
 
 - defaults:
@@ -267,6 +268,7 @@
           echo "ust_conf=$ust_conf" >> env.properties
           echo "LTTNG_TOOLS_JAVA_AGENTS={java_agents|true}" >> env.properties
           echo "java_preferred_jdk={java_preferred_jdk}" >> env.properties
+          echo "LTTNG_TOOLS_INSTALL_VERMIN={vermin}" >> env.properties
           if [ "{python}" != "" ]; then
             echo "PYTHON={python}" >> env.properties
           fi
@@ -343,6 +345,7 @@
           # built via depends-on
           echo "LTTNG_UST_JAVA_AGENTS={java_agents|false}" >> env.properties
           echo "java_preferred_jdk={java_preferred_jdk}" >> env.properties
+          echo "LTTNG_TOOLS_INSTALL_VERMIN={vermin}" >> env.properties
           if [ "{python}" != "" ]; then
             echo "PYTHON={python}" >> env.properties
           fi
@@ -1315,6 +1318,7 @@
           confs: !!python/tuple [std, no-ust, agents, debug-rcu, tls_fallback, std+debian]
           babelversions: !!python/tuple [stable-2.1, master]
           filter: '(build=="std") || ((babeltrace_version=="master" && (conf=="std" || conf=="agents" || conf=="no-ust") && liburcu_version=="master"))'
+          vermin: true
       - '{job_prefix}lttng-tools_{version}_{cctype}': &job_lttng-tools_master_clangbuild
           cctype: clangbuild
           ccs: !!python/tuple [clang-17, clang-18, clang-19]
@@ -1458,6 +1462,7 @@
           confs: !!python/tuple [std, no-ust, agents, debug-rcu, tls_fallback, std+debian]
           babelversions: !!python/tuple [stable-2.1, master]
           filter: '(build=="std") || ((babeltrace_version=="master" && (conf=="std" || conf=="agents" || conf=="no-ust") && liburcu_version=="master"))'
+          vermin: true
       - '{job_prefix}lttng-tools_{version}_{cctype}': &job_lttng-tools_stable-2-16_clangbuild
           cctype: clangbuild
           ccs: !!python/tuple [clang-17, clang-18, clang-19]
