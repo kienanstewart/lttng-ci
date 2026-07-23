@@ -24,6 +24,7 @@ _anchors:
       retentionStrategy: 'hudson.slaves.RetentionStrategy$Demand=class'
       retentionStrategy/inDemandDelay: '0'
       retentionStrategy/idleDelay: '5'
+      launcher/jvmOptions: '-server -Xmx2g'
     config_libvirt: &jenkins_ssh_agent_libvirt_default_config
       remoteFS: '/root'
       launcher/launcher: 'hudson.plugins.sshslaves.SSHLauncher=class'
