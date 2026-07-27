@@ -13,7 +13,7 @@
         - "{{ ansible_os_family }}.yml"
       skip: true
 
-- when: ansible_virtualization_role == "host" or (ansible_virtualization_role == "guest" and ansible_virtualization_type == "kvm")
+- when: ansible_virtualization_role == "host" or (ansible_virtualization_role == "guest" and ansible_virtualization_type in ["kvm", "VirtualPC", "KVM/Linux"]) or common_node_force_core_pattern|default(false)
   block:
     - name: 'Set core pattern for reboot'
       ansible.builtin.copy:
