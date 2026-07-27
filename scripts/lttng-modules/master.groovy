@@ -885,7 +885,7 @@ while ( kversions.size() != 0 || ongoingBuild.size() != 0 ) {
     }
 
     // Abort job if a newer instance is queued
-    if (!currentJobName.contains("gerrit")) {
+    if (!currentJobName.contains("review")) {
       similarJobQueued = Hudson.instance.queue.items.count{it.task.getFullDisplayName() == currentJobName}
       if (similarJobQueued > 0) {
         println "Abort, a newer instance of the job was queued"
