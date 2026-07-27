@@ -1,4 +1,7 @@
 ---
+
+common_node_force_core_pattern: true
+
 netplan_manage: true
 netplan_manage_package: false
 netplan_content: |

@@ -1,4 +1,7 @@
 ---
+
+common_node_force_core_pattern: true
+
 # This node runs netplan 0.101, which has a slightly different syntax
 # than more recent releases.
 netplan_manage: true
