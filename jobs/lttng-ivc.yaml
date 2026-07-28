@@ -127,11 +127,20 @@
 
     builders:
       - shell:
+          !include-raw-verbatim: lib/resources/clean_coredumps.sh
+      - shell:
           !include-raw-verbatim: scripts/lttng-ivc/build.sh
 
     publishers:
+      - postbuildscript:
+          mark-unstable-if-failed: true
+          builders:
+            - role: SLAVE
+              build-steps:
+                - shell:
+                    !include-raw-verbatim: lib/resources/collect_coredumps.sh
       - archive:
-          artifacts: 'artifacts/**'
+          artifacts: 'artifacts/**,core.tar.xz'
           follow-symlinks: true
           allow-empty: false
       - junit:
@@ -183,11 +192,20 @@
 
     builders:
       - shell:
+          !include-raw-verbatim: lib/resources/clean_coredumps.sh
+      - shell:
           !include-raw-verbatim: scripts/lttng-ivc/build.sh
 
     publishers:
+      - postbuildscript:
+          mark-unstable-if-failed: true
+          builders:
+            - role: SLAVE
+              build-steps:
+                - shell:
+                    !include-raw-verbatim: lib/resources/collect_coredumps.sh
       - archive:
-          artifacts: 'artifacts/**'
+          artifacts: 'artifacts/**,core.tar.xz'
           follow-symlinks: true
           allow-empty: false
       - junit:
