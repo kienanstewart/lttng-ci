@@ -61,8 +61,18 @@ print_os() {
     set -ex
 
     if command -v sysctl > /dev/null 2>&1 ; then
-        print_blue "Sysctl kernel.core settings"
-        sysctl -a | grep kernel.core
+        sysctl_core_pattern=kernel.core
+        if grep -q FreeBSD /etc/os-release 2>/dev/null ; then
+            sysctl_core_pattern=kern.corefile
+        fi
+
+        if command -v sw_vers 2>&1 > /dev/null ; then
+            # MacOS
+            sysctl_core_pattern=kern.corefile
+        fi
+
+        print_blue "Sysctl core pattern (${sysctl_core_pattern}) setting"
+        sysctl -a | grep "$sysctl_core_pattern"
     fi
 
     print_blue "ulimits"
