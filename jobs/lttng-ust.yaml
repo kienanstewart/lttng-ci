@@ -108,6 +108,8 @@
 - _lttng-ust_builders_defaults: &lttng-ust_builders_defaults
     name: 'lttng-ust_builders_defaults'
     builders:
+      - shell:
+          !include-raw-verbatim: lib/resources/clean_coredumps.sh
       # Generate a properties file to add additionnal env
       - shell: |
           #!/bin/bash
@@ -156,6 +158,8 @@
     name: 'lttng-ust_builders_review_lttng-tools'
 
     builders:
+      - shell:
+          !include-raw-verbatim: lib/resources/clean_coredumps.sh
       # Generate a properties file to add additional env
       - shell: |
           #!/bin/bash
@@ -229,6 +233,13 @@
 - _lttng-ust_publishers_defaults: &lttng-ust_publishers_defaults
     name: 'lttng-ust_publishers_defaults'
     publishers:
+      - postbuildscript: &lttng-ust_publisher_collect_coredumps_defaults
+          mark-unstable-if-failed: true
+          builders:
+            - role: SLAVE
+              build-steps:
+                - shell:
+                    !include-raw-verbatim: lib/resources/collect_coredumps.sh
       - tap: &lttng-ust_publisher_tap_defaults
           results: 'tap/**/*.log'
           fail-if-no-results: true
@@ -277,7 +288,7 @@
               <scm/>
             </io.jenkins.plugins.analysis.core.steps.IssuesRecorder>
       - archive: &lttng-ust_publisher_archive_defaults
-          artifacts: 'build/**,tap/**,log/**,src.tar.xz'
+          artifacts: 'build/**,tap/**,log/**,core.tar.xz,src.tar.xz'
           follow-symlinks: true
           allow-empty: false
       - workspace-cleanup: &lttng-ust_publisher_workspace-cleanup_defaults
@@ -313,6 +324,7 @@
 - _lttng-ust_publishers_review: &lttng-ust_publishers_review
     name: 'lttng-ust_publishers_review'
     publishers:
+      - postbuildscript: *lttng-ust_publisher_collect_coredumps_defaults
       - tap: *lttng-ust_publisher_tap_defaults
       # Fail job on any compiler warnings
       - raw:
@@ -562,6 +574,8 @@
                   branch-pattern: '{version}'
     builders:
       - shell:
+          !include-raw-verbatim: lib/resources/clean_coredumps.sh
+      - shell:
           !include-raw-verbatim: scripts/common/gerrit-depends-on.sh
       - inject:
           properties-file: gerrit_custom_dependencies.properties
@@ -673,8 +687,9 @@
           categories:
             - 'gerrit-{buildtype}'
     publishers:
+      - postbuildscript: *lttng-ust_publisher_collect_coredumps_defaults
       - archive:
-          artifacts: 'log/lttng-sessiond.log'
+          artifacts: 'log/lttng-sessiond.log,core.tar.xz'
           allow-empty: false
       - junit:
           results: 'src/lttng-ust-java-tests/**/target/failsafe-reports/*.xml'

@@ -458,8 +458,12 @@ fi
 # Clean the build directory
 if [ "$LTTNG_UST_MAKE_CLEAN" = "yes" ]; then
     print_header "Clean"
-
-    $MAKE clean
+    COREDUMP_COUNT="$(find /tmp -maxdepth 1 -name 'core\.[0-9]*' -and -type f 2>/dev/null | wc -l)"
+    if [[ "${COREDUMP_COUNT}" != "0" ]]; then
+        echo "Skipping make clean, found ${COREDUMP_COUNT} files matching coredump pattern" >&2
+    else
+        $MAKE clean
+    fi
 fi
 
 print_header "LTTng-UST build script ended with: $(test $exit_status == 0 && echo SUCCESS || echo FAILURE)"
