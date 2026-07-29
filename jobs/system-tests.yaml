@@ -260,6 +260,7 @@
     email_to: 'kstewart@efficios.com,jgalar@efficios.com'
     bt_branch: stable-2.1
     lttngversion:
+      - stable-2.16
       - stable-2.15
       - stable-2.14
     urcu_branch: stable-0.15
@@ -293,6 +294,7 @@
       - linux-6.6.y
       - linux-6.12.y
     lttngversion:
+      - stable-2.16
       - stable-2.15
       - stable-2.14
       - stable-2.13
