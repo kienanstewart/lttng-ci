@@ -137,6 +137,28 @@
     prefix: ''
     review: false
 
+- job-template:
+    name: '{prefix}infra_post_build'
+    defaults: infra
+    concurrent: true
+    dsl: !include-jinja2: pipelines/infra/post_build.groovy.j2
+    parameters:
+      - string:
+          name: bats_url
+          default: 'https://ci-bats01.internal.efficios.com:8081'
+      - string:
+          name: job_name
+          default: ''
+      - string:
+          name: job_run
+          default: ''
+      - string:
+          name: job_matrix_configuration
+          default: ''
+
+    # Job variables
+    prefix: ''
+
 - job:
     name: 'infra_post_review_merge'
     defaults: infra
@@ -237,6 +259,7 @@
       - '{prefix}infra_lttng-ci_{version}':
           prefix: 'dev_review_'
           review: true
+      - '{prefix}infra_post_build': {}
 
 - view:
     name: 'Infra'
