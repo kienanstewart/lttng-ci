@@ -1,0 +1,8 @@
+{
+    "run": 13,
+    "job": "lttng-test_master_linuxbuild",
+    "result": "SUCCESS",
+    "environment": {
+        "PROJECT_NAME": "lttng-test"
+    }
+}
