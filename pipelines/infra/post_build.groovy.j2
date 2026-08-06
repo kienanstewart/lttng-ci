@@ -1,0 +1,159 @@
+#!groovy
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: 2026 Kienan Stewart <kstewart@efficios.com>
+
+import groovy.transform.Field
+
+@Library('lttng-ci-kstewart@master')
+
+@Field def build_to_analyze = null;
+
+pipeline {
+  agent {
+    label 'deb13-amd64'
+  }
+
+  options {
+    ansiColor('xterm')
+    skipDefaultCheckout()
+    preserveStashes()
+    timestamps()
+  }
+
+  parameters {
+    string(name: 'job_name', defaultValue: '', description: 'The job name to analyze, e.g. lttng-tools_master_linuxbuild')
+    string(name: 'job_run', defaultValue: '', description: 'The run to analyze, e.g. 288')
+    string(name: 'job_matrix_configuration', defaultValue: '', description: 'The configuration for matrix jobs. E.g. "build=std,conf=std,platform=deb13-amd64"')
+    string(name: 'bats_url', defaultValue: '', description: 'The URL of the BATS server to upload results to')
+  }
+
+  stages {
+    stage('Get upstream job information') {
+      steps {
+        script {
+          // If the parameters are set, use those
+          def upstream_job = null;
+          def upstream_build = null;
+          if (params.job_name && params.job_run) {
+            upstream_job = Jenkins.getInstance().getItemByFullName(params.job_name);
+            if (upstream_job == null) {
+              throw new Exception("Job '${params.job_name}' not found");
+            }
+
+            upstream_build = upstream_job.getBuild(params.job_run);
+            if (upstream_build == null) {
+              throw new Exception("Job '${params.job_name}' run '${params.job_run}' not found");
+            }
+
+            if (params.job_matrix_configuration && upstream_job instanceof hudson.matrix.MatrixProject) {
+              def found = false;
+              for (run in upstream_build.getRuns()) {
+                if (run.getParent().getCombination().toString() == params.job_matrix_configuration) {
+                  found = true;
+                  upstream_build = run;
+                  break;
+                }
+              }
+
+              if (!found) {
+                throw new Exception("Job '${params.job_name}' run '${params.job_run}' configuration '${params.job_matrix_configuration}' not found");
+              }
+            }
+          }
+          else {
+            println(currentBuild.buildCauses);
+            for (cause in currentBuild.buildCauses) {
+              // The first cause should be the upstream one, even if this job was retriggered by a user.
+              // That being said, we want the most recent upstream cause since there could be a chain
+              // of jobs, e.g. urcu -> lttng-ust -> lttng-tools.
+              if (!cause["_class"] == 'hudson.model.Cause$UpstreamCause') {
+                println("Cause is not an upstream cause, skipping: cause='${cause["class"]}'");
+                continue;
+              }
+
+              upstream_job = Jenkins.getInstance().getItemByFullName(cause["upstreamProject"]);
+              upstream_build = upstream_job.getBuildByNumber(cause["upstreamBuild"]);
+              if (upstream_build != null) {
+                break;
+              }
+
+              // @TODO: How are matrix job configurations presented in this information?
+            }
+          }
+
+          if (upstream_build == null) {
+            throw new Exception("Source job or build not found")
+          }
+
+          build_to_analyze = upstream_build;
+        }
+      }
+    }
+
+    stage('Gathering job run data') {
+      steps {
+        cleanWs()
+        println("Fetching resources for ${build_to_analyze}")
+        dir('output') {
+          writeFile(
+            file: 'console.log',
+            text: build_to_analyze.getLog(),
+          )
+
+          // dir: tap/**/*.log - tap tests (most jobs except bt)
+          // file: results.xml (bt2, lttng-ivc)
+          // dir: junit/**/*.xml (lttng-ust-java-tests, lttng-tools)
+          copyArtifacts(
+            projectName: build_to_analyze.project.getFullName(),
+            filter: "results.xml,tap/**/*.log,junit/**/*.xml",
+            selector: specific(build_to_analyze.getNumber().toString()),
+          )
+        }
+
+        writeJSON(
+          file: 'state.json',
+          json: [
+            'job': build_to_analyze.project.getName(),
+            'run': build_to_analyze.getNumber(),
+            'environment': build_to_analyze.getEnvironment(),
+            'result': build_to_analyze.getResult().toString(),
+            'duration_ms': build_to_analyze.getDuration(),
+          ],
+        )
+      }
+    }
+
+    stage('Upload') {
+      when {
+        expression {
+          params.bats_server != ''
+        }
+      }
+
+
+      steps {
+        withEnv([
+          "BATS_JOB_CONSOLE_LOG=${WORKSPACE}/output/console.log",
+          "BATS_JOB_STATE_FILE=${WORKSPACE}/state.json",
+          "BATS_JOB_ARTIFACT_DIRECTORY=${WORKSPACE}/output",
+          "BATS_SERVER=${params.bats_url}",
+        ]) {
+          sh(
+            label: "Run upload script",
+            script: libraryResource(resource: "bats_upload.py"),
+          )
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      archiveArtifacts(artifacts: 'state.json,output/**')
+    }
+
+    // cleanup {
+    //   cleanWs(cleanWhenFailure: false)
+    // }
+  }
+}
