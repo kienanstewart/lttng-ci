@@ -1,0 +1,17 @@
+{
+    "run_id": 1,
+    "files": [
+        {
+            "name": "console.log",
+            "description": "Run console log",
+	        "content": "",
+            "content_type": "text/plain"
+        },
+        {
+            "name": "example.xml",
+            "content": "",
+            "description": "Example XML file",
+            "content_type": "text/xml"
+        }
+    ]
+}
