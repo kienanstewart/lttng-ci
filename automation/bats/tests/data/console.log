@@ -1,0 +1,955 @@
+Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 55
+originally caused by:
+ Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+ Started by user Kienan Stewart
+ Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 54
+ originally caused by:
+  Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+  Started by user Kienan Stewart
+  Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 53
+  originally caused by:
+   Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+   Started by user Kienan Stewart
+   Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 52
+   originally caused by:
+    Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+    Started by user Kienan Stewart
+    Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 51
+    originally caused by:
+     Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+     Started by user Kienan Stewart
+     Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 50
+     originally caused by:
+      Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+      Started by user Kienan Stewart
+      Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 48
+      originally caused by:
+       Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+       Started by user Kienan Stewart
+       Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 46
+       originally caused by:
+        Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+        Started by user Kienan Stewart
+        Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 45
+        originally caused by:
+         Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+         Started by user Kienan Stewart
+         Started by upstream project "dev_review_lttng-ust-java-tests_master_linuxbuild" build number 44
+         originally caused by:
+          Triggered by Gerrit: https://review.lttng.org/c/lttng-ust-java-tests/+/18467
+Running as SYSTEM
+[EnvInject] - Loading node environment variables.
+[EnvInject] - Preparing an environment for the build.
+[EnvInject] - Keeping Jenkins system variables.
+[EnvInject] - Keeping Jenkins build variables.
+[EnvInject] - Injecting as environment variables the properties content 
+LTTNG_UST_JAVA_AGENTS=true
+java_preferred_jdk=default
+PROJECT_NAME=lttng-ust-java-tests
+
+[EnvInject] - Variables injected successfully.
+[EnvInject] - Injecting contributions.
+Building remotely on ci-node-deb13-amd64-1a-03 (deb13-amd64) in workspace /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64
+The recommended git tool is: NONE
+No credentials specified
+Wiping out workspace first.
+Cloning the remote Git repository
+Cloning repository https://review.lttng.org/lttng-ust-java-tests
+ > git init /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests # timeout=10
+Fetching upstream changes from https://review.lttng.org/lttng-ust-java-tests
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.2'
+ > git fetch --tags --force --progress -- https://review.lttng.org/lttng-ust-java-tests +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://review.lttng.org/lttng-ust-java-tests # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://review.lttng.org/lttng-ust-java-tests # timeout=10
+Fetching upstream changes from https://review.lttng.org/lttng-ust-java-tests
+ > git fetch --tags --force --progress -- https://review.lttng.org/lttng-ust-java-tests refs/changes/*:refs/changes/* # timeout=10
+Checking out Revision f5043302adb395b88c35897cd4e0be8f6375a421 (refs/changes/67/18467/1)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f f5043302adb395b88c35897cd4e0be8f6375a421 # timeout=10
+Commit message: "Use junit5-treereporter for console output"
+ > git rev-list --no-walk f5043302adb395b88c35897cd4e0be8f6375a421 # timeout=10
+Run condition [Execute Shell] enabling prebuild for step [Copy artifacts from another project]
+Run condition [Execute Shell] enabling prebuild for step [BuilderChain]
+Run condition [Execute Shell] enabling prebuild for step [Copy artifacts from another project]
+Run condition [Execute Shell] enabling prebuild for step [BuilderChain]
+Run condition [Execute Shell] enabling prebuild for step [Copy artifacts from another project]
+Run condition [Execute Shell] enabling prebuild for step [BuilderChain]
+Run condition [Execute Shell] enabling prebuild for step [Copy artifacts from another project]
+Run condition [Execute Shell] enabling prebuild for step [BuilderChain]
+[deb13-amd64] $ /bin/bash /tmp/jenkins1580027236140526277.sh
+find: ‘/tmp/systemd-private-0526cd14781e4a6f8d46d69e06c9764e-systemd-logind.service-p7Cp9V’: Permission denied
+find: ‘/tmp/systemd-private-0526cd14781e4a6f8d46d69e06c9764e-exim4.service-IsTOeA’: Permission denied
+[deb13-amd64] $ /usr/bin/bash /tmp/jenkins1537327906519734193.sh
++ GERRIT_NAME=review.lttng.org
++ WORKSPACE=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64
++ PROJECT_NAME=lttng-ust-java-tests
++ gerrit_url=https://review.lttng.org
++ gerrit_query='&o=CURRENT_REVISION&o=DOWNLOAD_COMMANDS'
++ gerrit_json_query='.[0].revisions[.[0].current_revision].ref'
++ gerrit_json_query_status='.[0].status'
++ re='Depends-on: ([a-z0-9_-]+): ([^'\''$'\''\n'\'''\'']*)'
++ property_file=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/gerrit_custom_dependencies.properties
++ touch /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/gerrit_custom_dependencies.properties
++ pushd /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests
+~/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests ~/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64
++ git rev-list --format=%B --max-count=1 HEAD
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ set +x
++ continue
++ read -r line
++ popd
+~/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64
++ cat /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/gerrit_custom_dependencies.properties
+[EnvInject] - Injecting environment variables from a build step.
+[EnvInject] - Injecting as environment variables the properties file path 'gerrit_custom_dependencies.properties'
+[EnvInject] - Variables injected successfully.
+[deb13-amd64] $ /bin/sh -xe /tmp/CommandInterpreterCondition10825621176995370973.sh
++ test -z 
+Run condition [Execute Shell] enabling perform for step [Copy artifacts from another project]
+Copied 149 artifacts from "babeltrace_stable-2.1_linuxbuild » build=std,conf=std,deb13-amd64" build number 20
+[deb13-amd64] $ /bin/sh -xe /tmp/CommandInterpreterCondition8074251522482097343.sh
++ test -n 
+Run condition [Execute Shell] preventing perform for step [BuilderChain]
+[deb13-amd64] $ /bin/sh -xe /tmp/CommandInterpreterCondition11545975643900160536.sh
++ test -z 
+Run condition [Execute Shell] enabling perform for step [Copy artifacts from another project]
+Copied 217 artifacts from "liburcu_master_linuxbuild » build=std,conf=std,deb13-amd64" build number 118
+[deb13-amd64] $ /bin/sh -xe /tmp/CommandInterpreterCondition4256887657011326005.sh
++ test -n 
+Run condition [Execute Shell] preventing perform for step [BuilderChain]
+[deb13-amd64] $ /bin/sh -xe /tmp/CommandInterpreterCondition6998668505646787253.sh
++ test -z 
++ test -z 
+Run condition [Execute Shell] enabling perform for step [Copy artifacts from another project]
+Copied 206 artifacts from "lttng-ust_master_linuxbuild » build=std,conf=agents,master,deb13-amd64" build number 142
+[deb13-amd64] $ /bin/sh -xe /tmp/CommandInterpreterCondition3822256533622745248.sh
++ test -n 
++ test -n 
+Run condition [Execute Shell] preventing perform for step [BuilderChain]
+[deb13-amd64] $ /bin/sh -xe /tmp/CommandInterpreterCondition4057213613890180928.sh
++ test -z 
++ test -z 
++ test -z 
+Run condition [Execute Shell] enabling perform for step [Copy artifacts from another project]
+Copied 177 artifacts from "lttng-tools_master_linuxbuild » babeltrace_version=stable-2.1,build=std,conf=agents,liburcu_version=master,deb13-amd64" build number 572
+[deb13-amd64] $ /bin/sh -xe /tmp/CommandInterpreterCondition16070013291467367704.sh
++ test -n 
++ test -n 
++ test -n 
+Run condition [Execute Shell] preventing perform for step [BuilderChain]
+[deb13-amd64] $ /bin/bash /tmp/jenkins77796869931958644.sh
++ trap cleanup EXIT SIGINT SIGTERM
++ LD_LIBRARY_PATH=
++ LIBDIR=lib
++ LIBDIR_ARCH=lib
++ [[ -f /etc/redhat-release ]]
++ [[ -f /etc/products.d/SLES.prod ]]
++ [[ -f /etc/yocto-release ]]
++ [[ -z '' ]]
++ export JAVA_HOME=/usr/lib/jvm/default-java
++ JAVA_HOME=/usr/lib/jvm/default-java
++ DEPS_JAVA=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64
++ export CLASSPATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/lttng-ust-agent-all.jar:/usr/share/java/log4j-api.jar:/usr/share/java/log4j-core.jar:/usr/share/java/log4j-1.2.jar
++ CLASSPATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/lttng-ust-agent-all.jar:/usr/share/java/log4j-api.jar:/usr/share/java/log4j-core.jar:/usr/share/java/log4j-1.2.jar
++ case "${java_preferred_jdk:-}" in
++ LTTNG_UST_JAVA_TESTS_ENV=(PATH="${WORKSPACE}/deps/build/bin/:$PATH:/opt/apache/maven/bin/" LD_LIBRARY_PATH="${WORKSPACE}/deps/build/${LIBDIR}/:${WORKSPACE}/deps/build/${LIBDIR_ARCH}:$LD_LIBRARY_PATH" LTTNG_CONSUMERD32_BIN="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/lttng/libexec/lttng-consumerd" LTTNG_CONSUMERD64_BIN="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/lttng/libexec/lttng-consumerd" LTTNG_SESSION_CONFIG_XSD_PATH="${WORKSPACE}/deps/build/share/xml/lttng" BABELTRACE_PLUGIN_PATH="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugins" BABELTRACE_PLUGIN_PROVIDER_PATH="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugin-providers" LIBBABELTRACE2_PLUGIN_PROVIDER_DIR="${WORKSPACE}/deps/build/${LIBDIR_ARCH}/babeltrace2/plugin-providers")
++ LTTNG_UST_JAVA_TESTS_MAVEN_OPTS=("--no-transfer-progress" "-Dmaven.test.failure.ignore=true" "-Dcommon-jar-location=${WORKSPACE}/deps/build/share/java/lttng-ust-agent-common.jar" "-Djul-jar-location=${WORKSPACE}/deps/build/share/java/lttng-ust-agent-jul.jar" "-Dlog4j-jar-location=${WORKSPACE}/deps/build/share/java/lttng-ust-agent-log4j.jar" "-Dlog4j2-jar-location=${WORKSPACE}/deps/build/share/java/lttng-ust-agent-log4j2.jar" "-DargLine=-Djava.library.path=${WORKSPACE}/deps/build/${LIBDIR_ARCH}" "-Dmaven.test.redirectTestOutputToFile=true")
++ [[ '' != '' ]]
+++ env PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/bin/:/usr/local/bin:/usr/bin:/bin:/usr/games:/opt/apache/maven/bin/ LD_LIBRARY_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/:/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib: LTTNG_CONSUMERD32_BIN=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/lttng/libexec/lttng-consumerd LTTNG_CONSUMERD64_BIN=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/lttng/libexec/lttng-consumerd LTTNG_SESSION_CONFIG_XSD_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/share/xml/lttng BABELTRACE_PLUGIN_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugins BABELTRACE_PLUGIN_PROVIDER_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugin-providers LIBBABELTRACE2_PLUGIN_PROVIDER_DIR=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugin-providers lttng --version
+++ cut -d ' ' -f 5
++ LTTNG_VERSION=2.17.0-pre
++ verlt 2.17.0-pre 2.14
++ vercomp 2.17.0-pre 2.14
++ set +u
++ [[ 2.17.0-pre == \2\.\1\4 ]]
++ local IFS=.
++ ver1=('2' '17' '0-pre')
++ ver2=('2' '14')
++ local i ver1 ver2
++ (( i=3 ))
++ (( i<2 ))
++ (( i=0 ))
++ (( i<3 ))
++ [[ -z 2 ]]
++ (( 10#2 > 10#2 ))
++ (( 10#2 < 10#2 ))
++ (( i++ ))
++ (( i<3 ))
++ [[ -z 14 ]]
++ (( 10#17 > 10#14 ))
++ return 1
++ local res=1
++ '[' 1 -eq 2 ']'
++ mkdir -p /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/log
++ SESSIOND_ARGS=('-b')
++ [[ false == \t\r\u\e ]]
++ [[ false == \t\r\u\e ]]
++ env PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/bin/:/usr/local/bin:/usr/bin:/bin:/usr/games:/opt/apache/maven/bin/ LD_LIBRARY_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/:/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib: LTTNG_CONSUMERD32_BIN=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/lttng/libexec/lttng-consumerd LTTNG_CONSUMERD64_BIN=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/lttng/libexec/lttng-consumerd LTTNG_SESSION_CONFIG_XSD_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/share/xml/lttng BABELTRACE_PLUGIN_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugins BABELTRACE_PLUGIN_PROVIDER_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugin-providers LIBBABELTRACE2_PLUGIN_PROVIDER_DIR=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugin-providers lttng-sessiond -b
++ cd src/lttng-ust-java-tests
++ env PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/bin/:/usr/local/bin:/usr/bin:/bin:/usr/games:/opt/apache/maven/bin/ LD_LIBRARY_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/:/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib: LTTNG_CONSUMERD32_BIN=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/lttng/libexec/lttng-consumerd LTTNG_CONSUMERD64_BIN=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/lttng/libexec/lttng-consumerd LTTNG_SESSION_CONFIG_XSD_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/share/xml/lttng BABELTRACE_PLUGIN_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugins BABELTRACE_PLUGIN_PROVIDER_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugin-providers LIBBABELTRACE2_PLUGIN_PROVIDER_DIR=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugin-providers mvn -version
+[1mApache Maven 3.9.9[m
+Maven home: /usr/share/maven
+Java version: 21.0.8, vendor: Debian, runtime: /usr/lib/jvm/java-21-openjdk-amd64
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "6.12.90+deb13.1-amd64", arch: "amd64", family: "unix"
++ env PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/bin/:/usr/local/bin:/usr/bin:/bin:/usr/games:/opt/apache/maven/bin/ LD_LIBRARY_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/:/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib: LTTNG_CONSUMERD32_BIN=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/lttng/libexec/lttng-consumerd LTTNG_CONSUMERD64_BIN=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/lttng/libexec/lttng-consumerd LTTNG_SESSION_CONFIG_XSD_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/share/xml/lttng BABELTRACE_PLUGIN_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugins BABELTRACE_PLUGIN_PROVIDER_PATH=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugin-providers LIBBABELTRACE2_PLUGIN_PROVIDER_DIR=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib/babeltrace2/plugin-providers mvn --no-transfer-progress -Dmaven.test.failure.ignore=true -Dcommon-jar-location=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/share/java/lttng-ust-agent-common.jar -Djul-jar-location=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/share/java/lttng-ust-agent-jul.jar -Dlog4j-jar-location=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/share/java/lttng-ust-agent-log4j.jar -Dlog4j2-jar-location=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/share/java/lttng-ust-agent-log4j2.jar -DargLine=-Djava.library.path=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/deps/build/lib -Dmaven.test.redirectTestOutputToFile=true clean verify
+[[1;34mINFO[m] Scanning for projects...
+[[1;33mWARNING[m] The project org.lttng.ust:lttng-ust-java-parent:pom:1.1.0-SNAPSHOT uses prerequisites which is only intended for maven-plugin projects but not for non maven-plugin projects. For such purposes you should use the maven-enforcer-plugin. See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1mReactor Build Order:[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] LTTng-UST Java Agent                                               [pom]
+[[1;34mINFO[m] LTTng-Tools Java Utilities                                         [jar]
+[[1;34mINFO[m] LTTng-UST Java Agent Integration Tests Common Package              [jar]
+[[1;34mINFO[m] LTTng-UST Java Agent JUL API Integration Tests                     [jar]
+[[1;34mINFO[m] LTTng-UST Java Agent Log4j 1.x API Integration Tests               [jar]
+[[1;34mINFO[m] LTTng-UST Java Agent Log4j 2.x API Integration Tests               [jar]
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m----------------< [0;36morg.lttng.ust:lttng-ust-java-parent[0;1m >-----------------[m
+[[1;34mINFO[m] [1mBuilding LTTng-UST Java Agent 1.1.0-SNAPSHOT                       [1/6][m
+[[1;34mINFO[m]   from pom.xml
+[[1;34mINFO[m] [1m--------------------------------[ pom ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mclean:3.2.0:clean[m [1m(default-clean)[m @ [36mlttng-ust-java-parent[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:integration-test[m [1m(default)[m @ [36mlttng-ust-java-parent[0;1m ---[m
+[[1;34mINFO[m] No tests to run.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:verify[m [1m(default)[m @ [36mlttng-ust-java-parent[0;1m ---[m
+[[1;34mINFO[m] No tests to run.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m------------------< [0;36morg.lttng.tools:lttng-tools-java[0;1m >------------------[m
+[[1;34mINFO[m] [1mBuilding LTTng-Tools Java Utilities 1.1.0-SNAPSHOT                 [2/6][m
+[[1;34mINFO[m]   from lttng-tools-java/pom.xml
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mclean:3.2.0:clean[m [1m(default-clean)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:resources[m [1m(default-resources)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-tools-java/src/main/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:compile[m [1m(default-compile)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 4 source files to /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-tools-java/target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:testResources[m [1m(default-testResources)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-tools-java/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:testCompile[m [1m(default-testCompile)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] No sources to compile
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32msurefire:3.6.0-M1:test[m [1m(default-test)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] No tests to run.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mjar:3.1.2:jar[m [1m(default-jar)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] Building jar: /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-tools-java/target/lttng-tools-java-1.1.0-SNAPSHOT.jar
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:integration-test[m [1m(default)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] No tests to run.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:verify[m [1m(default)[m @ [36mlttng-tools-java[0;1m ---[m
+[[1;34mINFO[m] No tests to run.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------------< [0;36morg.lttng.ust:lttng-ust-java-tests-common[0;1m >--------------[m
+[[1;34mINFO[m] [1mBuilding LTTng-UST Java Agent Integration Tests Common Package 1.1.0-SNAPSHOT [3/6][m
+[[1;34mINFO[m]   from lttng-ust-java-tests-common/pom.xml
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mclean:3.2.0:clean[m [1m(default-clean)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:resources[m [1m(default-resources)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/src/main/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:compile[m [1m(default-compile)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 14 source files to /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/target/classes
+[[1;34mINFO[m] /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/src/main/java/org/lttng/ust/agent/integration/filter/FilterListenerITBase.java: Some input files use unchecked or unsafe operations.
+[[1;34mINFO[m] /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/src/main/java/org/lttng/ust/agent/integration/filter/FilterListenerITBase.java: Recompile with -Xlint:unchecked for details.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:testResources[m [1m(default-testResources)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:testCompile[m [1m(default-testCompile)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 3 source files to /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/target/test-classes
+[[1;34mINFO[m] /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/src/test/java/org/lttng/ust/agent/integration/client/TcpClientDebugListener.java: /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/src/test/java/org/lttng/ust/agent/integration/client/TcpClientDebugListener.java uses unchecked or unsafe operations.
+[[1;34mINFO[m] /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/src/test/java/org/lttng/ust/agent/integration/client/TcpClientDebugListener.java: Recompile with -Xlint:unchecked for details.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32msurefire:3.6.0-M1:test[m [1m(default-test)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mjar:3.1.2:jar[m [1m(default-jar)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] Building jar: /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/target/lttng-ust-java-tests-common-1.1.0-SNAPSHOT.jar
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:integration-test[m [1m(default)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.client.TcpClientIT[m - 13.32 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEvent[m - 0.317 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableAppContextsSameRetriever[m - 0.205 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableAppContextThenDestroy[m - 0.131 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEventLogLevelRange[m - 0.111 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableSameAppContextTwoSessions[m - 0.215 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEventsLogLevelSingleAndRange[m - 0.204 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableAppContextsSameContext[m - 0.206 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEventsLogLevelRangeAndSingle[m - 0.203 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEventsDiffFilters[m - 0.303 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEventThenDestroy[m - 0.226 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextEnabledAndInFilterString[m - 0.296 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEventsLogLevelAndFilters[m - 0.392 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableAppContext[m - 0.103 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableThenDisableOneEvent[m - 0.113 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableSomeThenDisableAll[m - 0.297 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableAllEvents[m - 0.062 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableDiffAppContextTwoSessions[m - 0.212 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEventsLogLevelRangeAndSingleDiffSessions[m - 0.219 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEnableEventLogLevelSingle[m - 0.111 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextInFilterString[m - 0.210 s
+[[1;34mINFO[m]    └─ [1;32m✔ testEnableAllThenDisableAll[m - 0.111 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.context.ContextRegistrationIT[m - 0.245 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testRegistration[m - 0.239 s
+[[1;34mINFO[m]    └─ [1;32m✔ testRegistrationInvalid[m - 0.004 s
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1;32mTests run: 23, Failures: 0, Errors: 0, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;33mWARNING[m] Corrupted channel by directly writing to native stream in forked JVM 1. See FAQ web page and the dump file /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-common/target/failsafe-reports/2026-08-07T19-05-28_615-jvmRun1.dumpstream
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:verify[m [1m(default)[m @ [36mlttng-ust-java-tests-common[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m---------------< [0;36morg.lttng.ust:lttng-ust-java-tests-jul[0;1m >---------------[m
+[[1;34mINFO[m] [1mBuilding LTTng-UST Java Agent JUL API Integration Tests 1.1.0-SNAPSHOT [4/6][m
+[[1;34mINFO[m]   from lttng-ust-java-tests-jul/pom.xml
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mclean:3.2.0:clean[m [1m(default-clean)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:resources[m [1m(default-resources)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-jul/src/main/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:compile[m [1m(default-compile)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;34mINFO[m] No sources to compile
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:testResources[m [1m(default-testResources)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-jul/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:testCompile[m [1m(default-testCompile)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 20 source files to /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-jul/target/test-classes
+[[1;34mINFO[m] /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-jul/src/test/java/org/lttng/ust/agent/integration/events/JulLegacyApiIT.java: Some input files use or override a deprecated API.
+[[1;34mINFO[m] /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-jul/src/test/java/org/lttng/ust/agent/integration/events/JulLegacyApiIT.java: Recompile with -Xlint:deprecation for details.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32msurefire:3.6.0-M1:test[m [1m(default-test)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mjar:3.1.2:jar[m [1m(default-jar)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;33mWARNING[m] JAR will be empty - no content was marked for inclusion!
+[[1;34mINFO[m] Building jar: /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-jul/target/lttng-ust-java-tests-jul-1.1.0-SNAPSHOT.jar
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:integration-test[m [1m(default)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;34mINFO[m] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.context.JulAppContextIT[m - 172.4 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueFloat[m - 7.240 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueShort[m - 7.200 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueBooleanFalse[m - 7.179 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueDouble[m - 7.163 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueObject[m - 7.179 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextAvailableAndEnabledCtf1[m - 6.994 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueString[m - 7.171 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueCharacter[m - 7.171 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsOneAvailableTwoEnabled[m - 7.268 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueByte[m - 7.167 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueLong[m - 7.168 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueNull[m - 7.171 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsOneAvailableOtherEnabled[m - 7.168 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionNotEnabled[m - 7.203 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsTwoAvailableOneEnabled[m - 7.175 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoContexts[m - 7.082 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextNotAvailableButEnabled[m - 6.961 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionEnabledNotMatching[m - 7.306 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionEnabledMatching[m - 7.303 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextAvailableButNotEnabled[m - 7.075 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueInteger[m - 6.972 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueBooleanTrue[m - 6.974 s
+[[1;34mINFO[m]    └─ [1;32m✔ testContextAvailableAndEnabled[m - 7.167 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.context.JulAppContextOrderingIT[m - 49.77 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentRetriever[m - 7.139 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentRetrieverSession[m - 7.132 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionRetrieverAgent[m - 7.139 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentSessionRetriever[m - 7.121 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testRetrieverAgentSession[m - 7.121 s
+[[1;34mINFO[m]    └─ [1;32m✔ testRetrieverSessionAgent[m - 6.934 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.filter.JulFilterListenerOrderingIT[m - 80.05 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerSessionAgent_AgentSession[m - 6.026 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerSessionAgent_SessionAgent[m - 6.067 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionListenerAgent_AgentSession[m - 6.026 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionListenerAgent_SessionAgent[m - 6.068 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentListenerSession_AgentSession[m - 6.065 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentListenerSession_SessionAgent[m - 6.150 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentListener_AgentSession[m - 6.026 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentListener_SessionAgent[m - 6.065 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerAgentSession_AgentSession[m - 6.066 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerAgentSession_SessionAgent[m - 6.153 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentSessionListener_AgentSession[m - 6.075 s
+[[1;34mINFO[m]    └─ [1;32m✔ testAgentSessionListener_SessionAgent[m - 6.161 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.filter.JulFilterListenerIT[m - 75.35 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRulesDisableAll[m - 6.259 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testOneRule[m - 6.063 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testDetachingListener[m - 6.247 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRulesDisableSome[m - 6.251 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testStatedump[m - 6.255 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSameEventsDiffFilters[m - 6.248 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testMultipleListeners[m - 6.251 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testUnattachedListeners[m - 6.155 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSameEventsDiffLogLevels[m - 6.251 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRules[m - 6.247 s
+[[1;34mINFO[m]    └─ [1;32m✔ testNoRules[m - 6.017 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.JulListEventsIT[m - 37.11 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyLoggersNoneAttached[m - 6.069 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testLoggersSomeDetached[m - 6.037 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyLoggersSomeAttached[m - 6.035 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testLoggersAllDetached[m - 6.039 s
+[[1;34mINFO[m]    └─ [1;32m✔ testManyLoggersAllAttached[m - 6.037 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.JulLegacyApiLoggerHierarchyListIT[m - 61.44 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[1] true, true, true, true[m - 6.080 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[2] true, true, true, false[m - 6.057 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[3] true, true, false, false[m - 6.054 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[4] true, false, true, true[m - 6.051 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[5] true, false, true, false[m - 6.059 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[6] true, false, false, false[m - 6.054 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[7] false, false, true, true[m - 6.055 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[8] false, false, true, false[m - 6.055 s
+[[1;34mINFO[m]    └─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[9] false, false, false, false[m - 6.054 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.JulLoggerHierarchyListIT[m - 37.59 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[1] true, true, true, true[m - 6.057 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[2] true, true, true, false[m - 6.055 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[3] true, true, false, false[m - 6.059 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[4] true, false, true, true[m - 6.057 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[5] true, false, true, false[m - 0.048 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[6] true, false, false, false[m - 0.050 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[7] false, false, true, true[m - 6.054 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[8] false, false, true, false[m - 0.046 s
+[[1;34mINFO[m]    └─ [1;32m✔ testList(boolean, boolean, boolean, boolean)[9] false, false, false, false[m - 0.053 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.JulEnabledEventsIT[m - 71.49 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEventPrefixOverlapping[m - 7.220 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndPrefix[m - 7.182 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEventPrefix[m - 7.116 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEvents[m - 7.076 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndSome[m - 7.070 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testLocalizedMessage[m - 7.070 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 7.112 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEventsAfterDisabling[m - 7.304 s
+[[1;34mINFO[m]    └─ [1;32m✔ testSomeEvents[m - 7.108 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.JulMultiSessionIT[m - 81.47 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testPrefixAndEvent[m - 9.425 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsOneSession[m - 8.989 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAllSessions[m - 9.307 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndPrefix[m - 9.004 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndSome[m - 9.395 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 9.427 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEventsAfterDisabling[m - 9.433 s
+[[1;34mINFO[m]    └─ [1;32m✔ testSomeEvents[m - 9.246 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.JulLegacyApiIT[m - 34.35 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListEvents[m - 6.040 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEvents[m - 7.099 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 7.132 s
+[[1;34mINFO[m]    └─ [1;32m✔ testSomeEvents[m - 7.140 s
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1;32mTests run: 96, Failures: 0, Errors: 0, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;33mWARNING[m] Corrupted channel by directly writing to native stream in forked JVM 1. See FAQ web page and the dump file /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-jul/target/failsafe-reports/2026-08-07T19-05-28_615-jvmRun1.dumpstream
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:verify[m [1m(default)[m @ [36mlttng-ust-java-tests-jul[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--------------< [0;36morg.lttng.ust:lttng-ust-java-tests-log4j[0;1m >--------------[m
+[[1;34mINFO[m] [1mBuilding LTTng-UST Java Agent Log4j 1.x API Integration Tests 1.1.0-SNAPSHOT [5/6][m
+[[1;34mINFO[m]   from lttng-ust-java-tests-log4j/pom.xml
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mclean:3.2.0:clean[m [1m(default-clean)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:resources[m [1m(default-resources)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j/src/main/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:compile[m [1m(default-compile)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;34mINFO[m] No sources to compile
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:testResources[m [1m(default-testResources)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:testCompile[m [1m(default-testCompile)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 9 source files to /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j/target/test-classes
+[[1;34mINFO[m] /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j/src/test/java/org/lttng/ust/agent/integration/events/Log4jLegacyApiIT.java: /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j/src/test/java/org/lttng/ust/agent/integration/events/Log4jLegacyApiIT.java uses or overrides a deprecated API.
+[[1;34mINFO[m] /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j/src/test/java/org/lttng/ust/agent/integration/events/Log4jLegacyApiIT.java: Recompile with -Xlint:deprecation for details.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32msurefire:3.6.0-M1:test[m [1m(default-test)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mjar:3.1.2:jar[m [1m(default-jar)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;33mWARNING[m] JAR will be empty - no content was marked for inclusion!
+[[1;34mINFO[m] Building jar: /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j/target/lttng-ust-java-tests-log4j-1.1.0-SNAPSHOT.jar
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:integration-test[m [1m(default)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;34mINFO[m] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.filter.Log4jFilterListenerIT[m - 75.69 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRulesDisableAll[m - 6.279 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testOneRule[m - 6.067 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testDetachingListener[m - 6.250 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRulesDisableSome[m - 6.259 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testStatedump[m - 6.259 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSameEventsDiffFilters[m - 6.255 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testMultipleListeners[m - 6.251 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testUnattachedListeners[m - 6.163 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSameEventsDiffLogLevels[m - 6.256 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRules[m - 6.254 s
+[[1;34mINFO[m]    └─ [1;32m✔ testNoRules[m - 6.017 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.filter.Log4jFilterListenerOrderingIT[m - 80.11 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerSessionAgent_AgentSession[m - 6.033 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerSessionAgent_SessionAgent[m - 6.075 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionListenerAgent_AgentSession[m - 6.028 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionListenerAgent_SessionAgent[m - 6.070 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentListenerSession_AgentSession[m - 6.070 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentListenerSession_SessionAgent[m - 6.160 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentListener_AgentSession[m - 6.026 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentListener_SessionAgent[m - 6.068 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerAgentSession_AgentSession[m - 6.071 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerAgentSession_SessionAgent[m - 6.155 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentSessionListener_AgentSession[m - 6.070 s
+[[1;34mINFO[m]    └─ [1;32m✔ testAgentSessionListener_SessionAgent[m - 6.164 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.context.Log4jAppContextOrderingIT[m - 49.48 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentRetriever[m - 7.140 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentRetrieverSession[m - 7.131 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionRetrieverAgent[m - 7.149 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentSessionRetriever[m - 6.951 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testRetrieverAgentSession[m - 6.950 s
+[[1;34mINFO[m]    └─ [1;32m✔ testRetrieverSessionAgent[m - 6.955 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.context.Log4jAppContextIT[m - 171.2 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueFloat[m - 6.987 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueShort[m - 7.203 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueBooleanFalse[m - 6.999 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueDouble[m - 7.191 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueObject[m - 7.187 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextAvailableAndEnabledCtf1[m - 7.206 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueString[m - 6.992 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueCharacter[m - 7.013 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsOneAvailableTwoEnabled[m - 7.082 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueByte[m - 6.971 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueLong[m - 7.168 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueNull[m - 7.163 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsOneAvailableOtherEnabled[m - 7.171 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionNotEnabled[m - 7.211 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsTwoAvailableOneEnabled[m - 7.160 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoContexts[m - 7.071 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextNotAvailableButEnabled[m - 7.162 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionEnabledNotMatching[m - 7.300 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionEnabledMatching[m - 7.304 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextAvailableButNotEnabled[m - 7.078 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueInteger[m - 7.172 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueBooleanTrue[m - 6.966 s
+[[1;34mINFO[m]    └─ [1;32m✔ testContextAvailableAndEnabled[m - 7.171 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4jMultiSessionIT[m - 80.53 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testPrefixAndEvent[m - 9.497 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsOneSession[m - 8.799 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAllSessions[m - 8.926 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndPrefix[m - 9.005 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndSome[m - 8.995 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 9.231 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEventsAfterDisabling[m - 9.603 s
+[[1;34mINFO[m]    └─ [1;32m✔ testSomeEvents[m - 9.031 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4jListEventsIT[m - 37.31 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyLoggersNoneAttached[m - 6.064 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testLoggersSomeDetached[m - 6.041 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyLoggersSomeAttached[m - 6.039 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testLoggersAllDetached[m - 6.039 s
+[[1;34mINFO[m]    └─ [1;32m✔ testManyLoggersAllAttached[m - 6.038 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4jLegacyApiIT[m - 34.27 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListEvents[m - 6.023 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEvents[m - 7.070 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 6.916 s
+[[1;34mINFO[m]    └─ [1;32m✔ testSomeEvents[m - 7.112 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4jEnabledEventsIT[m - 70.00 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEventPrefixOverlapping[m - 7.212 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndPrefix[m - 6.975 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEventPrefix[m - 6.923 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEvents[m - 6.887 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndSome[m - 7.253 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 7.123 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEventsAfterDisabling[m - 7.308 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEvents[m - 7.096 s
+[[1;34mINFO[m]    └─ [1;32m✔ testLocalizedMessage[m - 6.014 s
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1;32mTests run: 78, Failures: 0, Errors: 0, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;33mWARNING[m] Corrupted channel by directly writing to native stream in forked JVM 1. See FAQ web page and the dump file /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j/target/failsafe-reports/2026-08-07T19-05-28_615-jvmRun1.dumpstream
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:verify[m [1m(default)[m @ [36mlttng-ust-java-tests-log4j[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------------< [0;36morg.lttng.ust:lttng-ust-java-tests-log4j2[0;1m >--------------[m
+[[1;34mINFO[m] [1mBuilding LTTng-UST Java Agent Log4j 2.x API Integration Tests 1.1.0-SNAPSHOT [6/6][m
+[[1;34mINFO[m]   from lttng-ust-java-tests-log4j2/pom.xml
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mclean:3.2.0:clean[m [1m(default-clean)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:resources[m [1m(default-resources)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j2/src/main/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:compile[m [1m(default-compile)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 9 source files to /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j2/target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:testResources[m [1m(default-testResources)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] Copying 16 resources from src/test/resources to target/test-classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.9.0:testCompile[m [1m(default-testCompile)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 14 source files to /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j2/target/test-classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32msurefire:3.6.0-M1:test[m [1m(default-test)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mjar:3.1.2:jar[m [1m(default-jar)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] Building jar: /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j2/target/lttng-ust-java-tests-log4j2-1.1.0-SNAPSHOT.jar
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:integration-test[m [1m(default)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4j2CompatMultiSessionIT[m - 82.04 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testPrefixAndEvent[m - 9.669 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsOneSession[m - 9.160 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAllSessions[m - 9.136 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndPrefix[m - 8.943 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndSome[m - 9.140 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 9.127 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEventsAfterDisabling[m - 9.766 s
+[[1;34mINFO[m]    └─ [1;32m✔ testSomeEvents[m - 9.343 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4j2MultiSessionIT[m - 81.34 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testPrefixAndEvent[m - 9.145 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsOneSession[m - 9.152 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAllSessions[m - 9.328 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndPrefix[m - 9.156 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndSome[m - 9.331 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 9.336 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEventsAfterDisabling[m - 9.696 s
+[[1;34mINFO[m]    └─ [1;32m✔ testSomeEvents[m - 8.944 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4j2EnabledEventsIT[m - 69.84 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEventPrefixOverlapping[m - 7.136 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndPrefix[m - 7.142 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEventPrefix[m - 7.092 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEvents[m - 7.102 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndSome[m - 7.188 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 6.902 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEventsAfterDisabling[m - 7.233 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEvents[m - 6.999 s
+[[1;34mINFO[m]    └─ [1;32m✔ testLocalizedMessage[m - 6.038 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4j2CompatListEventsIT[m - 25.01 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyLoggersNoneAttached[m - 6.042 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyLoggersSomeAttached[m - 6.034 s
+[[1;34mINFO[m]    └─ [1;32m✔ testManyLoggersAllAttached[m - 6.032 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4j2ListEventsIT[m - 25.22 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyLoggersNoneAttached[m - 6.037 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyLoggersSomeAttached[m - 6.039 s
+[[1;34mINFO[m]    └─ [1;32m✔ testManyLoggersAllAttached[m - 6.034 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.events.Log4j2CompatEnabledEventsIT[m - 69.66 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEventPrefixOverlapping[m - 7.161 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndPrefix[m - 6.950 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testEventPrefix[m - 6.907 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEvents[m - 7.092 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAllEventsAndSome[m - 7.189 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoEvents[m - 6.899 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEventsAfterDisabling[m - 7.229 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSomeEvents[m - 6.986 s
+[[1;34mINFO[m]    └─ [1;32m✔ testLocalizedMessage[m - 6.029 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.context.Log4j2CompatAppContextIT[m - 168.4 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueFloat[m - 6.959 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueShort[m - 6.936 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueBooleanFalse[m - 6.944 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueDouble[m - 7.134 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueObject[m - 6.935 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextAvailableAndEnabledCtf1[m - 7.001 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueString[m - 7.151 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueCharacter[m - 6.936 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsOneAvailableTwoEnabled[m - 6.989 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueByte[m - 6.944 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueLong[m - 6.940 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueNull[m - 7.143 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsOneAvailableOtherEnabled[m - 6.936 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionNotEnabled[m - 6.929 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsTwoAvailableOneEnabled[m - 6.946 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoContexts[m - 6.890 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextNotAvailableButEnabled[m - 6.949 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionEnabledNotMatching[m - 7.189 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionEnabledMatching[m - 7.179 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextAvailableButNotEnabled[m - 7.091 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueInteger[m - 6.957 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueBooleanTrue[m - 6.938 s
+[[1;34mINFO[m]    └─ [1;32m✔ testContextAvailableAndEnabled[m - 6.935 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.context.Log4j2AppContextOrderingIT[m - 49.40 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentRetriever[m - 6.936 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentRetrieverSession[m - 7.130 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionRetrieverAgent[m - 7.132 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentSessionRetriever[m - 7.135 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testRetrieverAgentSession[m - 6.940 s
+[[1;34mINFO[m]    └─ [1;32m✔ testRetrieverSessionAgent[m - 6.940 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.context.Log4j2AppContextIT[m - 168.3 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueFloat[m - 6.939 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueShort[m - 7.133 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueBooleanFalse[m - 7.130 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueDouble[m - 6.932 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueObject[m - 6.943 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextAvailableAndEnabledCtf1[m - 6.991 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueString[m - 6.938 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueCharacter[m - 6.937 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsOneAvailableTwoEnabled[m - 6.992 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueByte[m - 7.152 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueLong[m - 7.144 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueNull[m - 7.137 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsOneAvailableOtherEnabled[m - 7.156 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionNotEnabled[m - 6.932 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextsTwoAvailableOneEnabled[m - 6.940 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testNoContexts[m - 6.891 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextNotAvailableButEnabled[m - 6.943 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionEnabledNotMatching[m - 6.979 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextFilterExpressionEnabledMatching[m - 7.184 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextAvailableButNotEnabled[m - 6.888 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueInteger[m - 6.934 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testContextValueBooleanTrue[m - 6.935 s
+[[1;34mINFO[m]    └─ [1;32m✔ testContextAvailableAndEnabled[m - 6.932 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.context.Log4j2CompatAppContextOrderingIT[m - 49.41 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentRetriever[m - 7.130 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentRetrieverSession[m - 7.135 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionRetrieverAgent[m - 7.135 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentSessionRetriever[m - 6.937 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testRetrieverAgentSession[m - 6.938 s
+[[1;34mINFO[m]    └─ [1;32m✔ testRetrieverSessionAgent[m - 6.945 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.filter.Log4j2CompatFilterListenerOrderingIT[m - 80.15 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerSessionAgent_AgentSession[m - 6.034 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerSessionAgent_SessionAgent[m - 6.076 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionListenerAgent_AgentSession[m - 6.035 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionListenerAgent_SessionAgent[m - 6.076 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentListenerSession_AgentSession[m - 6.075 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentListenerSession_SessionAgent[m - 6.162 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentListener_AgentSession[m - 6.033 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentListener_SessionAgent[m - 6.079 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerAgentSession_AgentSession[m - 6.079 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerAgentSession_SessionAgent[m - 6.161 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentSessionListener_AgentSession[m - 6.079 s
+[[1;34mINFO[m]    └─ [1;32m✔ testAgentSessionListener_SessionAgent[m - 6.164 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.filter.Log4j2FilterListenerIT[m - 75.13 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRulesDisableAll[m - 6.251 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testOneRule[m - 6.061 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testDetachingListener[m - 6.244 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRulesDisableSome[m - 6.255 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testStatedump[m - 6.251 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSameEventsDiffFilters[m - 6.252 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testMultipleListeners[m - 6.247 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testUnattachedListeners[m - 6.153 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSameEventsDiffLogLevels[m - 6.251 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRules[m - 6.252 s
+[[1;34mINFO[m]    └─ [1;32m✔ testNoRules[m - 6.015 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.filter.Log4j2FilterListenerOrderingIT[m - 80.14 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerSessionAgent_AgentSession[m - 6.034 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerSessionAgent_SessionAgent[m - 6.074 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionListenerAgent_AgentSession[m - 6.034 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionListenerAgent_SessionAgent[m - 6.072 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentListenerSession_AgentSession[m - 6.075 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentListenerSession_SessionAgent[m - 6.169 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentListener_AgentSession[m - 6.035 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSessionAgentListener_SessionAgent[m - 6.073 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerAgentSession_AgentSession[m - 6.079 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testListenerAgentSession_SessionAgent[m - 6.166 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testAgentSessionListener_AgentSession[m - 6.074 s
+[[1;34mINFO[m]    └─ [1;32m✔ testAgentSessionListener_SessionAgent[m - 6.161 s
+[[1;34mINFO[m] ── [1morg.lttng.ust.agent.integration.filter.Log4j2CompatFilterListenerIT[m - 75.35 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRulesDisableAll[m - 6.253 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testOneRule[m - 6.062 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testDetachingListener[m - 6.251 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRulesDisableSome[m - 6.255 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testStatedump[m - 6.247 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSameEventsDiffFilters[m - 6.252 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testMultipleListeners[m - 6.252 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testUnattachedListeners[m - 6.151 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testSameEventsDiffLogLevels[m - 6.260 s
+[[1;34mINFO[m]    ├─ [1;32m✔ testManyRules[m - 6.255 s
+[[1;34mINFO[m]    └─ [1;32m✔ testNoRules[m - 6.016 s
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1;32mTests run: 144, Failures: 0, Errors: 0, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;33mWARNING[m] Corrupted channel by directly writing to native stream in forked JVM 1. See FAQ web page and the dump file /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/src/lttng-ust-java-tests/lttng-ust-java-tests-log4j2/target/failsafe-reports/2026-08-07T19-05-28_615-jvmRun1.dumpstream
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mfailsafe:3.6.0-M1:verify[m [1m(default)[m @ [36mlttng-ust-java-tests-log4j2[0;1m ---[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1mReactor Summary for LTTng-UST Java Agent 1.1.0-SNAPSHOT:[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] LTTng-UST Java Agent ............................... [1;32mSUCCESS[m [  0.226 s]
+[[1;34mINFO[m] LTTng-Tools Java Utilities ......................... [1;32mSUCCESS[m [  0.749 s]
+[[1;34mINFO[m] LTTng-UST Java Agent Integration Tests Common Package [1;32mSUCCESS[m [ 14.359 s]
+[[1;34mINFO[m] LTTng-UST Java Agent JUL API Integration Tests ..... [1;32mSUCCESS[m [11:41 min]
+[[1;34mINFO[m] LTTng-UST Java Agent Log4j 1.x API Integration Tests [1;32mSUCCESS[m [09:59 min]
+[[1;34mINFO[m] LTTng-UST Java Agent Log4j 2.x API Integration Tests [1;32mSUCCESS[m [18:19 min]
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  40:15 min
+[[1;34mINFO[m] Finished at: 2026-08-07T19:45:44Z
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
++ ret=0
++ mkdir -p /home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64/junit
++ read -r line
+++ find . -iname failsafe-reports -and -type d
+++ echo ./lttng-ust-java-tests-log4j2/target/failsafe-reports
+++ cut -d / -f 2
++ project=lttng-ust-java-tests-log4j2
++ [[ lttng-ust-java-tests-log4j2 == \t\a\r\g\e\t ]]
++ test -f ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.context.Log4j2AppContextIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.context.Log4j2AppContextOrderingIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.context.Log4j2CompatAppContextIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.context.Log4j2CompatAppContextOrderingIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4j2CompatEnabledEventsIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4j2CompatListEventsIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4j2CompatMultiSessionIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4j2EnabledEventsIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4j2ListEventsIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4j2MultiSessionIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.filter.Log4j2CompatFilterListenerIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.filter.Log4j2CompatFilterListenerOrderingIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.filter.Log4j2FilterListenerIT.xml ./lttng-ust-java-tests-log4j2/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.filter.Log4j2FilterListenerOrderingIT.xml
+/tmp/jenkins77796869931958644.sh: line 203: test: too many arguments
++ echo 'No test files found for '\''lttng-ust-java-tests-log4j2'\'''
+No test files found for 'lttng-ust-java-tests-log4j2'
++ continue
++ read -r line
+++ echo ./lttng-ust-java-tests-log4j/target/failsafe-reports
+++ cut -d / -f 2
++ project=lttng-ust-java-tests-log4j
++ [[ lttng-ust-java-tests-log4j == \t\a\r\g\e\t ]]
++ test -f ./lttng-ust-java-tests-log4j/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.context.Log4jAppContextIT.xml ./lttng-ust-java-tests-log4j/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.context.Log4jAppContextOrderingIT.xml ./lttng-ust-java-tests-log4j/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4jEnabledEventsIT.xml ./lttng-ust-java-tests-log4j/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4jLegacyApiIT.xml ./lttng-ust-java-tests-log4j/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4jListEventsIT.xml ./lttng-ust-java-tests-log4j/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.Log4jMultiSessionIT.xml ./lttng-ust-java-tests-log4j/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.filter.Log4jFilterListenerIT.xml ./lttng-ust-java-tests-log4j/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.filter.Log4jFilterListenerOrderingIT.xml
+/tmp/jenkins77796869931958644.sh: line 203: test: too many arguments
++ echo 'No test files found for '\''lttng-ust-java-tests-log4j'\'''
+No test files found for 'lttng-ust-java-tests-log4j'
++ continue
++ read -r line
+++ echo ./lttng-ust-java-tests-jul/target/failsafe-reports
+++ cut -d / -f 2
++ project=lttng-ust-java-tests-jul
++ [[ lttng-ust-java-tests-jul == \t\a\r\g\e\t ]]
++ test -f ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.context.JulAppContextIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.context.JulAppContextOrderingIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.JulEnabledEventsIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.JulLegacyApiIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.JulLegacyApiLoggerHierarchyListIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.JulListEventsIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.JulLoggerHierarchyListIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.events.JulMultiSessionIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.filter.JulFilterListenerIT.xml ./lttng-ust-java-tests-jul/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.filter.JulFilterListenerOrderingIT.xml
+/tmp/jenkins77796869931958644.sh: line 203: test: too many arguments
++ echo 'No test files found for '\''lttng-ust-java-tests-jul'\'''
+No test files found for 'lttng-ust-java-tests-jul'
++ continue
++ read -r line
+++ echo ./lttng-ust-java-tests-common/target/failsafe-reports
+++ cut -d / -f 2
++ project=lttng-ust-java-tests-common
++ [[ lttng-ust-java-tests-common == \t\a\r\g\e\t ]]
++ test -f ./lttng-ust-java-tests-common/target/failsafe-reports/TEST-org.lttng.ust.agent.context.ContextRegistrationIT.xml ./lttng-ust-java-tests-common/target/failsafe-reports/TEST-org.lttng.ust.agent.integration.client.TcpClientIT.xml
+/tmp/jenkins77796869931958644.sh: line 203: test: ./lttng-ust-java-tests-common/target/failsafe-reports/TEST-org.lttng.ust.agent.context.ContextRegistrationIT.xml: binary operator expected
++ echo 'No test files found for '\''lttng-ust-java-tests-common'\'''
+No test files found for 'lttng-ust-java-tests-common'
++ continue
++ read -r line
++ exit 0
++ cleanup
++ killall lttng-sessiond
+[PostBuildScript] - [INFO] Executing post build scripts.
+[deb13-amd64] $ /bin/bash /tmp/jenkins6052810132875123963.sh
++ pids=()
+++ mktemp -t postbuild_file_list.XXXXXX
++ file_list=/tmp/postbuild_file_list.UwPt2O
++ ret=0
++ WORKSPACE=/home/jenkins/workspace/dev_review_lttng-ust-java-tests_master_linuxbuild/platform/deb13-amd64
+++ pgrep -l 'lttng|gen-ust-.+'
++ lttng_processes=
++ true
++ '[' -n '' ']'
++ read -r core_file
+++ find /tmp -maxdepth 1 -name 'core\.[0-9]*' -type f
++ '[' -s /tmp/postbuild_file_list.UwPt2O ']'
++ find /tmp -maxdepth 1 -name 'core\.[0-9]*' -type f -delete
++ rm -f /tmp/postbuild_file_list.UwPt2O
++ exit 0
+Archiving artifacts
+Recording test results
+ERROR: Step ‘Publish JUnit test result report’ failed: No test report files were found. Configuration error?
+[WS-CLEANUP] Deleting project workspace...
+[WS-CLEANUP] Deferred wipeout is used...
+[WS-CLEANUP] done
+Finished: FAILURE
