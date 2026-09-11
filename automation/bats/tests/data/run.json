@@ -1,0 +1,6 @@
+{
+    "run": 1,
+    "project": "lttng-tools",
+    "job": "lttng-tools_master_linuxbuild",
+    "state": "success"
+}
