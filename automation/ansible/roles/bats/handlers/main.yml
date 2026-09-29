@@ -1,0 +1,8 @@
+---
+
+- name: Restart bats
+  ansible.builtin.command:
+    # Glob patterns aren't supported by ansible.builtin.systemd/service
+    argv: ['systemctl', 'restart', 'bats@*']
+  ignore_errors: "{{ ansible_check_mode }}"
+  changed_when: true
