@@ -1,0 +1,95 @@
+---
+
+- name: Output instance conf
+  ansible.builtin.debug:
+    msg: "{{ bats_conf }}"
+
+- name: Create group
+  ansible.builtin.group:
+    name: "{{ bats_conf.group }}"
+    system: true
+
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ bats_conf.user }}"
+    group: "{{ bats_conf.user }}"
+    shell: '/usr/bin/false'
+    home: "{{ bats_conf.home }}"
+    system: true
+  register: bats_user_info
+
+- name: Check if bats application directory exists
+  ansible.builtin.stat:
+    path: "{{ bats_user_info.home }}/{{ bats_conf.application_directory }}"
+  register: bats_application_directory_stat
+
+- name: Checkout bats block
+  when: bats_application_directory_stat.stat.isdir is not defined or (bats_application_directory_stat.stat.isdir is defined and not bats_application_directory_stat.stat.isdir)
+  block:
+    - name: Create temporary directory for checkout
+      ansible.builtin.tempfile:
+        state: directory
+      register: bats_tempfile
+    - name: Checkout bats
+      ansible.builtin.git:
+        dest: "{{ bats_tempfile.path }}"
+        repo: "{{ bats_conf.source_url }}"
+        refspec: "{{ bats_conf.source_refspec }}"
+        version: "{{ (bats_conf.source_refspec | default('') | length > 0) | ternary('FETCH_HEAD', 'HEAD') }}"
+    - name: Copy checkout to application directory
+      ansible.builtin.copy:
+        remote_src: true
+        dest: "{{ bats_user_info.home }}/{{ bats_conf.application_directory }}"
+        src: "{{ bats_tempfile.path }}/{{ bats_conf.source_dir }}/"
+        owner: "{{ bats_conf.user }}"
+        group: "{{ bats_conf.group }}"
+        mode: '0755'
+  always:
+    - name: Remove temporary checkout
+      ansible.builtin.file:
+        path: "{{ bats_tempfile.path }}"
+        state: absent
+
+- name: Add systemd service override block
+  block:
+    - name: Create instance override directory
+      ansible.builtin.file:
+        path: "/etc/systemd/system/bats@{{ bats_conf.instance }}.service.d"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Create instance override file
+      ansible.builtin.template:
+        src: bats.override.j2
+        dest: "/etc/systemd/system/bats@{{ bats_conf.instance }}.service.d/override.conf"
+        owner: root
+        group: root
+        mode: '0644'
+      register: bats_override
+    - name: Reload systemctl
+      ansible.builtin.systemd_service:
+        daemon_reload: "{{ bats_override.changed }}"
+
+- name: Configure service instance environment file
+  ansible.builtin.template:
+    src: bats.env.j2
+    dest: "/etc/bats/{{ bats_conf.instance }}.env"
+    owner: "{{ bats_conf.user }}"
+    group: "{{ bats_conf.group }}"
+    mode: "0440"
+  notify:
+    - 'Restart bats'
+
+- name: Configure application environment file
+  ansible.builtin.debug:
+    msg: 'hi'
+  notify:
+    - 'Restart bats'
+
+- name: Run systemd service
+  ansible.builtin.systemd_service:
+    name: "bats@{{ bats_conf.instance }}.service"
+    state: 'started'
+    enabled: true
+  ignore_errors: "{{ ansible_check_mode }}"
