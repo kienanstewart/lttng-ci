@@ -176,7 +176,7 @@ poetry run python3 -m isort --check --diff .
               label: 'pytest',
               script: '''#!/usr/bin/bash -x
 source ../venv/bin/activate
-poetry run pytest
+poetry run pytest tests/
 '''
             )
           }
