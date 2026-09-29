@@ -1,0 +1,18 @@
+---
+
+bats_instances:
+  dev:
+    application_directory: dev
+    source_url: https://review.lttng.org/lttng-ci
+    source_refspec: refs/changes/63/18663/11
+    host: 0.0.0.0
+    port: 8081
+    workers: 2
+
+  prod:
+    application_directory: prod
+    source_url: https://review.lttng.org/lttng-ci
+    source_refspec: refs/changes/63/18663/11
+    host: 0.0.0.0
+    port: 8080
+    workers: 6
