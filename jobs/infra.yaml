@@ -16,6 +16,71 @@
       - ansicolor
 
 - job-template:
+    name: '{prefix}infra_bats_{version}'
+    defaults: infra
+    concurrent: true
+    dsl: !include-jinja2: pipelines/infra/bats.groovy.j2
+    parameters: !j2-yaml: |
+      - bool:
+          name: DEPLOY
+          default: {deploy}
+      - string:
+          name: DEPLOY_ENV
+          default: '{deploy_env}'
+      - string:
+          name: 'GIT_URL'
+          default: 'https://github.com/lttng/lttng-ci'
+      - string:
+          name: 'GIT_BRANCH'
+          default: '{version}'
+      {% if review %}
+      {% include 'common/review_parameters.yaml.inc' %}
+      {% endif %}
+
+    scm:
+      - git:
+          url: 'https://github.com/lttng/lttng-ci.git'
+          branches:
+            - origin/{version}
+          basedir: src/lttng-ci
+          skip-tag: true
+    properties:
+      !j2-yaml: |
+            {% if review %}
+            - build-discarder:
+                !include: common/review_discarder.yaml.inc
+            {% else %}
+            - build-discarder:
+                !include: common/default_discarder.yaml.inc
+            {% endif %}
+    triggers:
+      - !j2-yaml: |
+        {% if review %}
+        gerrit:
+          trigger-on:
+            - comment-added-event:
+                approval-category: 'CI-Build'
+                approval-value: 1
+          projects:
+            - project-compare-type: 'PLAIN'
+              project-pattern: 'lttng-ci'
+              branches:
+                - branch-compare-type: 'ANT'
+                  branch-pattern: '{version}'
+        {% else %}
+        pollscm:
+          cron: '@hourly'
+        {% endif %}
+
+    # job variables
+    deploy: false
+    deploy_env: ''
+    version:
+      - master
+    prefix: ''
+    review: false
+
+- job-template:
     name: '{prefix}infra_lttng-ci_{version}'
     defaults: infra
     concurrent: true
@@ -164,6 +229,10 @@
 - project:
     name: infra
     jobs:
+      - '{prefix}infra_bats_{version}': {}
+      - '{prefix}infra_bats_{version}':
+          prefix: 'dev_review_'
+          review: true
       - '{prefix}infra_lttng-ci_{version}': {}
       - '{prefix}infra_lttng-ci_{version}':
           prefix: 'dev_review_'
