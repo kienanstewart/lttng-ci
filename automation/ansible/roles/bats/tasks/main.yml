@@ -1,0 +1,33 @@
+---
+
+- name: Install dependencies
+  ansible.builtin.package:
+    name:
+      - python3-poetry
+
+- name: Create configuration directory
+  ansible.builtin.file:
+    path: /etc/bats
+    state: directory
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Add systemd service
+  ansible.builtin.template:
+    src: bats.service.j2
+    dest: /etc/systemd/system/bats@.service
+    owner: root
+    group: root
+    mode: '0644'
+  register: bats_service_file
+  notify:
+    - 'Restart bats'
+
+
+- name: Deploy bats instances
+  loop: "{{ bats_instances | dict2items }}"
+  ansible.builtin.include_tasks:
+    file: instance.yml
+  vars:
+    bats_conf: "{{ bats_instance_defaults | combine(item.value, {'instance': item.key}) }}"
