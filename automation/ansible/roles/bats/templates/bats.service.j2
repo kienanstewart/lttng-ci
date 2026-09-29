@@ -1,0 +1,15 @@
+[Unit]
+Description=BATS Server for %i
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/bats/%i.env
+ExecStartPre=poetry lock
+ExecStartPre=poetry install
+ExecStartPre=poetry run alembic upgrade head
+ExecStart=poetry run uvicorn bats.server:app
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

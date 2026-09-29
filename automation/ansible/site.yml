@@ -55,11 +55,21 @@
     - lttng_tools
     - lttng_modules
     - libs_i386
+- name: Include bats roles
+  hosts: bats
+  roles:
+    - common
+    - bats
 - name: Include developer roles
   hosts: developer
   roles:
     - developer
     - docker
+- name: Include bats roles
+  hosts: bats
+  roles:
+    - common
+    - bats
 - name: Include ripper roles
   hosts: ripper
   tasks:
