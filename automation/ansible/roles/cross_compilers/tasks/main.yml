@@ -11,11 +11,14 @@
       skip: true
 
 # Setup/install tasks.
-- ansible.builtin.include_tasks: setup-RedHat.yml
+- name: Include EL tasks
+  ansible.builtin.include_tasks: setup-RedHat.yml
   when: ansible_os_family in ['RedHat', 'Rocky']
 
-- ansible.builtin.include_tasks: setup-Debian.yml
+- name: Include Debian tasks
+  ansible.builtin.include_tasks: setup-Debian.yml
   when: ansible_os_family == 'Debian'
 
-- ansible.builtin.include_tasks: setup-Alpine.yml
+- name: Include Alpine tasks
+  ansible.builtin.include_tasks: setup-Alpine.yml
   when: ansible_os_family == 'Alpine'

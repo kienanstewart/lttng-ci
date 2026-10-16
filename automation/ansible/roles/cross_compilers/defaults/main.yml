@@ -1,0 +1,5 @@
+---
+cross_compilers_debian_bookworm_snapshot: false
+cross_compilers_install: true
+cross_compilers_packages: []
+cross_compilers_legacy_install: "{{ compilers_legacy_install | default(true) }}"

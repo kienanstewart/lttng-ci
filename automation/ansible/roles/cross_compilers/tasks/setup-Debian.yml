@@ -1,37 +1,50 @@
 ---
 - name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 86400
 
 - name: Add snapshot soures for gcc-11-powerpc/riscv64
   when: ansible_distribution == 'Debian' and ansible_distribution_major_version == '12'
   block:
-    - ansible.builtin.copy:
+    - name: Create snapshot preference file
+      ansible.builtin.copy:
         dest: /etc/apt/preferences.d/snapshot.pref
         content: "Package: *\nPin: origin \"snapshot.debian.org\"\nPin-Priority: 400\n"
+        owner: root
+        group: root
+        mode: '0644'
       when: cross_compilers_debian_bookworm_snapshot
-    - ansible.builtin.apt_repository:
+    - name: Add bookworm snapshot repository
+      ansible.builtin.apt_repository:
         repo: 'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/20230109T091852Z/ bookworm main'
-        state: "{{cross_compilers_debian_bookworm_snapshot|ternary('present', 'absent')}}"
-    - ansible.builtin.apt:
+        state: "{{ cross_compilers_debian_bookworm_snapshot | ternary('present', 'absent') }}"
+    - name: Update APT cache
+      ansible.builtin.apt:
         update_cache: true
 
 - name: Ensure cross-compilers packages are installed.
   when: cross_compilers_install|default(true) and ansible_architecture not in ['armv8l']
   ansible.builtin.apt:
-    name: "{{ cross_compilers_packages | difference(lookup('vars', 'cross_compilers_packages_exclude_{{ansible_userspace_architecture|default(ansible_architecture)}}', default=[]))}}"
+    name: "{{ cross_compilers_packages | difference(lookup('vars', 'cross_compilers_packages_exclude_{{ ansible_userspace_architecture | default(ansible_architecture) }}', default=[])) }}"
 
 - name: Install legacy cross compilers
-  when: ansible_distribution == 'Debian' and ansible_architecture == 'x86_64' and compilers_legacy_install
+  when: ansible_distribution == 'Debian' and ansible_architecture == 'x86_64' and cross_compilers_legacy_install
   block:
     # This step needs to happen after the cross compiler packages are installed
     # so the libgcc cross libraries can be copied
-    - ansible.builtin.shell:
-        cmd: "dpkg -l | grep -E '^ii[ ]+gcc-[0-9]+-cross-base[^-:]' | tr -s ' ' | cut -d ' ' -f 2 | cut -d '-' -f 2 | sort -n | tail -n 1"
-      register: gcc_cross_major_version
+    - name: Find gcc cross base major version
+      ansible.builtin.shell:
+        executable: /usr/bin/bash
+        cmd: |
+          set -o pipefail
+          dpkg -l | grep -E '^ii[ ]+gcc-[0-9]+-cross-base[^-:]' | tr -s ' ' | cut -d ' ' -f 2 | cut -d '-' -f 2 | sort -n | tail -n 1
+      register: cross_compilers_gcc_cross_major_version
+      changed_when: false
     - name: Copy gcc-cross libs
       ansible.builtin.command:
-        argv: ['cp', '-r', "/usr/lib/gcc-cross/{{item}}/{{gcc_cross_major_version.stdout | trim}}/", "/usr/lib/gcc-cross/{{item}}/4.8.5"]
-        creates: "/usr/lib/gcc-cross/{{item}}/4.8.5"
+        argv: ['cp', '-r', "/usr/lib/gcc-cross/{{ item }}/{{ cross_compilers_gcc_cross_major_version.stdout | trim }}/", "/usr/lib/gcc-cross/{{ item }}/4.8.5"]
+        creates: "/usr/lib/gcc-cross/{{ item }}/4.8.5"
       with_items:
         - aarch64-linux-gnu
         - arm-linux-gnueabihf
@@ -45,18 +58,26 @@
       ansible.builtin.get_url:
         url: https://obj-jenkins.internal.efficios.com/compilers/gcc-4.8-x86_64-linux-gnu-cross.tgz
         dest: /root/gcc-4.8-x86_64-linux-gnu-cross.tgz
-      register: cross_gcc48_download
+        owner: root
+        group: root
+        mode: '0640'
+      register: cross_compilers_gcc48_download
     - name: Extract gcc-4.8 cross compiler binaries
-      when: cross_gcc48_download.changed
+      when: cross_compilers_gcc48_download.changed  # noqa: no-handler
       ansible.builtin.command:
         argv: ['tar', '-C', '/', '-xzf', '/root/gcc-4.8-x86_64-linux-gnu-cross.tgz']
+      changed_when: true
 
     - name: Download gcc-5.5 cross compiler binaries
       ansible.builtin.get_url:
         url: https://obj-jenkins.internal.efficios.com/compilers/gcc-5.5-x86_64-linux-gnu-cross.tgz
         dest: /root/gcc-5.5-x86_64-linux-gnu-cross.tgz
-      register: cross_gcc55_download
+        owner: root
+        group: root
+        mode: '0640'
+      register: cross_compilers_gcc55_download
     - name: Extract gcc-5.5 cross compiler binaries
-      when: cross_gcc55_download.changed
+      when: cross_compilers_gcc55_download.changed  # noqa: no-handler
       ansible.builtin.command:
         argv: ['tar', '-xzf', '/root/gcc-5.5-x86_64-linux-gnu-cross.tgz', '-C', '/']
+      changed_when: true

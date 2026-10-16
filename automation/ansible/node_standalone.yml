@@ -3,7 +3,7 @@
     - common
     - common_node
     - compilers
-    - cross-compilers
+    - cross_compilers
     - babeltrace
     - librseq
     - liburcu

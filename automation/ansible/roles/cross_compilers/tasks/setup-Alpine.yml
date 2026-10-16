@@ -1,0 +1,9 @@
+---
+- name: Update apk cache.
+  community.general.apk:
+    update_cache: true
+
+- name: Ensure cross-compilers packages are installed.
+  when: cross_compilers_install | bool
+  community.general.apk:
+    name: "{{ cross_compilers_packages }}"
