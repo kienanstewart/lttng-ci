@@ -2,9 +2,9 @@
 
 - name: Activate required products
   when: ansible_distribution == 'SLES'
-  include_role:
+  ansible.builtin.include_role:
     name: suse
     tasks_from: product
-  loop: "{{developer_sles_products|default([])}}"
+  loop: "{{ developer_sles_products }}"
   loop_control:
     loop_var: 'product'

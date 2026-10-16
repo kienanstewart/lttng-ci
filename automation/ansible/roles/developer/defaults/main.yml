@@ -21,3 +21,5 @@ developer_install_vlttng: true
 developer_pip_requirements:
   - python3-pip
   - python3-setuptools
+
+developer_sles_products: []
