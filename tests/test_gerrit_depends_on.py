@@ -35,6 +35,28 @@ def project_git_repo(project_name, workspace):
     p.wait()
     assert p.returncode == 0
 
+    # Set local committer information. This avoids errors when
+    # running the test in environments where the global git config
+    # doesn't supply a user or email.
+    p = subprocess.Popen(["git", "-C", str(project_dir), "branch", "-m", "main"])
+    p.wait()
+    p = subprocess.Popen(
+        [
+            "git",
+            "-C",
+            str(project_dir),
+            "config",
+            "set",
+            "user.email",
+            "test@example.com",
+        ]
+    )
+    p.wait()
+    p = subprocess.Popen(
+        ["git", "-C", str(project_dir), "config", "set", "user.name", "Test"]
+    )
+    p.wait()
+
     p = subprocess.Popen(
         [
             "git",
