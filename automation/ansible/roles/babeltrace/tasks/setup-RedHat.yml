@@ -1,9 +1,8 @@
 ---
 - name: Ensure babeltrace build dependencies are installed.
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ babeltrace_packages }}"
-    state: installed
 
 - name: Ensure babeltrace test dependencies are installed
   ansible.builtin.pip:
-    name: "{{babeltrace_packages_pip|default([])}}"
+    name: "{{ babeltrace_packages_pip | default([]) }}"

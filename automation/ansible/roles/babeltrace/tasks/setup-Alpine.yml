@@ -1,10 +1,12 @@
 ---
 - name: Update apk cache.
-  apk: update_cache=yes
+  community.general.apk:
+    update_cache: true
 
 - name: Ensure babeltrace build dependencies are installed.
-  apk: "name={{ babeltrace_packages }} state=present"
+  community.general.apk:
+    name: "{{ babeltrace_packages }}"
 
 - name: Ensure babeltrace test dependencies are installed
   ansible.builtin.pip:
-    name: "{{babeltrace_packages_pip|default([])}}"
+    name: "{{ babletrace_packages_pip }}"
