@@ -1,7 +1,7 @@
 - hosts: node_standalone
   roles:
     - common
-    - common-node
+    - common_node
     - compilers
     - cross-compilers
     - babeltrace

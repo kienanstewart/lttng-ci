@@ -14,7 +14,7 @@
 - hosts: node_yocto
   roles:
     - common
-    - common-node
+    - common_node
     - netplan
 - hosts: gitmirror
   roles:
@@ -28,7 +28,7 @@
 - hosts: ci_node:developer
   roles:
     - common
-    - common-node
+    - common_node
     - cross-compilers
     - compilers
     - babeltrace

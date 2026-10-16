@@ -1,7 +1,7 @@
 - hosts: node_sles
   roles:
     - common
-    - common-node
+    - common_node
     - compilers
     - babeltrace
     - librseq

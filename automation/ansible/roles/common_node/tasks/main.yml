@@ -13,7 +13,8 @@
         - "{{ ansible_os_family }}.yml"
       skip: true
 
-- when: ansible_virtualization_role == "host" or (ansible_virtualization_role == "guest" and ansible_virtualization_type in ["kvm", "VirtualPC", "KVM/Linux"]) or common_node_force_core_pattern|default(false)
+- name: Set core pattern
+  when: ansible_virtualization_role == "host" or (ansible_virtualization_role == "guest" and ansible_virtualization_type in ["kvm", "VirtualPC", "KVM/Linux"]) or common_node_force_core_pattern|default(false)
   block:
     - name: 'Set core pattern for reboot'
       ansible.builtin.copy:
@@ -39,26 +40,32 @@
         argv: ['cat', '/proc/sys/kernel/core_pattern']
       check_mode: false
       changed_when: false
-      register: current_core_pattern
+      register: common_node_current_core_pattern
     - name: 'Update current core pattern'
-      when: current_core_pattern.stdout|trim != common_node_core_pattern
+      when: common_node_current_core_pattern.stdout|trim != common_node_core_pattern
       ansible.builtin.command:
-        argv: ['sysctl', '-w', "kernel.core_pattern='{{common_node_core_pattern}}'"]
+        argv: ['sysctl', '-w', "kernel.core_pattern='{{ common_node_core_pattern }}'"]
+      changed_when: true
 
 # Setup/install tasks.
-- ansible.builtin.include_tasks: setup-RedHat.yml
+- name: Include EL tasks
+  ansible.builtin.include_tasks: setup-RedHat.yml
   when: ansible_os_family in ['RedHat', 'Rocky']
 
-- ansible.builtin.include_tasks: setup-Debian.yml
+- name: Include Debian tasks
+  ansible.builtin.include_tasks: setup-Debian.yml
   when: ansible_os_family == 'Debian'
 
-- ansible.builtin.include_tasks: setup-Alpine.yml
+- name: Include Alpine tasks
+  ansible.builtin.include_tasks: setup-Alpine.yml
   when: ansible_os_family == 'Alpine'
 
-- ansible.builtin.include_tasks: setup-Suse.yml
+- name: Include SUSE tasks
+  ansible.builtin.include_tasks: setup-Suse.yml
   when: ansible_os_family == 'Suse'
 
-- when: common_node_rootfs_readonly_reboot|default(false)
+- name: Manage readonly reboot script
+  when: common_node_rootfs_readonly_reboot|default(false)
   block:
     - name: Install readonly reboot script
       ansible.builtin.copy:
@@ -75,20 +82,22 @@
         minute: '*/10'
         user: 'root'
 
-- community.general.pam_limits:
+- name: Set jenkins nofile limit
+  community.general.pam_limits:
     domain: 'jenkins'
     limit_item: 'nofile'
     limit_type: '-'
-    value: '{{common_jenkins_limit_nofile}}'
+    value: '{{ common_node_jenkins_limit_nofile }}'
 
 - name: Increase jenkins core dump limit
   community.general.pam_limits:
     domain: 'jenkins'
     limit_item: 'core'
     limit_type: '-'
-    value: '{{common_jenkins_limit_core}}'
+    value: '{{ common_node_jenkins_limit_core }}'
 
-- ansible.builtin.file:
+- name: Create /usr/local/bin
+  ansible.builtin.file:
     path: /usr/local/bin
     state: directory
     mode: '0755'

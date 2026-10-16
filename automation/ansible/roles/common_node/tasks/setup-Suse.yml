@@ -2,18 +2,24 @@
 
 - name: Activate SLES Products
   when: ansible_distribution == 'SLES'
-  include_role:
+  ansible.builtin.include_role:
     name: suse
     tasks_from: product
-  loop: "{{common_node_products|default([])}}"
+  loop: "{{ common_node_products | default([]) }}"
   loop_control:
     loop_var: 'product'
 
 - name: Ensure common_node patterns are installed.
-  zypper: "name={{ common_node_patterns }} type=pattern state=present update_cache=yes"
+  community.general.zypper:
+    name: "{{ common_node_patterns }}"
+    type: pattern
+    update_cache: true
 
 - name: Ensure common_node packages are installed.
-  zypper: "name={{ common_node_packages }} type=package state=present update_cache=yes"
+  community.general.zypper:
+    name: "{{ common_node_packages }}"
+    type: package
+    update_cache: true
 
 - name: Install maven from upstream binary
   when: ansible_distribution_major_version == "12"
@@ -22,11 +28,17 @@
       ansible.builtin.file:
         path: '/opt/apache'
         state: 'directory'
+        owner: 'root'
+        group: 'root'
+        mode: '0755'
     - name: Download release
       ansible.builtin.get_url:
         url: 'https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz'
         checksum: 'sha512:https://downloads.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz.sha512'
         dest: '/opt/apache'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
     - name: Unarchive release
       ansible.builtin.unarchive:
         dest: '/opt/apache/'
@@ -52,4 +64,4 @@
     state: stopped
   # The package may be not installed by default on some versions,
   # or it was manually purged.
-  ignore_errors: true
+  ignore_errors: true  # noqa: ignore-errors

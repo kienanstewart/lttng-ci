@@ -102,14 +102,14 @@ ci-rootnode-yocto50-amd64-2[a:c]-01
 ci-rootnode-yocto50-arm64-[1:2][a:b]-01
 
 [node_sles]
-ci-node-sles16sp0-amd64-2[a:d]-01 common_jenkins_limit_nofile=1000000
+ci-node-sles16sp0-amd64-2[a:d]-01 common_node_jenkins_limit_nofile=1000000
 
 [node_el]
 ci-node-el8-amd64-1b-[01:03] ansible_python_interpreter=python3.12
 ci-node-el9-amd64-1b-01
 ci-node-el8-arm64-01    ansible_python_interpreter=python3.12
 ci-node-el9-arm64-01
-ci-node-el10-amd64-2[a:b]-[01:02] common_jenkins_limit_nofile=1000000
+ci-node-el10-amd64-2[a:b]-[01:02] common_node_jenkins_limit_nofile=1000000
 ci-rootnode-el8-amd64-1d-01
 
 [node_yocto]

@@ -1,9 +1,12 @@
 ---
 - name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 86400
 
 - name: Ensure common_node packages are installed.
-  apt: "name={{ common_node_packages }} state=present"
+  ansible.builtin.apt:
+    name: "{{ common_node_packages }}"
 
 - name: Install binutils-gold
   when: ansible_architecture != 'riscv64' and ansible_distribution_version is version('13', '>=')
@@ -15,21 +18,21 @@
   block:
     - name: Install i386 linux headers Debian
       when: ansible_architecture == 'i386' and ansible_distribution == 'Debian'
-      apt:
+      ansible.builtin.apt:
         name: ['linux-headers-686', 'linux-headers-686-pae']
     - name: Install amd64 linux headers Debian
       when: ansible_architecture == 'x86_64' and ansible_distribution == 'Debian'
-      apt:
+      ansible.builtin.apt:
         name: ['linux-headers-amd64']
     - name: Install armhf linux headers Debian
       when: ansible_architecture == 'armv7l' and ansible_distribution == 'Debian'
-      apt:
+      ansible.builtin.apt:
         name: ['linux-headers-armmp-lpae']
     - name: Install arm64 linux headers Debian
       when: ansible_architecture == 'aarch64' and ansible_distribution == 'Debian'
-      apt:
+      ansible.builtin.apt:
         name: ['linux-headers-arm64']
     - name: Install linux headers Ubuntu
       when: ansible_distribution == 'Ubuntu'
-      apt:
+      ansible.builtin.apt:
         name: linux-headers-generic

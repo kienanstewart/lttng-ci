@@ -1,0 +1,8 @@
+---
+- name: Update apk cache.
+  community.general.apk:
+    update_cache: true
+
+- name: Ensure common_node packages are installed.
+  community.general.apk:
+    name: "{{ common_node_packages }}"

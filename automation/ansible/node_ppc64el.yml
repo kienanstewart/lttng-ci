@@ -1,7 +1,7 @@
 - hosts: node_ppc64el
   roles:
     - common
-    - common-node
+    - common_node
     - babeltrace
     - librseq
     - liburcu
