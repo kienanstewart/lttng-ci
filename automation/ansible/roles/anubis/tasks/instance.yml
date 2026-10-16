@@ -15,24 +15,30 @@
   ansible.builtin.copy:
     src: /usr/share/doc/anubis/botPolicies.yaml
     remote_src: true
-    dest: "/etc/anubis/{{anubis_instance}}.botPolicies.yaml"
+    dest: "/etc/anubis/{{ anubis_instance }}.botPolicies.yaml"
+    owner: root
+    group: root
+    mode: "0644"
 
 - name: Create instance environment configuration
   ansible.builtin.template:
-    dest: "/etc/anubis/{{anubis_instance}}.env"
+    dest: "/etc/anubis/{{ anubis_instance }}.env"
     src: env.j2
+    owner: root
+    group: root
+    mode: "0644"
   vars:
-    anubis_instance_env: "{{anubis_env_defaults|combine(anubis_env|default(dict()))}}"
+    anubis_instance_env: "{{ anubis_env_defaults | combine(anubis_env | default(dict())) }}"
   register: anubis_config
 
 - name: Ensure anubis service
   ansible.builtin.service:
-    name: "anubis@{{anubis_instance}}.service"
-    state: "{{anubis_instance_state|default('started')}}"
+    name: "anubis@{{ anubis_instance }}.service"
+    state: "{{ anubis_instance_state | default('started') }}"
     enabled: true
 
 - name: Restart anubis
-  when: anubis_config.changed
+  when: anubis_config.changed  # noqa: no-handler
   ansible.builtin.service:
-    name: "anubis@{{anubis_instance}}.service"
+    name: "anubis@{{ anubis_instance }}.service"
     state: restarted
