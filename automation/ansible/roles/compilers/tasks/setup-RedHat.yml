@@ -1,5 +1,4 @@
 ---
 - name: Ensure compilers packages are installed.
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ compilers_packages }}"
-    state: installed
