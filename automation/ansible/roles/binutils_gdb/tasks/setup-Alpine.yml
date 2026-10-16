@@ -1,0 +1,8 @@
+---
+- name: Update apk cache.
+  community.general.apk:
+    update_cache: true
+
+- name: Ensure binutils_gdb build dependencies are installed.
+  community.general.apk:
+    name: "{{ binutils_gdb_packages }}"

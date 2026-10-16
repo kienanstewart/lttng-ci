@@ -8,4 +8,4 @@
     - lttng-ust
     - lttng-tools
     - lttng-modules
-    - binutils-gdb
+    - binutils_gdb

@@ -32,7 +32,7 @@
     - cross-compilers
     - compilers
     - babeltrace
-    - binutils-gdb
+    - binutils_gdb
     - librseq
     - liburcu
     - lttng-ust

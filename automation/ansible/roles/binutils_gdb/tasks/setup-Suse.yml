@@ -1,0 +1,5 @@
+---
+- name: Ensure binutils_gdb build dependencies are installed.
+  community.general.zypper:
+    name: "{{ binutils_gdb_packages }}"
+    update_cache: true

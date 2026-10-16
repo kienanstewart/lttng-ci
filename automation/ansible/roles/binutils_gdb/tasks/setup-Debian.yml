@@ -3,13 +3,13 @@
 - name: Enable debug archive
   ansible.builtin.apt_repository:
     filename: main_debug
-    repo: "deb https://deb.debian.org/debian-debug/ {{ansible_distribution_release}}-debug main"
+    repo: "deb https://deb.debian.org/debian-debug/ {{ ansible_distribution_release }}-debug main"
 
 - name: Update apt cache.
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 86400
 
 - name: Ensure binutils_gdb build dependencies are installed.
   ansible.builtin.apt:
-    name: "{{binutils_gdb_packages}}"
+    name: "{{ binutils_gdb_packages }}"
