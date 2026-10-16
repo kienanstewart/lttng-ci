@@ -1,13 +1,15 @@
 ---
 - name: Upgrade all packages
   when: common_upgrade_all_packages
-  ansible.builtin.apk:
-    state: latest
+  community.general.apk:
+    state: latest  # noqa: package-latest
     update_cache: true
     upgrade: true
 
 - name: Update apk cache.
-  ansible.builtin.apk: update_cache=yes
+  community.general.apk:
+    update_cache: true
 
 - name: Ensure common packages are installed.
-  ansible.builtin.apk: "name={{ common_packages }} state=present"
+  community.general.apk:
+    name: "{{ common_packages }}"

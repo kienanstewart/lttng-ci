@@ -42,12 +42,12 @@
 - name: Join domain
   ansible.windows.win_domain_membership:
     dns_domain_name: 'internal.efficios.com'
-    hostname: "{{ansible_hostname}}"
+    hostname: "{{ ansible_hostname }}"
     domain_ou_path: 'DC=internal,DC=efficios,DC=com'
     state: 'domain'
     domain_admin_user: "{{ lookup('community.general.bitwarden', '2443aefa-0b85-497d-aa0e-aef6011295c4', search='id', field='username')[0] }}"
     domain_admin_password: "{{ lookup('community.general.bitwarden', '2443aefa-0b85-497d-aa0e-aef6011295c4', search='id', field='password')[0] }}"
-  register: domain_state
+  register: common_domain_state
 - name: Install python
   ansible.windows.win_package:
     path: 'https://www.python.org/ftp/python/3.11.3/python-3.11.3-arm64.exe'
@@ -88,5 +88,5 @@
     state: present
     enabled: true
 - name: Reboot if domain changed
-  when: domain_state.reboot_required
-  ansible.windows.win_reboot:
+  when: common_domain_state.reboot_required
+  ansible.windows.win_reboot: {}

@@ -1,5 +1,15 @@
 ---
 
-- name: 'apt update'
-  ansible.builtin.command:
-    argv: ['apt', 'update']
+- name: 'Update APT cache'
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: 'Restart prometheus-node-exporter'
+  ansible.builtin.service:
+    name: prometheus-node-exporter
+    state: restarted
+
+- name: 'Restart promtail'
+  ansible.builtin.service:
+    name: promtail
+    state: restarted

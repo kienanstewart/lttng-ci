@@ -5,47 +5,60 @@
     - name: Check registration
       ansible.builtin.command:
         argv: ['SUSEConnect', '--status']
-      register: registration_status
+      register: common_registration_status
       ignore_errors: true
+      changed_when: false
     - name: Cleanup registration
-      when: registration_status.rc != 0
+      when: common_registration_status.rc != 0
       ansible.builtin.command:
         argv[ 'SUSEConnect', '--cleanup']
-    - ansible.builtin.set_fact:
-        registration_status_data: "{{registration_status.stdout|ansible.builtin.from_json|first}}"
+      changed_when: true
+    - name: Set registration status data fact
+      ansible.builtin.set_fact:
+        common_registration_status_data: "{{ common_registration_status.stdout | ansible.builtin.from_json | first }}"
     - name: Get key from host environment
-      when: registration_status_data['status'] == 'Not Registered'
+      when: common_registration_status_data['status'] == 'Not Registered'
+      # @TODO: ansible-core 2.22+ use register_secret
       ansible.builtin.set_fact:
-        registration_key: "{{lookup('ansible.builtin.env', 'SLES_REGISTRATION_CODE_' + ansible_architecture, default='')}}"
+        common_registration_key: "{{ lookup('ansible.builtin.env', 'SLES_REGISTRATION_CODE_' + ansible_architecture, default='') }} "
     - name: Get key from bitwarden
-      when: registration_key|default('') == '' and registration_status_data['status'] == 'Not Registered'
+      when: common_registration_key|default('') == '' and common_registration_status_data['status'] == 'Not Registered'
       ansible.builtin.set_fact:
-        registration_key: "{{lookup('community.general.bitwarden', 'bec75018-99e8-4064-9cd9-addd011947e5', search='id', field='SLES_REGISTRATION_CODE_' +ansible_architecture)[0]}}"
+        common_registration_key: "{{ lookup('community.general.bitwarden', 'bec75018-99e8-4064-9cd9-addd011947e5', search='id', field='SLES_REGISTRATION_CODE_' + ansible_architecture)[0] }}"
     - name: Perform registration
-      when: registration_status_data['status'] == 'Not Registered'
+      when: common_registration_status_data['status'] == 'Not Registered'
       ansible.builtin.command:
-        argv: ['SUSEConnect', '-r', "{{registration_key}}"]
+        argv: ['SUSEConnect', '-r', "{{ common_registration_key }}"]
+      register:
+        common_registration_result
+      changed_when: common_registration_result.rc == 0
 
 - name: Connect SLES Repo
   when: ansible_distribution == 'SLES'
-  include_role:
+  ansible.builtin.include_role:
     name: suse
     tasks_from: product
-  loop: "{{common_sles_connect_repos}}"
+  loop: "{{ common_sles_connect_repos }}"
   loop_control:
     loop_var: 'product'
 
 - name: Upgrade packages
   when: common_upgrade_all_packages
-  ansible.builtin.zypper:
+  community.general.zypper:
     name: '*'
-    state: latest
+    state: latest  # noqa: package-latest
     update_cache: true
-  register: result
-  failed_when: result.rc != 0 and result.rc != 107
+  register: common_result
+  failed_when: common_result.rc != 0 and common_result.rc != 107
 
 - name: Ensure common patterns are installed.
-  zypper: "name={{ common_patterns }} type=pattern state=present update_cache=yes"
+  community.general.zypper:
+    name: "{{ common_patterns }}"
+    type: pattern
+    update_cache: true
 
 - name: Ensure common packages are installed.
-  zypper: "name={{ common_packages }} type=package state=present update_cache=yes"
+  community.general.zypper:
+    name: "{{ common_packages }}"
+    type: package
+    update_cache: true

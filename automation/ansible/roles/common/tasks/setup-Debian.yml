@@ -2,9 +2,9 @@
 - name: Upgrade packages
   when: common_upgrade_all_packages
   ansible.builtin.apt:
-    state: latest
+    state: latest  # noqa: package-latest
     update_cache: true
-    upgrade: yes
+    upgrade: true
 
 - name: Add LTTng-CI PPA
   # This provides gdb with no babeltrace; however, it's only made
@@ -26,43 +26,49 @@
         filename: efficios-ubuntu-ci
 
 - name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 86400
 
 - name: Ensure common packages are installed.
-  apt: "name={{ common_packages }} state=present"
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
 
 - name: Install unattended upgrades
-  apt:
+  ansible.builtin.apt:
     name: 'unattended-upgrades'
-    state: "{{(unattended_upgrades|bool)|ternary('present', 'absent')}}"
+    state: "{{ common_unattended_upgrades | ternary('present', 'absent') }}"
 
 - name: Enable extra repos for unattended upgrades
-  template:
+  ansible.builtin.template:
     dest: /etc/apt/apt.conf.d/51unattended_upgrades_extra_repos.conf
     src: unattended_upgrades_extra_repos.conf.j2
+    mode: '0644'
   vars:
     repos_base:
       - "${distro_id}:${distro_codename}-updates"
       - "${distro_id}:${distro_codename}-backports"
-    repos_Ubuntu:
+    repos_ubuntu:
       - "LP-PPA-efficios-ci:${distro_codename}"
-    repos_Debian: []
-    repos: "{{repos_base|union(lookup('vars', 'repos_' + ansible_distribution, default=[]))|sort}}"
+    repos_debian: []
+    repos: "{{ repos_base | union(lookup('vars', 'repos_' + (ansible_distribution | lower), default=[])) | sort }}"
 
 - name: Enable unattended upgrades
   block:
-    - copy:
+    - name: Set auto-upgrades configuration
+      ansible.builtin.copy:
         dest: /etc/apt/apt.conf.d/20auto-upgrades
         content: "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";\n"
-      when: unattended_upgrades | bool
-      ignore_errors: "{{ansible_check_mode}}"
-    - file:
-        path: /etc/apt/apt.conf.d/20auto-upgrades
-        state: "{{(unattended_upgrades|bool)|ternary('file', 'absent')}}"
         owner: root
         group: root
         mode: '0644'
-      ignore_errors: "{{ansible_check_mode}}"
+      when: common_unattended_upgrades
+      ignore_errors: "{{ ansible_check_mode }}"
+    - name: Remove auto-upgrades configuration
+      ansible.builtin.file:  # noqa: risky-file-permissions
+        path: /etc/apt/apt.conf.d/20auto-upgrades
+        state: "{{ common_unattended_upgrades | ternary('file', 'absent') }}"
+      ignore_errors: "{{ ansible_check_mode }}"
 - name: Install microcode for physical hosts
   when: ansible_virtualization_role == 'host'
   block:
@@ -70,18 +76,20 @@
       when: "'AuthenticAMD' in ansible_processor"
       ansible.builtin.apt:
         name: amd64-microcode
-      register: amd64_microcode
+      register: common_amd64_microcode
     - name: Install Intel microcode
       when: "'GenuineIntel' in ansible_processor"
       ansible.builtin.apt:
         name: intel-microcode
-      register: intel_microcode
+      register: common_intel_microcode
     - name: Update initramfs
-      when: amd64_microcode.changed or intel_microcode.changed
+      when: common_amd64_microcode.changed or common_intel_microcode.changed
       ansible.builtin.command:
         argv: ['update-initramfs', '-u', '-k', 'all']
+      register: common_update_initramfs
+      changed_when: common_update_initramfs.rc == 0
     - name: Set reboot required
-      when: amd64_microcode.changed or intel_microcode.changed
+      when: common_amd64_microcode.changed or common_intel_microcode.changed
       ansible.builtin.copy:
         dest: /var/run/reboot-required
         content: '*** System restart required ***'
@@ -93,19 +101,22 @@
   tags:
     - monitoring
   block:
-    - ansible.builtin.apt:
+    - name: Install prometheus exporter packages
+      ansible.builtin.apt:
         name:
           - prometheus-node-exporter
           - prometheus-node-exporter-collectors
-    - ansible.builtin.lineinfile:
-        line: "ARGS={{common_prometheus_node_exporter_args|quote}}"
+    - name: Configuration prometheus node exporter
+      ansible.builtin.lineinfile:
+        line: "ARGS={{ common_prometheus_node_exporter_args | quote }}"
         path: /etc/default/prometheus-node-exporter
-      register: node_exporter_config
-    - when: node_exporter_config.changed
+      notify:
+        - 'Restart prometheus-node-exporter'
+    - name: Enable prometheus-node-exporter
       ansible.builtin.service:
         name: prometheus-node-exporter
-        state: restarted
         enabled: true
+        state: started
 
 - name: Work-around for git hanging during checkouts
   # @see https://support.efficios.com/issues/1532
@@ -117,7 +128,8 @@
         name: 'http.version'
         value: 'HTTP/1.1'
 
-- when: common_install_promtail
+- name: Install promtail
+  when: common_install_promtail
   tags:
     - monitoring
   block:
@@ -127,14 +139,17 @@
           ansible.builtin.copy:
             dest: /etc/apt/keyrings/grafana.gpg
             src: grafana.gpg
-          register: signing_key
+            owner: root
+            group: root
+            mode: '0644'
+          register: common_signing_key
         - name: Add apt source
           ansible.builtin.apt_repository:
             filename: grafana
             repo: 'deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main'
-          register: apt_source
+          register: common_apt_source
         - name: Apt update
-          when: signing_key.changed or apt_source.changed
+          when: common_signing_key.changed or common_apt_source.changed
           ansible.builtin.apt:
             update_cache: true
     - name: Install promtail
@@ -153,9 +168,10 @@
         owner: 'root'
         group: 'root'
         mode: '0644'
-      register: promtail_configuration
+      notify:
+        - 'Restart promtail'
     - name: Manage promtail service
       ansible.builtin.service:
         name: 'promtail'
         enabled: true
-        state: "{{promtail_configuration.changed|ternary('restarted', 'started')}}"
+        state: started
