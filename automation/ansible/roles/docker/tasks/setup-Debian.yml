@@ -1,15 +1,18 @@
 ---
-- when: ansible_distribution_release in ['trixie', 'sid']
+- name: Disable docker upstream for testing/unstable
+  when: ansible_distribution_release in ['trixie', 'sid']
   ansible.builtin.set_fact:
     docker_upstream: false
-- ansible.builtin.set_fact:
-    docker_packages: "{{docker_upstream|ternary(docker_upstream_packages, lookup('vars', 'docker_' + ansible_distribution + '_packages', default=[]))}}"
-- when: docker_upstream
+- name: Set docker packages fact
+  ansible.builtin.set_fact:
+    docker_packages: "{{ docker_upstream | ternary(docker_upstream_packages, lookup('vars', 'docker_' + ansible_distribution | lower + '_packages', default=[])) }}"
+- name: Configure docker upstream repository
+  when: docker_upstream
   block:
     - name: Add upstream docker apt key
       ansible.builtin.apt_key:
-        url: "https://download.docker.com/linux/{{ansible_distribution|lower}}/gpg"
+        url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
     - name: Add upstream docker sources
       ansible.builtin.apt_repository:
         filename: 'docker'
-        repo: "deb https://download.docker.com/linux/{{ansible_distribution|lower}} {{ansible_distribution_release}} stable"
+        repo: "deb https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"

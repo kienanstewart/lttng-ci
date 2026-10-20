@@ -2,12 +2,13 @@
 
 - name: Add SLES products
   when: ansible_distribution == 'SLES'
-  include_role:
+  ansible.builtin.include_role:
     name: suse
     tasks_from: product
-  loop: "{{docker_sles_products|default([])}}"
+  loop: "{{ docker_sles_products }}"
   loop_control:
     loop_var: product
 
-- ansible.builtin.set_fact:
-    docker_packages: "{{docker_SLES_packages}}"
+- name: Set docker_packages fact
+  ansible.builtin.set_fact:
+    docker_packages: "{{ docker_sles_packages }}"

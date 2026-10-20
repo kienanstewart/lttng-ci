@@ -1,18 +1,18 @@
 ---
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: "{{item}}"
+  ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - files:
-        - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
-        - "{{ansible_distribution}}-{{ansible_distribution_release}}.yml"
-        - "{{ansible_distribution}}.yml"
-        - "{{ansible_os_family}}.yml"
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
       skip: true
 - name: OS-specific setup
-  ansible.builtin.include_tasks: "{{item}}"
+  ansible.builtin.include_tasks: "{{ item }}"
   with_first_found:
     - files:
-        - "setup-{{ansible_os_family}}.yml"
+        - "setup-{{ ansible_os_family }}.yml"
       skip: true
 - name: Deploy docker network configuration
   block:
@@ -34,7 +34,7 @@
         - 'Restart docker'
 - name: Install docker
   ansible.builtin.package:
-    name: "{{docker_packages}}"
+    name: "{{ docker_packages }}"
 - name: Ensure docker is running
   ansible.builtin.service:
     name: 'docker'

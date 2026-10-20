@@ -8,18 +8,18 @@ docker_upstream_packages:
   - 'docker-buildx-plugin'
   - 'docker-compose-plugin'
 
-docker_Debian_packages:
+docker_debian_packages:
   - 'docker.io'
   - 'docker-compose'
 
 docker_sles_products: []
 
-docker_SLES_packages:
+docker_sles_packages:
   - 'docker'
 
-docker_Ubuntu_packages:
+docker_ubuntu_packages:
   - 'docker.io'
   - 'docker-compose-v2'
 
 # Rocky Linux doesn't provide packages for docker
-docker_Rocky_packages: []
+docker_rocky_packages: []
