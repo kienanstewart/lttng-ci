@@ -1,5 +1,5 @@
 ---
-cgit_sections:
+gitmirror_cgit_sections:
   - section: git
     clone-url: git://git-mirror.internal.efficios.com/git/$CGIT_REPO_URL
     scan-path: /storage/git-mirror/gitdaemon/export/git
@@ -15,20 +15,20 @@ cgit_sections:
     clone-url: git://git-mirror.internal.efficios.com/efficios/$CGIT_REPO_URL
     project-list: /storage/git-mirror/gitdaemon/efficios/projects.list
     scan-path: /storage/git-mirror/gitdaemon/export/efficios
-cgit_export_links:
+gitmirror_cgit_export_links:
   efficios: '../efficios'
   lttng: '../lttng'
   git: '../git'
   kernel: '../kernel/pub/scm/linux/kernel/git'
 
-git_daemon_conf:
+gitmirror_git_daemon_conf:
   GIT_DAEMON_ENABLE: 'true'
   GIT_DAEMON_USER: 'gitdaemon'
   GIT_DAEMON_OPTIONS: '"--export-all --max-connections=128"'
   GIT_DAEMON_BASE_PATH: '/storage/git-mirror/gitdaemon/export'
   GIT_DAEMON_DIRECTORY: '/storage/git-mirror/gitdaemon/export'
 
-grokmirror_instances:
+gitmirror_grokmirror_instances:
   efficios.com:
     core:
       toplevel: '/storage/git-mirror/gitdaemon/efficios'

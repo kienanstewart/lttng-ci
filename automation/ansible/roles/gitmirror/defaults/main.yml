@@ -1,5 +1,5 @@
 ---
-cgit_configuration:
+gitmirror_cgit_configuration:
   - ['root-title', 'EfficiOS local git mirror']
   - ['root-desc', 'mirror of common repositories used by the CI']
   - ['enable-git-config', '1']
@@ -9,19 +9,19 @@ cgit_configuration:
   - ['css', '/cgit-css/cgit.css']
   - ['logo', '/cgit-css/cgit.png']
   - ['favicon', '/cgit-css/favicon.ico']
-cgit_export_links: {}
-cgit_sections: {}
-cgit_tls_cert: '/etc/ssl/certs/internal.efficios.com.pem'
-cgit_tls_key: '/etc/ssl/private/internal.efficios.com.key'
+gitmirror_cgit_export_links: {}
+gitmirror_cgit_sections: {}
+gitmirror_cgit_tls_cert: '/etc/ssl/certs/internal.efficios.com.pem'
+gitmirror_cgit_tls_key: '/etc/ssl/private/internal.efficios.com.key'
 
-git_daemon_conf:
+gitmirror_git_daemon_conf:
   GIT_DAEMON_ENABLE: 'false'
   GIT_DAEMON_USER: 'gitdaemon'
   GIT_DAEMON_BASE_PATH: '/var/lib'
   GIT_DAEMON_DIRECTORY: '/var/lib/git'
 
-grokmirror_instances: {}
-grokmirror_instance_defaults:
+gitmirror_grokmirror_instances: {}
+gitmirror_grokmirror_instance_defaults:
   core:
     manifest: '${toplevel}/manifest.js.gz'
     loglevel: 'info'

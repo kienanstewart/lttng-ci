@@ -2,7 +2,8 @@
 - name: Install cgit
   ansible.builtin.apt:
     name: ['cgit', 'apache2']
-- import_role:
+- name: Include certs
+  ansible.builtin.import_role:
     name: common
     tasks_from: certs
   tags:
@@ -13,6 +14,9 @@
   ansible.builtin.template:
     src: cgitrc.j2
     dest: /etc/cgitrc
+    owner: root
+    group: root
+    mode: '0644'
 - name: Configure apache2
   block:
     - name: Enable cgit configuration
@@ -43,6 +47,9 @@
       ansible.builtin.template:
         src: apache2.conf.j2
         dest: /etc/apache2/sites-available/cgit.conf
+        owner: root
+        group: root
+        mode: '0644'
       notify:
         - Restart apache
     - name: Enable cgit site configuration
@@ -54,20 +61,28 @@
 - name: Install git-daemon
   ansible.builtin.apt:
     name: ['git-daemon-sysvinit']
+- name: Create gitdaemon group
+  ansible.builtin.group:
+    name: gitdaemon
+    system: true
 - name: Create git-daemon base path
-  when: git_daemon_conf.GIT_DAEMON_BASE_PATH
+  when: gitmirror_git_daemon_conf.GIT_DAEMON_BASE_PATH | length > 0
   ansible.builtin.file:
-    path: "{{git_daemon_conf.GIT_DAEMON_BASE_PATH}}"
+    path: "{{ gitmirror_git_daemon_conf.GIT_DAEMON_BASE_PATH }}"
     state: directory
     owner: gitdaemon
     group: gitdaemon
+    mode: '0644'
 - name: Configure git-daemon
-  with_items: "{{git_daemon_conf|dict2items}}"
+  with_items: "{{ gitmirror_git_daemon_conf | dict2items }}"
   community.general.ini_file:
     path: /etc/default/git-daemon
-    option: "{{item.key}}"
-    value: "{{item.value}}"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
     no_extra_spaces: true
+    owner: root
+    group: root
+    mode: '0644'
   notify:
     - Restart git-daemon
 - name: Create git-daemon group
@@ -80,17 +95,32 @@
     append: true
     groups: ['gitdaemon']
 - name: Install grokmirror
+  when: ansible_distribution_release != 'bookworm'
+  ansible.builtin.apt:
+    name: grokmirror
+- name: Install grokmirror from local deb
+  when: ansible_distribution_release == 'bookworm'
   block:
-    - ansible.builtin.copy:
+    - name: Download grokmirror deb
+      ansible.builtin.copy:
         src: files/grokmirror_2.0.11-1_all.deb
         dest: /root/grokmirror.deb
-      register: grokmirror_deb
-    - when: grokmirror_deb.changed
+        owner: root
+        group: root
+        mode: '0644'
+      register: gitmirror_grokmirror_deb
+    - name: Install from deb file
+      when: gitmirror_grokmirror_deb.changed  # noqa: no-handler
       ansible.builtin.command:
         argv: ['apt', 'install', '-y', '/root/grokmirror.deb']
-    - ansible.builtin.file:
-        state: directory
-        dest: /etc/grokmirror
+      changed_when: true
+- name: Create grokmirror configuration directory
+  ansible.builtin.file:
+    state: directory
+    dest: /etc/grokmirror
+    owner: root
+    group: root
+    mode: '0644'
 - name: Create grokmirror log directory
   ansible.builtin.file:
     state: directory
@@ -98,24 +128,27 @@
     owner: gitdaemon
     group: root
     mode: '0755'
-- ansible.builtin.file:
+- name: Create gitdaemon storage directory
+  ansible.builtin.file:
     state: directory
     dest: /storage/git-mirror/gitdaemon
     owner: gitdaemon
     group: gitdaemon
+    mode: '0755'
 - name: Create grokmirror configs
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: mirror_instance.yml
-  with_items: "{{grokmirror_instances|dict2items}}"
+  with_items: "{{ gitmirror_grokmirror_instances | dict2items }}"
   vars:
-    name: "{{item.key}}"
-    mirror: "{{item.value}}"
+    gitmirror_instance_name: "{{ item.key }}"
+    gitmirror_instance_mirror: "{{ item.value }}"
 - name: Create legacy pull directory
   ansible.builtin.file:
     state: directory
     dest: /storage/git-mirror/gitdaemon/git
     owner: gitdaemon
     group: gitdaemon
+    mode: '0755'
 - name: Create legacy pull script
   ansible.builtin.copy:
     src: update.sh
@@ -134,8 +167,8 @@
     job: 'cd /storage/git-mirror/gitdaemon/git && ./update.sh >/dev/null 2>&1'
     user: gitdaemon
 - name: Link cgit export directories
-  with_items: "{{cgit_export_links|dict2items}}"
+  with_items: "{{ gitmirror_cgit_export_links | dict2items }}"
   ansible.builtin.file:
     state: link
-    src: "{{item.value}}"
-    path: "/storage/git-mirror/gitdaemon/export/{{item.key}}"
+    src: "{{ item.value }}"
+    path: "/storage/git-mirror/gitdaemon/export/{{ item.key }}"

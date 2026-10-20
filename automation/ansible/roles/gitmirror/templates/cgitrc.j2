@@ -1,8 +1,8 @@
-{% for entry in cgit_configuration %}
+{% for entry in gitmirror_cgit_configuration %}
 {{entry[0]}}={{entry[1]}}
 {% endfor %}
 
-{% for section in cgit_sections %}
+{% for section in gitmirror_cgit_sections %}
 {% for key, value in section.items() %}
 {{key}}={{value}}
 {% endfor %}

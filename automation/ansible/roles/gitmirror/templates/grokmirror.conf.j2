@@ -1,6 +1,6 @@
 # {{name}}
 #
-{% for section, conf in data.items() %}
+{% for section, conf in gitmirror_instance_data.items() %}
 [{{section}}]
 {% for key, value in conf.items() %}
 {% if value is not string and value is iterable %}
