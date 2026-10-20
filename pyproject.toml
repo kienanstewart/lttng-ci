@@ -30,6 +30,7 @@ asv = "^0.6.6"
 bs4 = "^0.0.2"
 scipy = "^1.17.1"
 numpy = "^2.4.6"
+ansible-dev-tools = "^26.10.0"
 
 [build-system]
 requires = ["poetry-core"]
