@@ -1,0 +1,11 @@
+---
+scenario:
+  name: standalone
+  test_sequence:
+    - dependency
+    - syntax
+    - converge
+    - idempotence
+    - verify
+
+shared_state: true

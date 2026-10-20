@@ -1,0 +1,87 @@
+---
+
+- name: Add hosts to jenkins group
+  hosts: all
+  gather_facts: true
+  vars:
+    molecule_skipped_scenarios: "{{ (molecule_skip_scenarios | default([])) | difference(molecule_include_scenarios | default([])) }}"
+    runtime_inventory_dir: "{{ molecule_ephemeral_directory + '/runtime_inventory' }}"
+  tasks:
+    - name: End hosts that skip this scenario
+      ansible.builtin.meta: end_host
+      when: "'jenkins' in molecule_skipped_scenarios"
+    - name: Add host to the jenkins group
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups:
+          - jenkins
+      loop: "{{ ansible_play_batch }}"
+      # Never signal a change for this, since it breaks the idempotence step
+      changed_when: false
+
+- name: Apply site playbook
+  ansible.builtin.import_playbook: ../../site.yml
+  vars:
+    # The first run of the play will install Jenkins, but it requires manual initialization.
+    # Don't define any plugins since the install of the plugins won't be idempotent until
+    # the initialization is complete.
+    jenkins_plugins_skip: true
+    jenkins_systemd_service_override: |
+      [Service]
+      Environment="JAVA_OPTS=-Djenkins.install.runSetupWizard=false"
+
+- name: Initialize jenkins
+  hosts: jenkins
+  tasks:
+    - name: End play if password is available
+      when: jenkins_url_password | default('') | length > 0
+      ansible.builtin.meta: end_host
+    - name: Lookup initial admin password
+      ansible.builtin.command:
+        argv: ['cat', '/var/lib/jenkins/secrets/initialAdminPassword']
+      register: jenkins_initial_password_contents
+      changed_when: false
+    - name: Set jenkins_url_password fact
+      ansible.builtin.set_fact:
+        jenkins_url_password: "{{ jenkins_initial_password_contents.stdout | trim }}"
+    - name: Save jenkins_url_password to ansible controller
+      delegate_to: localhost
+      ansible.builtin.copy:
+        # noqa: risky-file-permissions
+        content: |
+          jenkins_url_password: "{{ jenkins_url_password }}"
+        dest: "{{ runtime_inventory_dir }}/host_vars/{{ item }}/jenkins.yml"
+      loop: "{{ ansible_play_batch }}"
+    - name: Remove initial password file
+      ansible.builtin.file:
+        path: /var/lib/jenkins/secrets/initialAdminPassword
+        state: absent
+    - name: Set the Jenkins url
+      # Without this, the jenkins_plugin task always reports changed.
+      ansible.builtin.copy:
+        dest: /var/lib/jenkins/jenkins.model.JenkinsLocationConfiguration.xml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+        content: |
+          <?xml version='1.1' encoding='UTF-8'?>
+            <jenkins.model.JenkinsLocationConfiguration>
+            <adminAddress>address not configured yet &lt;nobody@nowhere&gt;</adminAddress>
+            <jenkinsUrl>http://{{ ansible_default_ipv4.address }}:8080/</jenkinsUrl>
+          </jenkins.model.JenkinsLocationConfiguration>
+    - name: Restart jenkins
+      ansible.builtin.service:
+        name: jenkins
+        state: restarted
+
+- name: Apply site playbook
+  ansible.builtin.import_playbook: ../../site.yml
+  vars:
+    # The default list is long and slow, use a reduced list to validate the plugin install task.
+    jenkins_plugins:
+      - git
+    jenkins_restart_on_change: true
+    # Make sure the systemd conf won't change since the last run for the idempotency check.
+    jenkins_systemd_service_override: |
+      [Service]
+      Environment="JAVA_OPTS=-Djenkins.install.runSetupWizard=false"

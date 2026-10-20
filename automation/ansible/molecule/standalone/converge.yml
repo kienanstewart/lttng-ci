@@ -1,0 +1,22 @@
+---
+- name: Add hosts to node_standalone group
+  hosts: all
+  gather_facts: true
+  vars:
+    molecule_skipped_scenarios: "{{ (molecule_skip_scenarios | default([])) | difference(molecule_include_scenarios | default([])) }}"
+  tasks:
+    - name: End hosts that skip this scenario
+      ansible.builtin.meta: end_host
+      when: "'standalone' in molecule_skipped_scenarios"
+    - name: Add host to the ci_node group
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups:
+          - node_standalone
+      loop: "{{ ansible_play_batch }}"
+
+- name: Apply site playbook
+  ansible.builtin.import_playbook: ../../site.yml
+  vars:
+    # Don't clone the linux kernel
+    lttng_modules_checkout_repo: false

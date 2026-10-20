@@ -1,0 +1,22 @@
+---
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: false
+    ignore-errors: false
+    # We don't use role-file at this time, but this
+    # will silence warnings about it not existing.
+    # @see https://docs.ansible.com/projects/molecule/configuration/#dependency
+    role-file: roles/requirements.yml
+    requirements-file: roles/requirements.yml
+
+scenario:
+  name: gitmirror
+  test_sequence:
+    - dependency
+    - syntax
+    - converge
+    - idempotence
+    - verify
+
+shared_state: true

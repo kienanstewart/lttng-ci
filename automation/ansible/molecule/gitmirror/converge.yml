@@ -1,0 +1,15 @@
+---
+# Purpose: bring the instance to the desired state by running the role under test.
+# Molecule calls this playbook with `molecule converge`.
+- name: Converge
+  hosts: all
+  gather_facts: true
+  vars:
+    molecule_skipped_scenarios: "{{ (molecule_skip_scenarios | default([])) | difference(molecule_include_scenarios | default([])) }}"
+  tasks:
+    - name: End play on hosts that skip this scenario
+      ansible.builtin.meta: end_host
+      when: "'gitmirror' in molecule_skipped_scenarios"
+    - name: Apply gitmirror role
+      ansible.builtin.include_role:
+        name: gitmirror

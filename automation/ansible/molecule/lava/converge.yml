@@ -1,0 +1,22 @@
+---
+
+- name: Add hosts to lava group
+  hosts: all
+  gather_facts: true
+  vars:
+    molecule_skipped_scenarios: "{{ (molecule_skip_scenarios | default([])) | difference(molecule_include_scenarios | default([])) }}"
+  tasks:
+    - name: End hosts that skip this scenario
+      ansible.builtin.meta: end_host
+      when: "'lava' in molecule_skipped_scenarios"
+    - name: Add host to the lava group
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups:
+          - infra_lava
+      loop: "{{ ansible_play_batch }}"
+      # Never signal a change for this, since it breaks the idempotence step
+      changed_when: false
+
+- name: Apply site playbook
+  ansible.builtin.import_playbook: ../../site.yml

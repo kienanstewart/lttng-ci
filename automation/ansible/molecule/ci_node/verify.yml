@@ -1,0 +1,18 @@
+---
+# Purpose: assert that the instance really ended up in the expected state.
+# Molecule calls this playbook with `molecule verify`.
+- name: Verify
+  hosts: all
+  gather_facts: true
+  vars:
+    molecule_skipped_scenarios: "{{ (molecule_skip_scenarios | default([])) | difference(molecule_include_scenarios | default([])) }}"
+  tasks:
+    - name: End play if host skips this scenario
+      ansible.builtin.meta: end_host
+      when: "'ci_node' in molecule_skipped_scenarios"
+    - name: Verify in block
+      block:
+        - name: Assert
+          ansible.builtin.assert:
+            that:
+              - true

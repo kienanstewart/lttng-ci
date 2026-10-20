@@ -1,0 +1,32 @@
+---
+# Purpose: assert that the instance really ended up in the expected state.
+# Molecule calls this playbook with `molecule verify`.
+- name: Verify
+  hosts: all
+  gather_facts: true
+  vars:
+    molecule_skipped_scenarios: "{{ (molecule_skip_scenarios | default([])) | difference(molecule_include_scenarios | default([])) }}"
+  tasks:
+    - name: End play on hosts that skip this scenario
+      ansible.builtin.meta: end_host
+      when: "'gitmirror' in molecule_skipped_scenarios"
+    - name: Verify in block
+      block:
+        - name: Cgit is accessible via HTTP
+          ansible.builtin.uri:
+            url: "http://{{ ansible_default_ipv4.address }}/"
+            status_code:
+              - 200
+              - 302
+              # No repositories initialized
+              - 404
+        - name: Cgit is accessible via HTTPs
+          delegate_to: localhost
+          ansible.builtin.uri:
+            url: "https://{{ ansible_default_ipv4.address }}"
+            status_code:
+              - 200
+              - 302
+              # No repositories initialized
+              - 404
+            validate_certs: false

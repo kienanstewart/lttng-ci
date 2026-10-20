@@ -1,0 +1,21 @@
+---
+
+ansible:
+  executor:
+    backend: ansible-playbook
+    args:
+      ansible_playbook:
+        - "--inventory=${MOLECULE_EPHEMERAL_DIRECTORY}/runtime_inventory"
+        - "--inventory=${MOLECULE_SCENARIO_DIRECTORY}/inventory/hosts.yml"
+
+scenario:
+  name: release_upgrade
+  test_sequence:
+    - create
+    - dependency
+    - syntax
+    - converge
+    - verify
+    - destroy
+
+shared_state: false

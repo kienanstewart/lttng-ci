@@ -1,0 +1,13 @@
+---
+
+- name: Validate that current release matches post-upgrade expectation
+  hosts: all
+  tasks:
+    - name: Assert OS reports running on next version
+      when: expect_release_after_play | default('') | length > 0
+      ansible.builtin.assert:
+        that: ansible_distribution_release == expect_release_after_play
+    - name: Assert hostname updated
+      when: expect_hostname_after_play | default('') | length > 0
+      ansible.builtin.assert:
+        that: ansible_hostname == expect_hostname_after_play

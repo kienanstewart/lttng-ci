@@ -43,6 +43,7 @@ ansible-playbook -i hosts [-l SUBSET] site.yaml
 
 * access: Any user / ssh access tasks
 * certs: Any certificate deployment and renewal tasks
+* molecule-notest / notest: skipped during molecule runs
 * monitoring: Any tasks related to installing or configuring monitoring services
 * slow: Any tasks that may take a long time
 
@@ -53,6 +54,37 @@ ansible-playbook -i hosts [-l SUBSET] site.yaml
 ### Example: Only manage users/SSH keys
 
 `ansible-playbook -t access`
+
+# Testing
+
+The tests use molecule_incus to manage ephemereal hosts. The default is to use
+the "ci" remote.
+
+Test all scenarios:
+
+    # This is required for common secrets, like TLS certs
+    bw unlock
+    export BW_SESSION="..."
+    poetry run molecule -c extensions/molecule/config.yml test --all
+
+Test multiple different versions of ansible & python
+
+    # The default command is the above
+    tox
+
+With tox, tests can be still targeted:
+
+    tox run -- test -s jenkins
+
+The environments can be run in parallel, although multiple runners using the same incus instance will conflict at this time.
+
+    tox p -- test -s plays/release_upgrade
+
+The ansible remote used to created the testing instance can be modified (default: ci):
+
+    ANSIBLE_INCUS_REMOTE=xxx poetry run molecule -c extensions/molecule/config.yml test --all
+
+Note: some integration tests currently require access to the bitwarden vault, e.g. for certificates.
 
 # Bootstrapping hosts
 

@@ -1,0 +1,17 @@
+---
+- name: Install python3-apt
+  hosts: all
+  tasks:
+    - name: Install python3-apt
+      # This is required on debian13+ to do apt related tasks
+      # It is automatically installed, but the install sems to race with
+      # other parts apt tasks like updating the cache
+      when: ansible_distribution == 'Debian'
+      ansible.builtin.package:
+        name: python3-apt
+
+- name: Run dist upgrade play
+  ansible.builtin.import_playbook: ../../../playbooks/release-upgrade.yml
+  vars:
+    # noqa: var-naming[pattern]
+    UPDATE_HOSTNAME: true

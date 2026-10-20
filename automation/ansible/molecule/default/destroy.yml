@@ -1,0 +1,43 @@
+---
+
+- name: Destroy instances
+  hosts: localhost
+  connection: local
+  vars:
+    default_remote: "{{ ansible_incus_remote | default(lookup('ansible.builtin.env', 'ANSIBLE_INCUS_REMOTE', default='local')) }}"
+    default_project: "{{ ansible_incus_project | default('default') }}"
+    # This includes the scenario name, unless invoked with MOLECULE_EPHEMERAL_DIRECTORY=x
+    instance_suffix: "{{ molecule_ephemeral_directory | basename | regex_replace('[^a-zA-Z0-9]+', '') }}"
+    runtime_inventory_dir: "{{ molecule_ephemeral_directory + '/runtime_inventory' }}"
+    scenario_name: "{{ molecule_yml.scenario.name }}"
+    scenario_name_clean: "{{ molecule_yml.scenario.name | regex_replace('[^a-zA-Z0-9]+', '') }}"
+    shared_state: "{{ molecule_yml.shared_state | default(false) }}"
+  tasks:
+    - name: End if there are no items in test_resources
+      when: "'test_resources' not in groups"
+      ansible.builtin.meta: end_play
+    - name: Add scenario to instance suffix
+      when: not shared_state and scenario_name_clean not in instance_suffix
+      ansible.builtin.set_fact:
+        instance_suffix: "{{ instance_suffix + '-' + scenario_name_clean }}"
+    - name: Delete instance
+      ansible.builtin.command:
+        argv:
+          - incus
+          - delete
+          - '-f'
+          - "--project={{ hostvars[item]['project'] | default(default_project) }}"
+          - "{{ hostvars[item]['remote'] | default(default_remote) + ':' }}{{ instance_name }}"
+      failed_when:
+        - _incus_delete.rc != 0
+        - "'Instance not found' not in _incus_delete.stderr"
+      register: _incus_delete
+      vars:
+        instance_name: "{{ item + '-' + instance_suffix }}"
+      loop: "{{ groups['test_resources'] }}"
+      changed_when: true
+    - name: Remove runtime configuration
+      ansible.builtin.file:
+        path: "{{ runtime_inventory_dir }}/host_vars/{{ item }}/runtime.yml"
+        state: absent
+      loop: "{{ groups['test_resources'] }}"

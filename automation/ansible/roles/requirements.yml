@@ -1,9 +1,13 @@
 ---
 collections:
   - name: ansible.posix
+  - name: community.crypto
+    version: '>=3.5.0'
+    type: galaxy
   - name: community.general
     version: '>=5.4.0'
     type: galaxy
+  - name: community.libvirt
   - name: community.windows
     version: '>=2.2.0'
     type: galaxy

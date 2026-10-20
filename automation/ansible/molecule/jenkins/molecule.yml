@@ -1,0 +1,13 @@
+---
+
+scenario:
+  name: jenkins
+  test_sequence:
+    - dependency
+    - syntax
+    - converge
+    - idempotence
+    - verify
+    - cleanup
+
+shared_state: true

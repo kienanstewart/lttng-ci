@@ -1,0 +1,20 @@
+---
+
+ansible:
+  executor:
+    backend: ansible-playbook
+    args:
+      ansible_playbook:
+        - "--inventory=${MOLECULE_EPHEMERAL_DIRECTORY}/runtime_inventory"
+        - "--inventory=${MOLECULE_SCENARIO_DIRECTORY}/../inventory/hosts.yml"
+  env:
+    ANSIBLE_INCUS_REMOTE: "${ANSIBLE_INCUS_REMOTE:-ci}"
+  cfg:
+    defaults:
+      transport: community.general.incus
+      deprecation_warnings: false
+  playbooks:
+    create: create.yml
+    destroy: destroy.yml
+
+shared_state: true

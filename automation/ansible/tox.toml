@@ -1,0 +1,19 @@
+# python: 3.13 (trixie), 3.14, 3.15 (sid/forky)
+# ansible-core: 2.19 (trixie), 2.22 (sid/forky)
+env_list = [
+  { product = [
+     ["py313", "py314", "py315"],
+     ["ansible219", "ansible222"]], exclude = ["py315-ansible219"] },
+]
+
+[env_run_base]
+description = "Run ansible tests"
+deps = [
+  { replace = "if", condition = "factor.ansible219", then = ["ansible-core>=2.19,<2.20"], extend = true },
+  { replace = "if", condition = "factor.ansible222", then = ["ansible-core>=2.22rc0,<2.23"], extend = true },
+  "ansible-dev-tools",
+]
+
+commands = [["molecule", "-c", "extensions/molecule/config.yml", {replace="posargs", default=["test", "--all"], extend=true}]]
+pass_env = ["ANSIBLE_INCUS_REMOTE", "BW_SESSION", "MOLECULE_*"]
+set_env = {TOX_ENVNAME = "{env_name}", MOLECULE_EPHEMERAL_DIRECTORY =  "/tmp/{env_name}"}

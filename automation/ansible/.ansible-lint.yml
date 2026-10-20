@@ -1,4 +1,7 @@
 ---
+exclude_paths:
+  - .ansible
+  - .tox
 
 skip_list:
   - 'yaml[line-length]'

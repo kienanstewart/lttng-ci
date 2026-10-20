@@ -1,0 +1,43 @@
+---
+
+- name: Add hosts to jenkins group
+  hosts: all
+  gather_facts: true
+  vars:
+    molecule_skipped_scenarios: "{{ (molecule_skip_scenarios | default([])) | difference(molecule_include_scenarios | default([])) }}"
+  tasks:
+    - name: End hosts that skip this scenario
+      ansible.builtin.meta: end_host
+      when: "'jenkins' in molecule_skipped_scenarios"
+    - name: Add host to the jenkins group
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups:
+          - jenkins
+      loop: "{{ ansible_play_batch }}"
+      # Never signal a change for this, since it breaks the idempotence step
+      changed_when: false
+
+- name: Verify
+  hosts: jenkins
+  gather_facts: true
+  tasks:
+    - name: Verify in block
+      block:
+        - name: Jenkins is accessible via HTTP
+          ansible.builtin.uri:
+            url: "http://{{ ansible_default_ipv4.address }}:8080/"
+            status_code:
+              - 200
+              - 403
+        - name: Anubis port is open
+          ansible.builtin.uri:
+            url: "http://{{ ansible_default_ipv4.address }}:9080"
+            status_code:
+              - 200
+              - 403
+            headers:
+              X-Real-Ip: "{{ ansible_default_ipv4.address }}"
+        - name: Anubis metrics port is open
+          ansible.builtin.uri:
+            url: "http://{{ ansible_default_ipv4.address }}:9090/metrics"
