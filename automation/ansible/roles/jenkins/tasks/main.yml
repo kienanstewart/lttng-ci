@@ -4,12 +4,15 @@
   ansible.builtin.copy:
     src: jenkins.asc
     dest: '/etc/apt/keyrings/jenkins.asc'
+    owner: root
+    group: root
+    mode: '0644'
 - name: Add Jenkins stable apt repository
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/jenkins.asc] https://pkg.jenkins.io/debian{{'-stable' if jenkins_lts else ''}} binary/"
+    repo: "deb [signed-by=/etc/apt/keyrings/jenkins.asc] https://pkg.jenkins.io/debian{{ '-stable' if jenkins_lts else '' }} binary/"
 - name: Install Jenkins depencies
   ansible.builtin.package:
-    name: "{{jenkins_dependencies}}"
+    name: "{{ jenkins_dependencies }}"
 - name: Install Jenkins
   ansible.builtin.package:
     name:
@@ -27,10 +30,10 @@
     group: 'root'
     mode: '0755'
 - name: Add service override
-  when: jenkins_systemd_service_override|default(false)
+  when: (jenkins_systemd_service_override | default('')) | length > 0
   ansible.builtin.copy:
     dest: '/etc/systemd/system/jenkins.service.d/override.conf'
-    content: "{{jenkins_systemd_service_override}}"
+    content: "{{ jenkins_systemd_service_override }}"
     owner: 'root'
     group: 'root'
     mode: '0644'
@@ -50,16 +53,16 @@
     tasks_from: instance.yml
   vars:
     anubis_instance: 'jenkins'
-    anubis_env: "{{jenkins_anubis_env}}"
+    anubis_env: "{{ jenkins_anubis_env }}"
 
 - name: Jenkins plugin
   community.general.jenkins_plugin:
-    name: "{{item}}"
-    state: "{{item.state|default('present')}}"
-    url: "{{jenkins_url|default('http://localhost:8080')}}"
-    url_username: "{{jenkins_url_username}}"
-    url_password: "{{jenkins_url_password}}"
-  loop: "{{jenkins_plugins}}"
+    name: "{{ item }}"
+    state: "{{ item.state | default('present') }}"
+    url: "{{ jenkins_url | default('http://localhost:8080') }}"
+    url_username: "{{ jenkins_url_username }}"
+    url_password: "{{ jenkins_url_password }}"
+  loop: "{{ jenkins_plugins }}"
   notify:
     - Request Jenkins restart
   tags:
