@@ -1,6 +1,6 @@
 ---
 
-lava_devices:
+lava_server_devices:
   - name: 'x86_server-cloud03'
     extend: 'x86.jinja2'
     vars:

@@ -1,0 +1,16 @@
+---
+- name: Check device type details
+  become: true
+  become_user: lavaserver
+  register: lava_server_device_details
+  ignore_errors: true
+  ansible.builtin.command:
+    argv: ['lava-server', 'manage', 'device-types', 'details', "{{ item }}"]
+  changed_when: false
+- name: Enable device type
+  become: true
+  become_user: lavaserver
+  when: lava_server_device_details.rc == 1
+  ansible.builtin.command:
+    argv: ['lava-server', 'manage', 'device-types', 'add', "{{ item }}"]
+  changed_when: true

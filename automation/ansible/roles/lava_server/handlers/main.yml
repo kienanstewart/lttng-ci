@@ -1,7 +1,8 @@
 ---
 - name: Reload apache
-  shell:
-    cmd: apache2ctl graceful
+  ansible.builtin.command:
+    argv: ['apache2ctl', 'graceful']
+  changed_when: true
 - name: Restart apache
   ansible.builtin.service:
     name: apache2

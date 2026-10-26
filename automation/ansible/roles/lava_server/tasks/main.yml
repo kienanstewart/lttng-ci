@@ -17,14 +17,14 @@
         update_cache: true
 
 - name: Install lava-server
-  apt:
+  ansible.builtin.apt:
     name:
       - lava-server
       - libvirt-clients
 - name: Enable apache modules
-  shell:
-    cmd: a2enmod "{{ item }}"
-    creates: "/etc/apache2/mods-enabled/{{item}}.load"
+  ansible.builtin.command:
+    argv: ['a2enmod', item]
+    creates: "/etc/apache2/mods-enabled/{{ item }}.load"
   loop:
     - proxy
     - proxy_http
@@ -38,13 +38,13 @@
   notify:
     - Reload apache
 - name: Enable lava-server site
-  shell:
-    cmd: a2ensite lava-server.conf
+  ansible.builtin.command:
+    argv: ['a2ensite', 'lava-server.conf']
     creates: /etc/apache2/sites-enabled/lava-server.conf
   notify:
     - Reload apache
 - name: Deploy internal certificate
-  import_role:
+  ansible.builtin.import_role:
     name: common
     tasks_from: certs
   notify:
@@ -52,9 +52,12 @@
   tags:
     - certs
 - name: Create TLS vhost
-  copy:
+  ansible.builtin.copy:
     src: vhost-tls.conf
     dest: /etc/apache2/sites-enabled/lava-server-tls.conf
+    owner: root
+    group: root
+    mode: '0644'
   notify:
     - Reload apache
 - name: Configure lava-server allowed hosts
@@ -76,7 +79,7 @@
   notify:
     - Restart lava-server-gunicorn
 - name: Add lava devices
-  include_tasks: enable_device.yml
+  ansible.builtin.include_tasks: enable_device.yml
   loop:
     - qemu
     - x86
@@ -85,11 +88,11 @@
 - name: Deploy lava device configuration
   ansible.builtin.template:
     src: device.jinja2.j2
-    dest: "/etc/lava-server/dispatcher-config/devices/{{item.name}}.jinja2"
+    dest: "/etc/lava-server/dispatcher-config/devices/{{ item.name }}.jinja2"
     owner: root
     group: lavaserver
     mode: '0640'
-  with_items: "{{lava_devices|default([])}}"
+  with_items: "{{ lava_server_devices | default([]) }}"
 - name: Generate root SSH keypair
   # The public key can be installed on qemu hosts
   # lava-worker runs as root, not as lavaserver.
