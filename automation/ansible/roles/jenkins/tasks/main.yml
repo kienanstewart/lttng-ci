@@ -13,6 +13,9 @@
 - name: Install Jenkins depencies
   ansible.builtin.package:
     name: "{{ jenkins_dependencies }}"
+- name: Install Jenkins OS-specific dependencies
+  ansible.builtin.package:
+    name: "{{ jenkins_dependencies_os[ansible_distribution][ansible_distribution_major_version] }}"
 - name: Install Jenkins
   ansible.builtin.package:
     name:
@@ -56,10 +59,11 @@
     anubis_env: "{{ jenkins_anubis_env }}"
 
 - name: Jenkins plugin
+  when: not jenkins_plugins_skip
   community.general.jenkins_plugin:
     name: "{{ item }}"
     state: "{{ item.state | default('present') }}"
-    url: "{{ jenkins_url | default('http://localhost:8080') }}"
+    url: "{{ jenkins_url }}"
     url_username: "{{ jenkins_url_username }}"
     url_password: "{{ jenkins_url_password }}"
   loop: "{{ jenkins_plugins }}"

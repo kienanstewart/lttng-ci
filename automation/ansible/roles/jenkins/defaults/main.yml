@@ -9,7 +9,15 @@ jenkins_anubis_env:
 jenkins_lts: true
 jenkins_dependencies:
   - fontconfig
-  - openjdk-17-jre
+jenkins_dependencies_os:
+  Debian:
+    "12":
+      - openjdk-17-jre
+    "13":
+      - openjdk-21-jre
+    "14":
+      - openjdk-25-jre
+jenkins_plugins_skip: false
 jenkins_plugins:
   - active-directory
   - ansicolor
@@ -77,3 +85,6 @@ jenkins_plugins:
   - workflow-job
   - ws-cleanup
 jenkins_restart_on_change: false
+jenkins_systemd_service_override: ''
+jenkins_url: http://localhost:8080
+jenkins_url_username: admin
