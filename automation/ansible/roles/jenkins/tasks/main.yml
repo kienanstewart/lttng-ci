@@ -42,7 +42,7 @@
     mode: '0644'
   notify:
     - Systemd daemon-reload
-    - Request Jenkins restart
+    - Restart jenkins
 - name: Jenkins service
   ansible.builtin.service:
     name: jenkins
@@ -67,7 +67,22 @@
     url_username: "{{ jenkins_url_username }}"
     url_password: "{{ jenkins_url_password }}"
   loop: "{{ jenkins_plugins }}"
-  notify:
-    - Request Jenkins restart
+  register: jenkins_plugins_managed
   tags:
     - slow
+- name: Check if restart is required
+  # noqa: no-handler
+  when: jenkins_plugins_managed.changed
+  community.general.jenkins_script:
+    script: |
+      print(Jenkins.instance.updateCenter.restartRequiredForCompletion)
+    user: "{{ jenkins_url_username }}"
+    password: "{{ jenkins_url_password }}"
+  register: jenkins_check_restart
+  changed_when: jenkins_check_restart.output | trim == "true"
+
+- name: Restart jenkins after plugin change
+  when: jenkins_check_restart.changed and jenkins_restart_on_change
+  ansible.builtin.service:
+    name: jenkins
+    state: restarted

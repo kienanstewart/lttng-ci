@@ -3,7 +3,7 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: Request Jenkins restart
+- name: Restart jenkins
   when: jenkins_restart_on_change | default(false)
   community.general.jenkins_script:
     script: |
