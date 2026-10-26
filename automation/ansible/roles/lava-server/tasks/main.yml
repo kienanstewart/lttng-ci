@@ -1,4 +1,21 @@
 ---
+- name: Add trixie-backports block
+  when: ansible_distribution == 'Debian' and ansible_distribution_major_version == "13"
+  block:
+    - name: Add trixie-backports
+      ansible.builtin.apt_repository:
+        repo: 'deb https://deb.debian.org/debian trixie-backports main'
+    - name: Add unattended-upgrades configuration for trixie-backports
+      ansible.builtin.copy:
+        content: "Unattended-Upgrade::Origins-Pattern:: \"origin=Debian Backports,codename=${distro_codename}-backports,label=Debian Backports\";\n"
+        dest: /etc/apt/apt.conf.d/90unattended_upgrades-backports.conf
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Update APT
+      ansible.builtin.apt:
+        update_cache: true
+
 - name: Install lava-server
   apt:
     name:
