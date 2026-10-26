@@ -1,10 +1,12 @@
 ---
 
-- ansible.builtin.include_tasks:
+- name: Include install tasks
+  ansible.builtin.include_tasks:
     file: install.yml
 
 # The core pattern is used by the CI containers
-- when: ansible_virtualization_role == "host" or (ansible_virtualization_role == "guest" and ansible_virtualization_type == "kvm")
+- name: Set core pattern block
+  when: ansible_virtualization_role == "host" or (ansible_virtualization_role == "guest" and ansible_virtualization_type == "kvm")
   block:
     - name: 'Set core pattern for reboot'
       ansible.builtin.copy:
@@ -22,34 +24,44 @@
     - name: 'Check current core pattern'
       ansible.builtin.command:
         argv: ['cat', '/proc/sys/kernel/core_pattern']
-      register: current_core_pattern
+      register: incus_current_core_pattern
+      changed_when: false
     - name: 'Update current core pattern'
-      when: current_core_pattern.stdout|trim != "'{{incus_core_pattern}}'"
+      when: incus_current_core_pattern.stdout | trim != incus_core_pattern
       ansible.builtin.command:
-        argv: ['sysctl', '-w', "kernel.core_pattern='{{incus_core_pattern}}'"]
+        argv: ['sysctl', '-w', "kernel.core_pattern='{{ incus_core_pattern }}'"]
+      changed_when: true
 
 - name: Check for images volume configuration
   ansible.builtin.command:
-    argv: ['incus', 'config', "--target={{lxd_cluster['server_name']|default(ansible_hostname)}}", 'get', 'storage.images_volume']
-  register: images_volume_conf
-- name: Configure images volume
-  when: images_volume_conf.stdout|trim != "default/storage-images"
+    argv: ['incus', 'config', "--target={{ lxd_cluster['server_name'] | default(ansible_hostname) }}", 'get', 'storage.images_volume']
+  register: incus_images_volume_conf
+  changed_when: false
+- name: Configure images volume block
+  when: incus_images_volume_conf.stdout | trim != "default/storage-images"
   block:
-    - name: Create volume
+    - name: Create images volume
       ansible.builtin.command:
-        argv: ['incus', 'storage', 'volume', 'create', '--target', "{{lxd_cluster['server_name']|default(ansible_hostname)}}", 'default', 'storage-images']
-    - ansible.builtin.command:
-        argv: ['incus', 'config', 'set', '--target', "{{lxd_cluster['server_name']|default(ansible_hostname)}}", 'storage.images_volume', 'default/storage-images']
+        argv: ['incus', 'storage', 'volume', 'create', '--target', "{{ lxd_cluster['server_name'] | default(ansible_hostname) }}", 'default', 'storage-images']
+      changed_when: true
+    - name: Set cluster images volume
+      ansible.builtin.command:
+        argv: ['incus', 'config', 'set', '--target', "{{ lxd_cluster['server_name'] | default(ansible_hostname) }}", 'storage.images_volume', 'default/storage-images']
+      changed_when: true
 
 - name: Check for backups volume configuration
   ansible.builtin.command:
-    argv: ['incus', 'config', "--target={{lxd_cluster['server_name']|default(ansible_hostname)}}", 'get', 'storage.backups_volume']
-  register: backups_volume_conf
-- name: Configure backups volume
-  when: backups_volume_conf.stdout|trim != "default/storage-backups"
+    argv: ['incus', 'config', "--target={{ lxd_cluster['server_name'] | default(ansible_hostname) }}", 'get', 'storage.backups_volume']
+  register: incus_backups_volume_conf
+  changed_when: false
+- name: Configure backups volume block
+  when: incus_backups_volume_conf.stdout|trim != "default/storage-backups"
   block:
-    - name: Create volume
+    - name: Create backup volume
       ansible.builtin.command:
-        argv: ['incus', 'storage', 'volume', 'create', '--target', "{{lxd_cluster['server_name']|default(ansible_hostname)}}", 'default', 'storage-backups']
-    - ansible.builtin.command:
-        argv: ['incus', 'config', 'set', '--target', "{{lxd_cluster['server_name']|default(ansible_hostname)}}", 'storage.backups_volume', 'default/storage-backups']
+        argv: ['incus', 'storage', 'volume', 'create', '--target', "{{ lxd_cluster['server_name'] | default(ansible_hostname) }}", 'default', 'storage-backups']
+      changed_when: true
+    - name: Set cluster backups volume
+      ansible.builtin.command:
+        argv: ['incus', 'config', 'set', '--target', "{{ lxd_cluster['server_name'] | default(ansible_hostname) }}", 'storage.backups_volume', 'default/storage-backups']
+      changed_when: true

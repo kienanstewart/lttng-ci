@@ -1,5 +1,5 @@
 ---
 
-- name: 'apt update'
-  ansible.builtin.command:
-    argv: ['apt', 'update']
+- name: 'Update APT'
+  ansible.builtin.apt:
+    update_cache: true
