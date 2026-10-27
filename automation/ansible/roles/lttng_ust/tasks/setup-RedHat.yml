@@ -1,0 +1,4 @@
+---
+- name: Ensure lttng-ust build dependencies are installed.
+  ansible.builtin.dnf:
+    name: "{{ lttng_ust_packages }}"

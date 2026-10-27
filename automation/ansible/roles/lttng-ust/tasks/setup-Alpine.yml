@@ -1,6 +1,0 @@
----
-- name: Update apk cache.
-  apk: update_cache=yes
-
-- name: Ensure lttng-ust build dependencies are installed.
-  apk: "name={{ lttng_ust_packages }} state=present"

@@ -1,5 +1,8 @@
 ---
+- name: Update apk cache.
+  community.general.apk:
+    update_cache: true
+
 - name: Ensure lttng-ust build dependencies are installed.
-  dnf:
+  community.general.apk:
     name: "{{ lttng_ust_packages }}"
-    state: installed

@@ -8,7 +8,7 @@
     - binutils_gdb
     - librseq
     - liburcu
-    - lttng-ust
+    - lttng_ust
     - lttng_tools
     - lttng_modules
     - libs_i386
