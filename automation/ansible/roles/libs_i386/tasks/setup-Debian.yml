@@ -1,0 +1,22 @@
+---
+- name: Check if i386 foreign architecture is enabled in dpkg.
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      dpkg --print-foreign-architectures | grep i386
+    executable: /usr/bin/bash
+  register: libs_i386_dpkg_i386_is_enabled
+  failed_when: libs_i386_dpkg_i386_is_enabled.rc > 1
+  changed_when: false
+  check_mode: false
+
+- name: Add i386 foreign architecture to dpkg.
+  ansible.builtin.command:
+    argv: ['dpkg', '--add-architecture', 'i386']
+  when: libs_i386_dpkg_i386_is_enabled.rc == 1 and ansible_userspace_architecture | default('') == "x86_64"
+  changed_when: true
+
+- name: Update apt cache.
+  ansible.builtin.apt:
+    update_cache: true
+  when: libs_i386_dpkg_i386_is_enabled.rc == 1 and ansible_userspace_architecture | default('') == "x86_64"

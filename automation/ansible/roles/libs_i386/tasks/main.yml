@@ -2,26 +2,28 @@
 # Include variables and define needed variables.
 - name: Include OS-specific variables.
   ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
-  ignore_errors: true
+  ignore_errors: true  # noqa: ignore-errors
 
 - name: Define libs_i386_packages.
-  set_fact:
-    libs_i386_packages: "{{ __libs_i386_packages|default([]) | list }}"
+  ansible.builtin.set_fact:
+    libs_i386_packages: "{{ __libs_i386_packages | default([]) | list }}"
   when: libs_i386_packages is not defined
 
-- ansible.builtin.include_tasks: setup-Debian.yml
+- name: Include Debian tasks
+  ansible.builtin.include_tasks: setup-Debian.yml
   when: ansible_os_family == 'Debian'
 
-# Install libs from the default package manager
-- ansible.builtin.package:
-    name: "{{libs_i386_packages|default([])}}"
+- name: Install libs from default package manager
+  ansible.builtin.package:
+    name: "{{ libs_i386_packages | default([]) }}"
   # RedHat 10+ has removed .i386 packages; SLES handled separately
   when: ansible_userspace_architecture|default('') == 'x86_64' and ( ansible_os_family != 'RedHat' or (ansible_os_family == 'RedHat' and ansible_distribution_version is version('10', '<'))) and ansible_os_family != 'Suse'
 
-- ansible.builtin.zypper:
-    name: "{{libs_i386_packages|default([])}}"
+- name: Install packages from zypper
+  community.general.zypper:
+    name: "{{ libs_i386_packages | default([]) }}"
   when: ansible_userspace_architecture|default('') == 'x86_64' and ansible_os_family == 'Suse'
-  register: result
+  register: libs_i386_zypper_result
   failed_when:
     # Installing the *-32bit packages can fail with code 107, which indicates a
     # post-installation script had an error but the package is otherwise considered
@@ -32,4 +34,4 @@
     #   warning: %post(glibc-32bit-2.40-160000.4.1.x86_64) scriptlet failed, exit status 126
     #
     # @see https://manpages.opensuse.org/Tumbleweed/zypper/zypper.8.en.html
-    - result.rc != 0 and result.rc != 107
+    - libs_i386_zypper_result.rc != 0 and libs_i386_zypper_result.rc != 107
