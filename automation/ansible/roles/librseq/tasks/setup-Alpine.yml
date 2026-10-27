@@ -1,6 +1,8 @@
 ---
 - name: Update apk cache.
-  apk: update_cache=yes
+  community.general.apk:
+    update_cache: true
 
 - name: Ensure librseq build dependencies are installed.
-  apk: "name={{ librseq_packages }} state=present"
+  community.general.apk:
+    name: "{{ librseq_packages }}"

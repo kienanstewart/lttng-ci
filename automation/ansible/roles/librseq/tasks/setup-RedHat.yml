@@ -1,5 +1,4 @@
 ---
 - name: Ensure librseq build dependencies are installed.
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ librseq_packages }}"
-    state: installed
