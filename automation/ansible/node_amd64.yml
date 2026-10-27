@@ -10,5 +10,5 @@
     - liburcu
     - lttng-ust
     - lttng-tools
-    - lttng-modules
+    - lttng_modules
     - libs_i386

@@ -7,5 +7,5 @@
     - liburcu
     - lttng-ust
     - lttng-tools
-    - lttng-modules
+    - lttng_modules
     - binutils_gdb
