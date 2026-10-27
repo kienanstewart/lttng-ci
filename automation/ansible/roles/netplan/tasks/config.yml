@@ -1,22 +1,28 @@
 ---
-- when: item.dependencies|default([])
+- name: Install item dependencies
+  when: item.dependencies | default([])
   ansible.builtin.package:
-    name: "{{item.dependencies}}"
+    name: "{{ item.dependencies }}"
     install_recommends: false
 
-- when: state == 'present'
+- name: Create netplan configuration file
+  when: state == 'present'
   ansible.builtin.template:
     src: "netplan.yaml.j2"
-    dest: "{{filename}}"
+    dest: "{{ filename }}"
     mode: '0600'
     owner: 'root'
     group: 'root'
   notify:
     - 'Apply netplan'
 
-- when: state != 'present'
+- name: Manage state of netplan configuration file
+  when: state != 'present'
   ansible.builtin.file:
-    path: "{{filename}}"
-    state: "{{state}}"
+    path: "{{ filename }}"
+    state: "{{ state }}"
+    owner: root
+    group: root
+    mode: '0600'
   notify:
     - 'Apply netplan'

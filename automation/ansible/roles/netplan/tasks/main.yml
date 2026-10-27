@@ -11,16 +11,17 @@
         - "{{ ansible_os_family }}.yml"
       skip: true
 
-- when: netplan_manage
+- name: Install netplan block
+  when: netplan_manage
   block:
     - name: Install netplan
       when: netplan_manage_package
       ansible.builtin.package:
-        name: "{{netplan_package}}"
+        name: "{{ netplan_package }}"
     - name: Update netplan default.yaml
       when: netplan_content
       ansible.builtin.copy:
-        content: "{{netplan_content}}"
+        content: "{{ netplan_content }}"
         dest: /etc/netplan/default.yaml
         owner: root
         group: root
@@ -50,7 +51,7 @@
       ansible.builtin.include_tasks:
         file: config.yml
       vars:
-        "filename": "/etc/netplan/{{item.filename|default(item.name)}}.yaml"
-        "netplan_content": "{{item.content}}"
-        "state": "{{item.state|default('present')}}"
-      loop: "{{netplan_configs}}"
+        "filename": "/etc/netplan/{{ item.filename | default(item.name) }}.yaml"
+        "netplan_content": "{{ item.content }}"
+        "state": "{{ item.state | default('present') }}"
+      loop: "{{ netplan_configs }}"

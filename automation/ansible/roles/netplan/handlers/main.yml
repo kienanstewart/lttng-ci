@@ -4,3 +4,4 @@
   when: netplan_apply
   ansible.builtin.command:
     argv: ['netplan', 'apply']
+  changed_when: true
