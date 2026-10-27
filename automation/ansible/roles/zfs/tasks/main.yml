@@ -1,13 +1,13 @@
 ---
 - name: Install ZFS on Debian
   when: ansible_distribution == 'Debian'
-  apt:
+  ansible.builtin.apt:
     name: zfs-dkms
 - name: Set ZFS module options
   community.general.modprobe:
     name: zfs
     state: present
-    params: "zfs_arc_max={{zfs_arc_max}}"
+    params: "zfs_arc_max={{ zfs_arc_max }}"
 - name: Set default compression
   community.general.zfs:
     name: "tank"
@@ -18,7 +18,7 @@
       xattr: 'sa'
 - name: Create datasets
   community.general.zfs:
-    name: "tank/{{item}}"
+    name: "tank/{{ item }}"
     state: present
     extra_zfs_properties:
       mountpoint: 'none'
