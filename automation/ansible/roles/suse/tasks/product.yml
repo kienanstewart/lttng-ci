@@ -8,17 +8,19 @@
 
 - name: "Get product registration status"
   ansible.builtin.set_fact:
-    suse_product_status: "{{suse_products.stdout | ansible.builtin.from_json | ansible.builtin.items2dict(key_name='identifier', value_name='status')}}"
+    suse_product_status: "{{ suse_products.stdout | ansible.builtin.from_json | ansible.builtin.items2dict(key_name='identifier', value_name='status') }}"
 
-- name: "Connect product '{{product}}' using full version"
+- name: "Connect product full version: {{ product }}"
   when: product not in suse_product_status or suse_product_status[product] != 'Registered'
   ansible.builtin.command:
-    argv: ['SUSEConnect', '-p', "{{product}}/{{ansible_distribution_version}}/{{ansible_architecture}}"]
-  register: connect
-  ignore_errors: true
+    argv: ['SUSEConnect', '-p', "{{ product }}/{{ ansible_distribution_version }}/{{ ansible_architecture }}"]
+  register: suse_connect
+  ignore_errors: true  # noqa: ignore-errors
+  changed_when: true
 
 # Some products don't use the full version, but only the major version
-- name: "Connect product '{{product}}' using major version"
-  when: ('skipped' in connect and not connect.skipped) and connect.rc != 0 and (product not in suse_product_status or suse_product_status[product] != 'Registered')
+- name: "Connect product major version: {{ product }}"
+  when: ('skipped' in suse_connect and not suse_connect.skipped) and suse_connect.rc != 0 and (product not in suse_product_status or suse_product_status[product] != 'Registered')
   ansible.builtin.command:
-    argv: ['SUSEConnect', '-p', "{{product}}/{{ansible_distribution_major_version}}/{{ansible_architecture}}"]
+    argv: ['SUSEConnect', '-p', "{{ product }}/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}"]
+  changed_when: true
