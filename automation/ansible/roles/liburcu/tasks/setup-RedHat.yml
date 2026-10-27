@@ -1,5 +1,4 @@
 ---
 - name: Ensure liburcu build dependencies are installed.
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ liburcu_packages }}"
-    state: installed

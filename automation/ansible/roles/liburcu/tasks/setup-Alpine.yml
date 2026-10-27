@@ -1,6 +1,8 @@
 ---
 - name: Update apk cache.
-  apk: update_cache=yes
+  community.general.apk:
+    update_cache: true
 
 - name: Ensure liburcu build dependencies are installed.
-  apk: "name={{ liburcu_packages }} state=present"
+  community.general.apk:
+    name: "{{ liburcu_packages }}"
