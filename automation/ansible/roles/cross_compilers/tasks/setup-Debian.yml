@@ -23,10 +23,14 @@
       ansible.builtin.apt:
         update_cache: true
 
+- name: Set cross-compilers packages exclude variable name
+  ansible.builtin.set_fact:
+    cross_compilers_packages_exclude_variable_name: "cross_compilers_packages_exclude_{{ ansible_userspace_architecture | default(ansible_architecture) }}"
+
 - name: Ensure cross-compilers packages are installed.
   when: cross_compilers_install|default(true) and ansible_architecture not in ['armv8l']
   ansible.builtin.apt:
-    name: "{{ cross_compilers_packages | difference(lookup('vars', 'cross_compilers_packages_exclude_{{ ansible_userspace_architecture | default(ansible_architecture) }}', default=[])) }}"
+    name: "{{ cross_compilers_packages | difference(lookup('vars', cross_compilers_packages_exclude_variable_name, default=[])) }}"
 
 - name: Install legacy cross compilers
   when: ansible_distribution == 'Debian' and ansible_architecture == 'x86_64' and cross_compilers_legacy_install
