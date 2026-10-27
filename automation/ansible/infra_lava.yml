@@ -1,4 +1,5 @@
-- hosts: infra_lava
+- name: Include lava roles
+  hosts: infra_lava
   roles:
     - common
     - lava_server

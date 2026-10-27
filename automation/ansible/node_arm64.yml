@@ -1,4 +1,5 @@
-- hosts: node_arm64
+- name: Include arm64 node roles
+  hosts: node_arm64
   roles:
     - common
     - common_node

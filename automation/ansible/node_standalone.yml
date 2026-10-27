@@ -1,4 +1,5 @@
-- hosts: node_standalone
+- name: Include standalone node roles
+  hosts: node_standalone
   roles:
     - common
     - common_node

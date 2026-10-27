@@ -5,10 +5,10 @@ lava_server_devices:
     extend: 'x86.jinja2'
     vars:
       connection_command: 'telnet serial01.internal.efficios.com 7030'
-      hard_reset_command: "ipmiutil reset -w -u -U ADMIN -R {{lookup('community.general.bitwarden', 'c11c6ceb-fb32-4f36-bac7-aef601141f51', search='id', field='password')[0]}} -N cloud03-ipmi.internal.efficios.com"
-      power_off_command: "ipmiutil reset -d -U ADMIN -R {{lookup('community.general.bitwarden', 'c11c6ceb-fb32-4f36-bac7-aef601141f51', search='id', field='password')[0]}} -N cloud03-ipmi.internal.efficios.com"
-      power_on_command: "ipmiutil reset -u -U ADMIN -R {{lookup('community.general.bitwarden', 'c11c6ceb-fb32-4f36-bac7-aef601141f51', search='id', field='password')[0]}} -N cloud03-ipmi.internal.efficios.com"
-      soft_reset_command: "ipmiutil reset -w -p -U ADMIN -R {{lookup('community.general.bitwarden', 'c11c6ceb-fb32-4f36-bac7-aef601141f51', search='id', field='password')[0]}} -N cloud03-ipmi.internal.efficios.com"
+      hard_reset_command: "ipmiutil reset -w -u -U ADMIN -R {{ lookup('community.general.bitwarden', 'c11c6ceb-fb32-4f36-bac7-aef601141f51', search='id', field='password')[0] }} -N cloud03-ipmi.internal.efficios.com"
+      power_off_command: "ipmiutil reset -d -U ADMIN -R {{ lookup('community.general.bitwarden', 'c11c6ceb-fb32-4f36-bac7-aef601141f51', search='id', field='password')[0] }} -N cloud03-ipmi.internal.efficios.com"
+      power_on_command: "ipmiutil reset -u -U ADMIN -R {{ lookup('community.general.bitwarden', 'c11c6ceb-fb32-4f36-bac7-aef601141f51', search='id', field='password')[0] }} -N cloud03-ipmi.internal.efficios.com"
+      soft_reset_command: "ipmiutil reset -w -p -U ADMIN -R {{ lookup('community.general.bitwarden', 'c11c6ceb-fb32-4f36-bac7-aef601141f51', search='id', field='password')[0] }} -N cloud03-ipmi.internal.efficios.com"
       boot_interface: 'net2'
       boot_character_delay: '150'
   - name: 'lava-node-amd64-02'

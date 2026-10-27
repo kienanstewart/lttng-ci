@@ -3,7 +3,6 @@ lxd_cluster_ip: 172.18.0.186
 lxd_cluster:
   enabled: true
   server_address: 172.18.0.186
-  #cluster_token: # Only used once on cluster join
   member_config:
     - entity: storage-pool
       name: default

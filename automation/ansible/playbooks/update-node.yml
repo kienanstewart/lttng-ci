@@ -1,60 +1,67 @@
 ---
-- hosts: node:!node_standalone
+- name: Update node play
+  hosts: node:!node_standalone
   vars:
-    - job_wait_to_end: true
-    - job_abort: false
-    - upgrade: true
-    - wait_for_changes: true
+    job_wait_to_end: true
+    job_abort: false
+    upgrade: true
+    wait_for_changes: true
   tasks:
     - name: Initialize variables
       ansible.builtin.set_fact:
-        job_wait_to_end: "{{job_wait_to_end}}"
-        job_abort: "{{job_abort}}"
-        upgrade: "{{upgrade}}"
-        wait_for_changes: "{{wait_for_changes}}"
+        job_wait_to_end: "{{ job_wait_to_end }}"
+        job_abort: "{{ job_abort }}"
+        upgrade: "{{ upgrade }}"
+        wait_for_changes: "{{ wait_for_changes }}"
 
-    - name: Disable {{ansible_hostname}} in Jenkins
+    - name: Disable node in Jenkins {{ ansible_hostname }}
       ansible.builtin.command:
-        argv: "{{command_args | reject('equalto', '') | list}}"
+        argv: "{{ command_args | reject('equalto', '') | list }}"
       vars:
         command_args:
           - '../scripts/manage_jenkins_node.py'
           - 'disable'
           - '--wait'
-          - "{{ 0 if job_wait_to_end else -1}}"
-          - "{{ansible_hostname}}"
-          - "{{'--force-abort' if job_abort else ''}}"
+          - "{{ 0 if job_wait_to_end else -1 }}"
+          - "{{ ansible_hostname }}"
+          - "{{ '--force-abort' if job_abort else '' }}"
           - '--reason'
           - 'Ansible play: update-node'
       delegate_to: localhost
       retries: 3
+      changed_when: true
 
-    - when: upgrade
+    - name: Run package update
+      when: upgrade
       block:
         - name: Update apt cache
           when: ansible_os_family == 'Debian'
           ansible.builtin.apt:
+            # noqa: package-latest
             state: latest
             update_cache: true
-            upgrade: yes
+            upgrade: true
 
         - name: Update dnf
           when: ansible_os_family in ['RedHat', 'Rocky']
           ansible.builtin.dnf:
+            # noqa: package-latest
             state: latest
             update_cache: true
             update_only: true
 
         - name: Update zypper
           when: ansible_os_family == 'Suse'
-          ansible.builtin.zypper:
+          community.general.zypper:
             name: '*'
+            # noqa: package-latest
             state: latest
             update_cache: true
 
         - name: Update apk
           when: ansible_os_family == 'Alpine'
-          ansible.builtin.apk:
+          community.general.apk:
+            # noqa: package-latest
             state: latest
             update_cache: true
             upgrade: true
@@ -69,28 +76,31 @@
 - name: Cleanup
   hosts: node:!node_standalone
   tasks:
-    - ansible.builtin.debug:
-        msg: "Example playbook command: `ansible-playbook site.yml -l {{ansible_hostname}}`"
+    - name: Print example playbook command
+      ansible.builtin.debug:
+        msg: "Example playbook command: `ansible-playbook site.yml -l {{ ansible_hostname }}`"
       when: wait_for_changes
       delegate_to: localhost
-    - ansible.builtin.pause:
-        prompt: "Run any playbooks or make other changes against {{ansible_hostname}} then hit enter when ready to continue (Ctrl-C to abort)"
+    - name: Wait for user to confirm other changes are done
+      ansible.builtin.pause:
+        prompt: "Run any playbooks or make other changes against {{ ansible_hostname }} then hit enter when ready to continue (Ctrl-C to abort)"
       when: wait_for_changes
       delegate_to: localhost
     - name: Remove the jenkins workspace
       when: not job_wait_to_end
       ansible.builtin.file:
-        path: "{{item}}"
+        path: "{{ item }}"
         state: absent
       with_items:
         - /root/workspace
         - /home/jenkins/workspace
-    - name: Enable {{ansible_hostname}} in Jenkins
+    - name: Enable Jenkins node {{ ansible_hostname }}
       ansible.builtin.command:
-        argv: "{{command_args | list}}"
+        argv: "{{ command_args | list }}"
       vars:
         command_args:
           - '../scripts/manage_jenkins_node.py'
           - 'enable'
-          - "{{ansible_hostname}}"
+          - "{{ ansible_hostname }}"
       delegate_to: localhost
+      changed_when: true

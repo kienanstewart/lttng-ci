@@ -1,28 +1,53 @@
 ---
-- hosts: all
+- name: Post-build image clean
+  hosts: all
   tasks:
-    - when: ansible_os_family == 'Debian'
+    - name: Clean-up RPM cache
+      when: ansible_os_family in ['RedHat', 'Rocky']
+      ansible.builtin.command:
+        argv: ['dnf', 'clean', 'all']
+      changed_when: true
+    - name: Clean-up APT
+      when: ansible_os_family == 'Debian'
       ansible.builtin.command:
         argv: ['apt-get', 'clean']
-    - when: ansible_os_family == 'Suse'
+      changed_when: true
+    - name: Clean-up zypper
+      when: ansible_os_family == 'Suse'
       ansible.builtin.command:
         argv: ['zypper', 'clean']
-    - when: ansible_distribution == 'SLES'
+      changed_when: true
+    - name: SLES disconnect
+      when: ansible_distribution == 'SLES'
       block:
-        - ansible.builtin.command:
+        - name: SUSEConnect -d
+          ansible.builtin.command:
             argv: ['SUSEConnect', '-d']
-        - ansible.builtin.command:
+          changed_when: true
+        - name: Cleanup SUSEConnect state
+          ansible.builtin.command:
             argv: ['SUSEConnect', '--cleanup']
-    - ansible.builtin.command:
+          changed_when: true
+    - name: Clean cloud-init state
+      ansible.builtin.command:
         argv: ['cloud-init', 'clean']
+      changed_when: true
+      # noqa: ignore-errors
       ignore_errors: true
-    - ansible.builtin.command:
+    - name: Sync disk
+      ansible.builtin.command:
         argv: ['sync']
-    - ansible.builtin.shell:
+      changed_when: false
+    - name: Clear shell history
+      # noqa: command-instead-of-shell
+      ansible.builtin.shell:
         cmd: 'history -cw'
+      changed_when: true
       # Some default shells don't have the `history` built-in,
       # and it's not blocking that this works or not.
+      # noqa: ignore-errors
       ignore_errors: true
-    - ansible.builtin.file:
+    - name: Remove ansible extra authorized keys
+      ansible.builtin.file:
         path: /root/.ssh/authorized_keys2
         state: absent

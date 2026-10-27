@@ -1,4 +1,5 @@
-- hosts: node_ppc64el
+- name: Include ppc64el node roles
+  hosts: node_ppc64el
   roles:
     - common
     - common_node

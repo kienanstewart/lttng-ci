@@ -1,4 +1,5 @@
-- hosts: node_sles
+- name: Include Suse node roles
+  hosts: node_sles
   roles:
     - common
     - common_node

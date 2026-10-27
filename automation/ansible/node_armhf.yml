@@ -1,4 +1,5 @@
-- hosts: node_armhf
+- name: Include armhf node roles
+  hosts: node_armhf
   roles:
     - common
     - common_node

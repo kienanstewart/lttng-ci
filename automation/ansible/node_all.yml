@@ -1,4 +1,5 @@
-- hosts: all
+- name: Include all node roles
+  hosts: all
   roles:
     - common
     - common_node

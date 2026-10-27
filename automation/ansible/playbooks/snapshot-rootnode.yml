@@ -12,85 +12,97 @@
     upgrade: false
     wait_for_changes: true
   tasks:
-    - ansible.builtin.set_fact:
-        job_wait_to_end: "{{job_wait_to_end}}"
-        job_abort: "{{job_abort}}"
-        revert_before: "{{revert_before}}"
-        run_site_playbook: "{{run_site_playbook}}"
-        snapshot_name: "{{snapshot_name}}"
-        target_rootnode: "{{inventory_hostname}}"
-        upgrade: "{{upgrade}}"
-        wait_for_changes: "{{wait_for_changes}}"
+    - name: Set play facts
+      ansible.builtin.set_fact:
+        job_wait_to_end: "{{ job_wait_to_end }}"
+        job_abort: "{{ job_abort }}"
+        revert_before: "{{ revert_before }}"
+        run_site_playbook: "{{ run_site_playbook }}"
+        snapshot_name: "{{ snapshot_name }}"
+        target_rootnode: "{{ inventory_hostname }}"
+        upgrade: "{{ upgrade }}"
+        wait_for_changes: "{{ wait_for_changes }}"
 
 - name: Shutdown and revert
   hosts: node_standalone
   tasks:
-    - name: "Find {{target_rootnode}}'s host"
+    - name: "Find node host: {{ target_rootnode }}"
       ansible.builtin.command:
-        argv: "{{command_args|list}}"
+        argv: "{{ command_args | list }}"
       register: get_hypervisor
       vars:
         command_args:
           - '../scripts/manage_jenkins_node.py'
           - 'get_hypervisor'
-          - "{{target_rootnode}}"
+          - "{{ target_rootnode }}"
       delegate_to: localhost
-    - ansible.builtin.set_fact:
-        rootnode_host: "{{get_hypervisor.stdout|trim}}"
-    - name: Disable {{target_rootnode}} in Jenkins
+      changed_when: false
+    - name: Set rootnode_host fact
+      ansible.builtin.set_fact:
+        rootnode_host: "{{ get_hypervisor.stdout | trim }}"
+    - name: "Disable node in Jenkins: {{ target_rootnode }}"
       throttle: 1
       ansible.builtin.command:
-        argv: "{{command_args | reject('equalto', '') | list}}"
+        argv: "{{ command_args | reject('equalto', '') | list }}"
       vars:
         command_args:
           - '../scripts/manage_jenkins_node.py'
           - 'disable'
           - '--wait'
-          - "{{ 0 if job_wait_to_end else -1}}"
-          - "{{target_rootnode}}"
-          - "{{'--force-abort' if job_abort else ''}}"
+          - "{{ 0 if job_wait_to_end else -1 }}"
+          - "{{ target_rootnode }}"
+          - "{{ '--force-abort' if job_abort else '' }}"
           - '--reason'
           - 'Ansible play: snapshot rootnode'
       delegate_to: localhost
+      changed_when: true
     - name: Revert target rootnode
       when: revert_before
       ansible.builtin.command:
-        argv: ['virsh', 'snapshot-revert', "{{target_rootnode}}", '--snapshotname', "{{snapshot_name}}", '--running']
-      delegate_to: "{{rootnode_host}}"
+        argv: ['virsh', 'snapshot-revert', "{{ target_rootnode }}", '--snapshotname', "{{ snapshot_name }}", '--running']
+      delegate_to: "{{ rootnode_host }}"
+      changed_when: true
     - name: Wait for target rootnode to come back online
       when: revert_before
-      local_action: wait_for host={{ target_rootnode }}
-                    port=22
-                    delay=1
-                    timeout=300
-                    state=started
+      delegate_to: localhost
+      ansible.builtin.wait_for:
+        host: "{{ target_rootnode }}"
+        port: 22
+        delay: 1
+        timeout: 300
+        state: started
 
-    - when: upgrade
+    - name: Run package upgrade
+      when: upgrade
       block:
         - name: Update apt cache
           when: ansible_os_family == 'Debian'
           ansible.builtin.apt:
+            # noqa: package-latest
             state: latest
             update_cache: true
-            upgrade: yes
+            upgrade: true
 
         - name: Update dnf
           when: ansible_os_family in ['RedHat', 'Rocky']
           ansible.builtin.dnf:
+            # noqa: package-latest
             state: latest
             update_cache: true
             update_only: true
 
         - name: Update zypper
           when: ansible_os_family == 'Suse'
-          ansible.builtin.zypper:
+          community.general.zypper:
             name: '*'
+            # noqa: package-latest
             state: latest
             update_cache: true
 
         - name: Update apk
           when: ansible_os_family == 'Alpine'
-          ansible.builtin.apk:
+          community.general.apk:
+            # noqa: package-latest
             state: latest
             update_cache: true
             upgrade: true
@@ -105,51 +117,59 @@
 - name: Cleanup and snapshot
   hosts: node_standalone
   tasks:
-    - ansible.builtin.debug:
-        msg: "Example playbook command: `ansible-playbook site.yml -l {{target_rootnode}}`"
+    - name: Print playbook command
+      ansible.builtin.debug:
+        msg: "Example playbook command: `ansible-playbook site.yml -l {{ target_rootnode }}`"
       when: wait_for_changes
       delegate_to: localhost
-    - ansible.builtin.pause:
-        prompt: "Run any playbooks or make other changes against {{target_rootnode}} then hit enter when ready to continue (Ctrl-C to abort)"
+    - name: Wait for user confirmation to continue
+      ansible.builtin.pause:
+        prompt: "Run any playbooks or make other changes against {{ target_rootnode }} then hit enter when ready to continue (Ctrl-C to abort)"
       when: wait_for_changes
       delegate_to: localhost
     - name: Remove the jenkins workspace
       ansible.builtin.file:
-        path: "{{item}}"
+        path: "{{ item }}"
         state: absent
       with_items:
         - /root/workspace
         - /home/jenkins/workspace
     - name: Stop the VM
       ansible.builtin.command:
-        argv: ['virsh', 'destroy', "{{target_rootnode}}"]
-      delegate_to: "{{rootnode_host}}"
+        argv: ['virsh', 'destroy', "{{ target_rootnode }}"]
+      delegate_to: "{{ rootnode_host }}"
+      changed_when: true
     - name: Check for existing base snapshot
       ansible.builtin.shell:
-        cmd: "virsh snapshot-list '{{target_rootnode}}' --name | grep -E '^{{snapshot_name}}$'"
+        cmd: "virsh snapshot-list '{{ target_rootnode }}' --name | grep -E '^{{ snapshot_name }}$'"
       ignore_errors: true
       register: existing_snapshot
-      delegate_to: "{{rootnode_host}}"
+      delegate_to: "{{ rootnode_host }}"
+      changed_when: false
     - name: Remove existing base snapshot
       when: existing_snapshot.rc == 0
       ansible.builtin.command:
-        argv: ['virsh', 'snapshot-delete', '--snapshotname', "{{snapshot_name}}", "{{target_rootnode}}"]
-      delegate_to: "{{rootnode_host}}"
+        argv: ['virsh', 'snapshot-delete', '--snapshotname', "{{ snapshot_name }}", "{{ target_rootnode }}"]
+      delegate_to: "{{ rootnode_host }}"
+      changed_when: true
     - name: Snapshot
       ansible.builtin.command:
-        argv: ['virsh', 'snapshot-create-as', '--name', "{{snapshot_name}}", "{{target_rootnode}}"]
-      delegate_to: "{{rootnode_host}}"
+        argv: ['virsh', 'snapshot-create-as', '--name', "{{ snapshot_name }}", "{{ target_rootnode }}"]
+      delegate_to: "{{ rootnode_host }}"
+      changed_when: true
     - name: Start the vm
       ansible.builtin.command:
-        argv: ['virsh', 'start', "{{target_rootnode}}"]
-      delegate_to: "{{rootnode_host}}"
-    - name: Enable {{target_rootnode}} in Jenkins
+        argv: ['virsh', 'start', "{{ target_rootnode }}"]
+      delegate_to: "{{ rootnode_host }}"
+      changed_when: true
+    - name: "Enable Jenkins node: {{ target_rootnode }}"
       throttle: 1
       ansible.builtin.command:
-        argv: "{{command_args | list}}"
+        argv: "{{ command_args | list }}"
       vars:
         command_args:
           - '../scripts/manage_jenkins_node.py'
           - 'enable'
-          - "{{target_rootnode}}"
+          - "{{ target_rootnode }}"
       delegate_to: localhost
+      changed_when: true

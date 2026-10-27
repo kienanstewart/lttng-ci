@@ -2,37 +2,44 @@
 - name: Set next release
   hosts: all
   tasks:
-    - ansible.builtin.set_fact:
-        release_index: "{{lookup('ansible.utils.index_of', data=lookup('vars', ansible_distribution+'_releases', default=[]), test='eq', value=ansible_distribution_release)}}"
+    - name: Set release fact
+      ansible.builtin.set_fact:
+        release_index: "{{ lookup('ansible.utils.index_of', data=lookup('vars', ansible_distribution | lower + '_releases', default=[]), test='eq', value=ansible_distribution_release) }}"
     # If there is not a next release available (as defined below in Debian_releasess
     # or Ubuntu_releases), the execution of the playbook will fail at this step.
-    - ansible.builtin.set_fact:
-        next_release: "{{lookup('vars', ansible_distribution+'_releases')[release_index|int + 1]}}"
-    - ansible.builtin.debug:
-        msg: "Upgrading from {{ansible_distribution_release}} to {{next_release}}"
+    - name: Set next release fact
+      ansible.builtin.set_fact:
+        next_release: "{{ lookup('vars', ansible_distribution | lower + '_releases')[release_index | int + 1] }}"
+    - name: Print determined releases
+      ansible.builtin.debug:
+        msg: "Upgrading from {{ ansible_distribution_release }} to {{ next_release }}"
   vars:
     # 'stable' releases ordered from oldest to newest
-    Debian_releases:
+    debian_releases:
       - buster
       - bullseye
       - bookworm
       - trixie
       - forky
-    Ubuntu_releases:
+    ubuntu_releases:
       - focal
       - jammy
       - noble
+      - resolute
     incus_evacuate_node: ''
     jenkins_node_regex: ''
 
 - name: Run any outstanding upgrades
   hosts: all
   tasks:
-    - ansible.builtin.apt:
+    - name: Update APT cache
+      ansible.builtin.apt:
         update_cache: true
-    - ansible.builtin.apt:
+    - name: APT dist upgrade
+      ansible.builtin.apt:
         upgrade: dist
-    - ansible.builtin.apt:
+    - name: APT autoremove
+      ansible.builtin.apt:
         autoremove: true
         purge: true
 
@@ -43,7 +50,9 @@
       register: etckeeper
       ansible.builtin.command:
         cmd: test -d /etc/.git
+      # noqa: ignore-errors
       ignore_errors: true
+      changed_when: false
 
     - name: Tag etc configuration
       when: etckeeper.rc == 0
@@ -51,8 +60,10 @@
         - name: Remove etckeeper tag if it exists
           ansible.builtin.command:
             chdir: /etc
-            argv: ['git', 'tag', '-d', "pre-{{next_release}}"]
+            argv: ['git', 'tag', '-d', "pre-{{ next_release }}"]
+          # noqa: ignore-errors
           ignore_errors: true
+          changed_when: false
 
         - name: Add etckeeper tag
           ansible.builtin.command:
@@ -60,25 +71,42 @@
             argv:
               - git
               - tag
-              - "pre-{{next_release}}"
+              - "pre-{{ next_release }}"
+          changed_when: true
 
-        - name: etckeeper Git GC
+        - name: Run GC on etckeeper repo
+          # noqa: command-instead-of-module
           ansible.builtin.command:
             chdir: /etc
             cmd: 'git gc --prune'
+          changed_when: true
 
     - name: Backup package state
       block:
-        - ansible.builtin.shell:
-            cmd: "tar czf /var/backups/pre-{{next_release}}-backup.tgz /etc /var/lib/dpkg /var/lib/apt/extended_states"
-        - ansible.builtin.shell:
-            cmd: "dpkg --get-selections '*' > /var/backups/dpkg-selections-pre-{{next_release}}.txt"
-        - ansible.builtin.file:
-            path: "{{item}}"
+        - name: Tar apt state
+          community.general.archive:
+            dest: "/var/backups/pre-{{ next_release }}-backup.tgz"
+            path:
+              - /etc
+              - /var/lib/dpkg
+              - /var/lib/apt/extended_states
+            owner: root
+            group: root
+            mode: '0600'
+
+        - name: Get dpkg selections
+          ansible.builtin.shell:
+            cmd: "dpkg --get-selections '*' > /var/backups/dpkg-selections-pre-{{ next_release }}.txt"
+          changed_when: true
+
+        - name: Set permissions on backup file
+          ansible.builtin.file:
+            path: "{{ item }}"
+            owner: root
+            group: root
             mode: '0600'
           with_items:
-            - "/var/backups/pre-{{next_release}}-backup.tgz"
-            - "/var/backups/dpkg-selections-pre-{{next_release}}.txt"
+            - "/var/backups/dpkg-selections-pre-{{ next_release }}.txt"
 
 - name: Update hostname
   hosts: all
@@ -86,17 +114,20 @@
     # eg. ansible-playbook -e '{"UPDATE_HOSTNAME":true}' playbooks/release-upgrade.yml
     update_hostname: "{{lookup('vars', 'UPDATE_HOSTNAME', default='false')}}"
   tasks:
-    - ansible.builtin.debug:
-        msg: "update_hostname: {{update_hostname}}"
-    - ansible.builtin.replace:
+    - name: Output if hostname will be updated
+      ansible.builtin.debug:
+        msg: "update_hostname: {{ update_hostname }}"
+    - name: Replace hostname disitribution version name
+      ansible.builtin.replace:
         path: /etc/hostname
-        regexp: "{{ansible_distribution_release}}"
-        replace: "{{next_release}}"
+        regexp: "{{ ansible_distribution_release }}"
+        replace: "{{ next_release }}"
       when: update_hostname | bool
-    - ansible.builtin.replace:
+    - name: Replace hostname distribution major version
+      ansible.builtin.replace:
         path: /etc/hostname
-        regexp: "deb{{ansible_distribution_version}}"
-        replace: "deb{{ansible_distribution_version|int + 1 }}"
+        regexp: "deb{{ ansible_distribution_major_version }}"
+        replace: "deb{{ ansible_distribution_major_version | int + 1 }}"
       when: update_hostname | bool and ansible_distribution == 'Debian'
 
 - name: Debian major version upgrade
@@ -107,24 +138,48 @@
       APT_LISTCHANGES_FRONTEND: mail
     apt_common_options: "-o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confnew'"
   tasks:
-    - ansible.builtin.import_tasks: ../tasks/debian_release_upgrade.yml
+    - name: End play for non-Debian hosts
+      when: ansible_distribution != 'Debian'
+      ansible.builtin.meta: end_host
+    - name: Import release upgrade tasks
+      ansible.builtin.import_tasks: ../tasks/debian_release_upgrade.yml
       when: ansible_distribution == 'Debian'
 
 - name: Ubuntu major version upgrade
   hosts: all
+  vars:
+    # Since the nodes post-upgrade may have a different python interpreter,
+    # e.g. python3.11 -> python3.13, use a generic interpreter to avoid ansible
+    # task errors.
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
+    - name: End play for non-Ubuntu hosts
+      when: ansible_distribution != 'Ubuntu'
+      ansible.builtin.meta: end_host
+    - name: Install release upgrader package
+      ansible.builtin.apt:
+        name: ubuntu-release-upgrader-core
     - name: Do release upgrade
-      when: ansible_distribution == 'Ubuntu'
       ansible.builtin.command:
         cmd: 'do-release-upgrade -m server --frontend=DistUpgradeViewNonInteractive'
+      changed_when: true
+    - name: Reboot
+      ansible.builtin.reboot:
+        reboot_timeout: 300
 
 - name: Post-upgrade tasks
   hosts: all
+  vars:
+    # Since the nodes post-upgrade may have a different python interpreter,
+    # e.g. python3.11 -> python3.13, use a generic interpreter to avoid ansible
+    # task errors.
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
     - name: Mark rsyslog as auto
       when: next_release == 'bookworm'
       ansible.builtin.command:
         cmd: 'apt-mark auto rsyslog'
+      changed_when: true
     - name: Autoremove any packages
       ansible.builtin.apt:
         autoremove: true

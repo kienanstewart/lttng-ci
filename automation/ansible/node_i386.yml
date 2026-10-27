@@ -1,4 +1,5 @@
-- hosts: node_i386
+- name: Include i386 node roles
+  hosts: node_i386
   roles:
     - common
     - common_node

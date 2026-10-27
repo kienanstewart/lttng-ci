@@ -1,9 +1,8 @@
 ---
-- name: Delete .lttng folder for the jenkins user
+- name: Delete .lttng folder for the jenkins user block
   hosts: all
-
   tasks:
-    - name: delete .lttng folder
-      file:
+    - name: Delete .lttng folder
+      ansible.builtin.file:
         path: /home/jenkins/.lttng
         state: absent

@@ -1,4 +1,5 @@
-- hosts: node_el
+- name: Include EL node roles
+  hosts: node_el
   roles:
     - common
     - common_node

@@ -3,106 +3,144 @@
 # @TODO: Should 3rd party sources be removed?
 # @TODO: Ensure kernel package is installed
 # @TODO: Should a 2nd sshd be started on a non-standard port in case of failure?
-- name: dpkg audit
+- name: Run dpkg audit
   ansible.builtin.command:
     cmd: 'dpkg --audit'
+  changed_when: false
 
-- name: show holds
+- name: Show holds
   ansible.builtin.command:
     cmd: 'apt-mark showhold'
+  changed_when: false
 
-- name: remove all holds
+- name: Remove all holds
   ansible.builtin.command:
     cmd: "apt-mark unhold '*'"
+  changed_when: true
 
 - name: Replace release in apt sources.list
   ansible.builtin.replace:
-    regexp: "{{ansible_distribution_release}}"
-    replace: "{{next_release}}"
+    regexp: "{{ ansible_distribution_release }}"
+    replace: "{{ next_release }}"
     path: /etc/apt/sources.list
 
 - name: Replace release in apt sources.list.d
+  # Use shell for globbing the files in /etc/apt/sources.list.d
+  # noqa: command-instead-of-module
   ansible.builtin.shell:
-    cmd: "sed -i 's/{{ansible_distribution_release}}/{{next_release}}/' /etc/apt/sources.list.d/*"
-  ignore_errors: true
+    cmd: "sed -i 's/{{ ansible_distribution_release }}/{{ next_release }}/' /etc/apt/sources.list.d/*"
+  # sed can fail if there are no input files (code 2 for GNU sed)
+  register: result
+  failed_when:
+    - result.rc != 0
+    - result.rc != 2
+  changed_when: true
 
-- ansible.builtin.apt:
+- name: Update APT cache
+  ansible.builtin.apt:
     update_cache: true
 
 - name: Check space required during upgrades
+  # noqa: command-instead-of-module
   ansible.builtin.shell:
     cmd: "apt-get --assume-no full-upgrade | grep -E '^After this operation' | cut -d ',' -f 2 | cut -d ' ' -f 2,3"
   environment:
     LANG: 'C'
   register: apt_get_full_upgrade_no_action
   ignore_errors: true
+  changed_when: false
 
 - name: Check available disk space
   ansible.builtin.command:
     cmd: 'df -k --output=avail /'
   register: diskfree_output
+  changed_when: false
 
-- ansible.builtin.set_fact:
-    disk_space_available: "{{diskfree_output.stdout_lines[1] | ansible.builtin.human_to_bytes(default_unit='K')}}"
-    disk_space_required: "{{apt_get_full_upgrade_no_action.stdout_lines[0] | ansible.builtin.human_to_bytes}}"
+- name: Set diskspace variables
+  ansible.builtin.set_fact:
+    disk_space_available: "{{ diskfree_output.stdout_lines[1] | ansible.builtin.human_to_bytes(default_unit='K') }}"
+    disk_space_required: "{{ apt_get_full_upgrade_no_action.stdout_lines[0] | ansible.builtin.human_to_bytes }}"
 
-- ansible.builtin.debug:
+- name: Output disk space information
+  ansible.builtin.debug:
     msg:
-      - "Space required: {{disk_space_required}} bytes"
-      - "Space required with margin: {{disk_space_required|int * 2}}"
-      - "Space available: {{disk_space_available}} bytes"
+      - "Space required: {{ disk_space_required }} bytes"
+      - "Space required with margin: {{ disk_space_required | int * 2 }}"
+      - "Space available: {{ disk_space_available }} bytes"
 
 - name: Abort if insufficient space
-  when: (disk_space_required|int * 2) > disk_space_available|int
+  when: (disk_space_required | int * 2) > disk_space_available | int
   block:
-    - ansible.builtin.replace:
-        replace: "{{ansible_distribution_release}}"
-        regexp: "{{next_release}}"
+    - name: Revert next release in sources.list
+      ansible.builtin.replace:
+        replace: "{{ ansible_distribution_release }}"
+        regexp: "{{ next_release }}"
         path: /etc/apt/sources.list
-    - name: Replace release in apt sources.list.d
+    - name: Revert next release in apt sources.list.d
+      # Use shell for globbing
+      # noqa: command-instead-of-module
       ansible.builtin.shell:
-        cmd: "sed -i 's/{{next_release}}/{{ansible_distribution_release}}/' /etc/apt/sources.list.d/*"
-      ignore_errors: true
-    - ansible.builtin.meta: end_host
+        cmd: "sed -i 's/{{ next_release }}/{{ ansible_distribution_release }}/' /etc/apt/sources.list.d/*"
+      register: result
+      failed_when:
+        - result.rc != 0
+        - result.rc != 2
+      changed_when: true
+    - name: Update APT cache
+      ansible.builtin.apt:
+        update_cache: true
+    - name: End play on aborted host
+      ansible.builtin.meta: end_host
 
 - name: Download packages
+  # noqa: command-instead-of-module
   ansible.builtin.command:
-    cmd: 'apt-get -y -d upgrade {{apt_common_options}}'
-  environment: "{{apt_noninteractive_environment}}"
+    cmd: 'apt-get -y -d upgrade {{ apt_common_options }}'
+  environment: "{{ apt_noninteractive_environment }}"
+  changed_when: true
 
 - name: Minimal upgrade run
+  # noqa: command-instead-of-module
   ansible.builtin.command:
-    cmd: 'apt-get upgrade -y --without-new-pkgs {{apt_common_options}}'
-  environment: "{{apt_noninteractive_environment}}"
+    cmd: 'apt-get upgrade -y --without-new-pkgs {{ apt_common_options }}'
+  environment: "{{ apt_noninteractive_environment }}"
+  changed_when: true
 
 - name: Full upgrade run
+  # noqa: command-instead-of-module
   ansible.builtin.command:
-    cmd: 'apt-get full-upgrade -y {{apt_common_options}}'
-  environment: "{{apt_noninteractive_environment}}"
+    cmd: 'apt-get full-upgrade -y {{ apt_common_options }}'
+  environment: "{{ apt_noninteractive_environment }}"
+  changed_when: true
 
 - name: Offline jenkins nodes
-  when: jenkins_node_regex|default(false)
+  when: jenkins_node_regex | default('') is truthy
   delegate_to: localhost
   ansible.builtin.command:
     argv: [
       '../scripts/manage_jenkins_node.py', 'disable', '--wait', '-1',
       '--reason', 'Ansible: debian_release_upgrade', '--force-abort',
-      "{{jenkins_node_regex}}"
+      "{{ jenkins_node_regex }}"
     ]
   retries: 3
+  changed_when: true
 
 - name: Evacuate incus node
-  when: incus_evacuate_node|default(false)
+  when: incus_evacuate_node | default('') is truthy
   ansible.builtin.command:
-    argv: ['incus', 'cluster', 'evacuate', '--force', '--action', 'stop', "{{incus_evacuate_node}}"]
+    argv: ['incus', 'cluster', 'evacuate', '--force', '--action', 'stop', "{{ incus_evacuate_node }}"]
   # The evacuation can "fail" if an instance is already offline, e.g.
   # "Error: Failed to evacuate instances: Failed to stop instance "xxx": container is not running
+  # noqa: ignore-errors
   ignore_errors: true
+  changed_when: true
 
 - name: Stop libvirt guests
   ansible.builtin.service:
     name: libvirt-guests.service
     state: stopped
+  # Don't worry if the guests fail to stop or it times out
+  # noqa: ignore-errors
   ignore_errors: true
 
 # @TODO: reconfigure grub if installed
@@ -115,25 +153,32 @@
     reboot_timeout: 300
 
 - name: Restore incus node
-  when: incus_evacuate_node|default(false)
+  when: incus_evacuate_node | default('') is truthy
   ansible.builtin.command:
-    argv: ['incus', 'cluster', 'restore', '--force', "{{incus_evacuate_node}}"]
+    argv: ['incus', 'cluster', 'restore', '--force', "{{ incus_evacuate_node }}"]
+  changed_when: true
 
 - name: Online jenkins nodes
-  when: jenkins_node_regex|default(false)
+  when: jenkins_node_regex | default('') is truthy
   delegate_to: localhost
   ansible.builtin.command:
-    argv: ['../scripts/manage_jenkins_node.py', 'enable', "{{jenkins_node_regex}}"]
+    argv: ['../scripts/manage_jenkins_node.py', 'enable', "{{ jenkins_node_regex }}"]
   # This can error out when the host is the one running jenkins, and we don't have
   # a specific "wait-for-jenkins-online" type of check.
+  # noqa: ignore-errors
   ignore_errors: true
+  changed_when: true
 
 - name: Purge configuration of removed packages
+  # noqa: command-instead-of-module
   ansible.builtin.command:
     cmd: "apt-get -y purge '~c'"
-  environment: "{{apt_noninteractive_environment}}"
+  environment: "{{ apt_noninteractive_environment }}"
+  changed_when: true
 
 - name: Purge obsolete packages
+  # noqa: command-instead-of-module
   ansible.builtin.command:
     cmd: "apt-get -y purge '~o'"
-  environment: "{{apt_noninteractive_environment}}"
+  environment: "{{ apt_noninteractive_environment }}"
+  changed_when: true

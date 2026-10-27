@@ -1,4 +1,5 @@
-- hosts: all
+- name: Increase roles
+  hosts: all
   roles:
     - common
     - babeltrace

@@ -12,7 +12,7 @@
       private: false
 
   tasks:
-    - name: "apt update && apt dist-upgrade && apt clean && apt autoremove --purge"
+    - name: "Run apt update && apt dist-upgrade && apt clean && apt autoremove --purge"
       ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 3600
@@ -22,18 +22,22 @@
         purge: true
 
     - name: "Reboot server"
-      command: /sbin/reboot
+      ansible.builtin.command:
+        cmd: '/sbin/reboot'
       async: 0
       poll: 0
       ignore_errors: true
       when: reboot == "yes"
       register: last_result
 
-    - name: wait for the server to reboot
-      local_action: wait_for host={{ inventory_hostname }}
-          port=22
-          delay=1
-          timeout=300
-          state=started
+    - name: Wait for the server to reboot
+      delegate_to: localhost
+      ansible.builtin.wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        delay: 1
+        timeout: 300
+        state: started
+      # noqa: no-handler
       when: last_result.changed
       become: false

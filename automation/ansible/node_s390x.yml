@@ -1,4 +1,5 @@
-- hosts: node_s390x
+- name: Include s390x node roles
+  hosts: node_s390x
   roles:
     - common
     - common_node

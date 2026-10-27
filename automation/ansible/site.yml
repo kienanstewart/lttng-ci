@@ -1,31 +1,47 @@
 ---
-- import_playbook: hosts.yml
-- import_playbook: infra_lava.yml
-- import_playbook: node_armhf.yml
-- import_playbook: node_arm64.yml
-- import_playbook: node_ppc64el.yml
-- import_playbook: node_riscv64.yml
-- import_playbook: node_s390x.yml
-- import_playbook: node_i386.yml
-- import_playbook: node_amd64.yml
-- import_playbook: node_standalone.yml
-- import_playbook: node_sles.yml
-- import_playbook: node_el.yml
-- hosts: node_yocto
+- name: Import hosts playbook
+  import_playbook: hosts.yml
+- name: Import lava playbook
+  import_playbook: infra_lava.yml
+- name: Import armhf node playbook
+  import_playbook: node_armhf.yml
+- name: Import arm64 node playbook
+  import_playbook: node_arm64.yml
+- name: Import ppc64el node playbook
+  import_playbook: node_ppc64el.yml
+- name: Import riscv64 playbook
+  import_playbook: node_riscv64.yml
+- name: Import s390x node playbook
+  import_playbook: node_s390x.yml
+- name: Import i386 node playbook
+  import_playbook: node_i386.yml
+- name: Import amd64 node playbook
+  import_playbook: node_amd64.yml
+- name: Import standalone node playbook
+  import_playbook: node_standalone.yml
+- name: Import Suse node playbook
+  import_playbook: node_sles.yml
+- name: Import EL node playbook
+  import_playbook: node_el.yml
+- name: Include yocto node roles
+  hosts: node_yocto
   roles:
     - common
     - common_node
     - netplan
-- hosts: gitmirror
+- name: Include gitmirror roles
+  hosts: gitmirror
   roles:
     - common
     - gitmirror
-- hosts: jenkins
+- name: Include jenkins controller roles
+  hosts: jenkins
   roles:
     - common
     - anubis
     - jenkins
-- hosts: ci_node:developer
+- name: Include ci_node/developer roles
+  hosts: ci_node:developer
   roles:
     - common
     - common_node
@@ -39,13 +55,16 @@
     - lttng_tools
     - lttng_modules
     - libs_i386
-- hosts: developer
+- name: Include developer roles
+  hosts: developer
   roles:
     - developer
     - docker
-- hosts: ripper
+- name: Include ripper roles
+  hosts: ripper
   tasks:
-    - include_role:
+    - name: Include comme role
+      ansible.builtin.include_role:
         name: common
       tags:
         - never
