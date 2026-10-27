@@ -1,5 +1,4 @@
 ---
 - name: Ensure lttng-tools build dependencies are installed.
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ lttng_tools_packages }}"
-    state: installed

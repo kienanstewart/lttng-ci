@@ -1,7 +1,7 @@
 ---
 - name: Activate SLES Products
   when: ansible_distribution == 'SLES'
-  include_role:
+  ansible.builtin.include_role:
     name: suse
     tasks_from: product
   loop:
@@ -10,7 +10,11 @@
     loop_var: 'product'
 
 - name: Ensure lttng-tools build dependencies are installed.
-  zypper: "name={{ lttng_tools_packages }} state=installed update_cache=yes"
+  community.general.zypper:
+    name: "{{ lttng_tools_packages }}"
+    update_cache: true
 
 - name: Ensure lttng-tools build dependencies are installed (no recommends).
-  zypper: "name={{ lttng_tools_packages_no_recommends }} state=installed disable_recommends=yes"
+  community.general.zypper:
+    name: "{{ lttng_tools_packages_no_recommends }}"
+    disable_recommends: true

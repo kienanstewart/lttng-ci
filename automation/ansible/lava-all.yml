@@ -5,5 +5,5 @@
     - librseq
     - liburcu
     - lttng-ust
-    - lttng-tools
+    - lttng_tools
     - lttng_modules

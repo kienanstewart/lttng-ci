@@ -8,7 +8,7 @@
     - librseq
     - liburcu
     - lttng-ust
-    - lttng-tools
+    - lttng_tools
     - lttng_modules
     - libs_i386
     # Standalone (root) nodes should use fixed IP addresses
