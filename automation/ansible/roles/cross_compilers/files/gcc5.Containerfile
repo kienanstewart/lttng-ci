@@ -7,7 +7,7 @@ FROM docker.io/debian:bookworm
 #   for i in aarch64-linux-gnu arm-linux-gnueabihf i686-linux-gnu powerpc64le-linux-gnu powerpc-linux-gnu riscv64-linux-gnu s390x-linux-gnu ; do podman run --rm -e "TARGET=$i" -e "SRC_DIR=/src/gcc-releases-gcc-5.5.0" -e "BIN_SUFFIX=5" -e "CSTD=gnu11" -e "CXXSTD=gnu++11" -v ~/gcc-5:/output localhost/gcc-5 ; done
 #   tar -czf ~/gcc-5.tgz -C ~/gcc-5 ./
 
-RUN echo 'deb-src http://deb.debian.org/debian bookworm main contrib' >> /etc/apt/sources.list
+RUN echo 'deb-src https://deb.debian.org/debian bookworm main contrib' >> /etc/apt/sources.list
 RUN apt-get update
 
 RUN apt-get -y --force-yes build-dep gcc-12

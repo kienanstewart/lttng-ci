@@ -21,7 +21,7 @@
 
     - name: LTTng-CI PPA | apt source
       ansible.builtin.apt_repository:
-        repo: "deb [signed-by=/etc/apt/trusted.gpg.d/efficios_ubuntu_ci.gpg] http://ppa.launchpad.net/efficios/ci/ubuntu {{ ansible_distribution_release }} main"
+        repo: "deb [signed-by=/etc/apt/trusted.gpg.d/efficios_ubuntu_ci.gpg] https://ppa.launchpad.net/efficios/ci/ubuntu {{ ansible_distribution_release }} main"
         state: present
         filename: efficios-ubuntu-ci
 

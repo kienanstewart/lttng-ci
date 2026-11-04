@@ -12,10 +12,10 @@ autoinstall:
       - arches:
           - amd64
           - i386
-        uri: http://ca.archive.ubuntu.com/ubuntu
+        uri: https://ca.archive.ubuntu.com/ubuntu
       - arches:
           - default
-        uri: http://ports.ubuntu.com/ubuntu-ports
+        uri: https://ports.ubuntu.com/ubuntu-ports
   drivers:
     install: false
   kernel:
