@@ -3,6 +3,7 @@
 - name: Initialize cross play variables
   hosts: node_standalone
   vars:
+    disable_jenkins_node: true
     job_wait_to_end: true
     job_abort: false
     # Set to false when taking the first snapshot of a new rootnode
@@ -14,6 +15,7 @@
   tasks:
     - name: Set play facts
       ansible.builtin.set_fact:
+        disable_jenkins_node: "{{ disable_jenkins_node }}"
         job_wait_to_end: "{{ job_wait_to_end }}"
         job_abort: "{{ job_abort }}"
         revert_before: "{{ revert_before }}"
@@ -41,6 +43,7 @@
       ansible.builtin.set_fact:
         rootnode_host: "{{ get_hypervisor.stdout | trim }}"
     - name: "Disable node in Jenkins: {{ target_rootnode }}"
+      when: disable_jenkins_node
       throttle: 1
       ansible.builtin.command:
         argv: "{{ command_args | reject('equalto', '') | list }}"
@@ -163,6 +166,7 @@
       delegate_to: "{{ rootnode_host }}"
       changed_when: true
     - name: "Enable Jenkins node: {{ target_rootnode }}"
+      when: disable_jenkins_node
       throttle: 1
       ansible.builtin.command:
         argv: "{{ command_args | list }}"
