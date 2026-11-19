@@ -134,7 +134,7 @@ PYTHONPATH=. jenkins-jobs --conf etc/jenkins_jobs.ini-sample test jobs/ -o ../ou
               script: '''#!/usr/bin/bash -x
 source ../venv/bin/activate
 poetry run ansible-galaxy install -r automation/ansible/roles/requirements.yml
-poetry run ansible-lint automation/ansible
+poetry run ansible-lint -c automation/ansible/.ansible-lint.yml automation/ansible
 ''',
             )
           }
