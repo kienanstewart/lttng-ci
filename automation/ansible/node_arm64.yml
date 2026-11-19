@@ -10,3 +10,4 @@
     - lttng_tools
     - lttng_modules
     - binutils_gdb
+    - normand
