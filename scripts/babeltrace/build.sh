@@ -116,6 +116,33 @@ failed_configure() {
     exit 1
 }
 
+# Check that the git checkout has no untracked or modified files, meaning
+# that `.gitignore` isn't missing anything.
+check_git_untracked() {
+    local git_status_output
+
+    git_status_output=$(git -C "$SRCDIR" status --short)
+    if [ -n "$git_status_output" ]; then
+        echo "Error: There are untracked or modified files in the repository:"
+        echo "$git_status_output"
+        exit_status=1
+    else
+        echo "No untracked or modified files."
+    fi
+}
+
+# Remove the git checkout and unset `SRCDIR`.
+#
+# Run the git untracked files check first, as this is the last chance.
+remove_git_checkout() {
+    if [ "$BABELTRACE_GIT_UNTRACKED" = "yes" ]; then
+        check_git_untracked
+    fi
+
+    rm -rf "$SRCDIR"
+    unset SRCDIR
+}
+
 os_field() {
     field=$1
     if [ -f /etc/os-release ]; then
@@ -434,6 +461,9 @@ dist)
     # ignore the first directory level
     $TAR xvf "$SRCDIR"/*.tar.* --strip 1
 
+    # From now on, only use the extracted source tree
+    remove_git_checkout
+
     # Build in extracted source tree
     ./configure "${CONF_OPTS[@]}" || failed_configure
     ;;
@@ -448,6 +478,9 @@ oot-dist)
     # Run configure out of tree and generate the tar file
     "$SRCDIR/configure" "${MANDATORY_VENDOR_CONF_OPTS[@]}" || failed_configure
     $MAKE dist
+
+    # From now on, only use the extracted source tree
+    remove_git_checkout
 
     # Create a temporary directory to hold both the extracted source
     # directory and the build directory
@@ -583,21 +616,10 @@ if [ "$BABELTRACE_RUN_TESTS" = "yes" ]; then
     esac
 fi
 
-if [ "$BABELTRACE_GIT_UNTRACKED" = "yes" ]; then
-    # Check that the git repository has no untracked files, meaning that
-    # .gitignore is not missing anything.
-    pushd "$SRCDIR"
-
-    git_status_output=$(git status --short)
-    if [ -n "$git_status_output" ]; then
-        echo "Error: There are untracked or modified files in the repository:"
-        echo "$git_status_output"
-        exit_status=1
-    else
-        echo "No untracked or modified files."
-    fi
-
-    popd
+# Check for untracked files, unless remove_git_checkout() already did it
+# before removing the checkout
+if [ "$BABELTRACE_GIT_UNTRACKED" = "yes" ] && [ -n "${SRCDIR+x}" ]; then
+    check_git_untracked
 fi
 
 # Archive `archivedir`, which each build type sets to the directory
