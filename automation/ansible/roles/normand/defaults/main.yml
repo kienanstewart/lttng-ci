@@ -1,0 +1,6 @@
+---
+
+# 'uv' isn't broadly available from distro repos yet
+normand_packages: []
+
+normand_uv_from_upstream: true

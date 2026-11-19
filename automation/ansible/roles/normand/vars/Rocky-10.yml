@@ -1,0 +1,6 @@
+---
+
+normand_packages:
+  - uv
+
+normand_uv_from_upstream: false

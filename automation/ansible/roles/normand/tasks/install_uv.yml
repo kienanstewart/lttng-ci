@@ -1,0 +1,99 @@
+---
+
+- name: Check if uv already exists
+  ansible.builtin.file:
+    path: /usr/local/bin/uv
+    state: file
+  register: normand_uv_file
+  changed_when: false
+  failed_when: false
+
+- name: Install required packages
+  ansible.builtin.package:
+    name:
+      - tar
+
+- name: UV install block
+  when: normand_uv_file.state == 'absent'
+  block:
+    - name: Set UV version to install
+      ansible.builtin.set_fact:
+        normand_uv_version: '0.13.9'
+        normand_uv_current_arch: "{{ ansible_facts['userspace_architecture'] | default(ansible_facts['architecture']) }}"
+        normand_uv_arch_map:
+          # ansible_userspace_architecture|default(ansible_architecture) -> UV
+          'aarch64':
+            arch: 'aarch64'
+            abi: 'unknown-linux-gnu'
+          'armv8l':
+            arch: 'arm7'
+            abi: 'unknown-linux-gnueabihf'
+          's390x':
+            arch: 's390x'
+            abi: 'unknown-linux-gnu'
+          'i386':
+            arch: 'i686'
+            abi: 'unknown-linux-gnu'
+          'ppc64el':
+            arch: 'ppc64le'
+            abi: 'unknown-linux-gnu'
+          'riscv64':
+            arch: 'riscv64gc'
+            abi: 'unknown-linux-gnu'
+          'x86_64':
+            arch: 'x86_64'
+            abi: 'unknown-linux-gnu'
+
+    - name: Set download filename
+      ansible.builtin.set_fact:
+        normand_uv_filename: "uv-{{ normand_uv_arch_map[normand_uv_current_arch]['arch'] }}-{{ normand_uv_arch_map[normand_uv_current_arch]['abi'] }}"
+
+    - name: Create temporary download file for tar file
+      ansible.builtin.tempfile:
+        state: file
+      register: normand_uv_temp_tar_file
+
+    - name: Create temporary path for unpacking
+      ansible.builtin.tempfile:
+        state: directory
+      register: normand_uv_temp_dir
+
+    - name: Download UV tar file
+      ansible.builtin.get_url:
+        url: "https://github.com/astral-sh/uv/releases/download/{{ normand_uv_version }}/{{ normand_uv_filename }}.tar.gz"
+        dest: "{{ normand_uv_temp_tar_file.path }}"
+        checksum: "sha256:https://github.com/astral-sh/uv/releases/download/{{ normand_uv_version }}/{{ normand_uv_filename }}.tar.gz.sha256"
+        force: true
+        owner: root
+        group: root
+        mode: '0640'
+
+    - name: Unpack UV
+      ansible.builtin.unarchive:
+        dest: "{{ normand_uv_temp_dir.path }}"
+        remote_src: true
+        src: "{{ normand_uv_temp_tar_file.path }}"
+
+    - name: Copy UV binaries
+      ansible.builtin.copy:
+        dest: "/usr/local/bin/{{ item }}"
+        remote_src: true
+        src: "{{ normand_uv_temp_dir.path }}/{{ normand_uv_filename }}/{{ item }}"
+        owner: root
+        group: root
+        mode: '0755'
+      with_items:
+        - uv
+        - uvx
+  always:
+    - name: Remove temp file
+      when: normand_uv_temp_tar_file|default('') | length > 0
+      ansible.builtin.file:
+        path: "{{ normand_uv_temp_tar_file.path }}"
+        state: absent
+
+    - name: Remove temp download dir
+      when: normand_uv_temp_dir|default('') | length > 0
+      ansible.builtin.file:
+        path: "{{ normand_uv_temp_dir.path }}"
+        state: absent

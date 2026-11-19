@@ -1,0 +1,26 @@
+---
+
+# Include variables and define needed variables.
+
+- name: Include OS-specific variable tasks
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: setup_os_vars.yml
+  tags:
+    - always
+
+- name: Include OS-specific setup tasks
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: setup_os_tasks.yml
+
+- name: Install packages for normand
+  when: normand_packages | length > 0
+  ansible.builtin.package:
+    name: "{{ normand_packages }}"
+
+- name: Install UV from upstream
+  when: normand_uv_from_upstream
+  ansible.builtin.include_tasks: install_uv.yml
+  tags:
+    - always

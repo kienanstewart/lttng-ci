@@ -1,0 +1,6 @@
+---
+
+- name: Enable epel-release
+  # uv is in epel for EL 10+
+  ansible.builtin.package:
+    name: epel-release
