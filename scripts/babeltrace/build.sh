@@ -412,6 +412,7 @@ oot)
     # Create and enter a temporary build directory
     builddir=$(mktemp_compat -d)
     cd "$builddir"
+    archivedir="$builddir"
 
     "$SRCDIR/configure" "${CONF_OPTS[@]}" || failed_configure
     ;;
@@ -427,6 +428,7 @@ dist)
     # Create and enter a temporary build directory
     builddir=$(mktemp_compat -d)
     cd "$builddir"
+    archivedir="$builddir"
 
     # Extract the distribution tar in the build directory,
     # ignore the first directory level
@@ -439,32 +441,38 @@ dist)
 oot-dist)
     print_header "Build: Distribution Out of tree"
 
-    # Create and enter a temporary build directory
-    builddir=$(mktemp_compat -d)
-    cd "$builddir"
+    # Create and enter a temporary directory to generate the tar file
+    oot_dist_gendir=$(mktemp_compat -d)
+    cd "$oot_dist_gendir"
 
     # Run configure out of tree and generate the tar file
     "$SRCDIR/configure" "${MANDATORY_VENDOR_CONF_OPTS[@]}" || failed_configure
     $MAKE dist
 
-    dist_srcdir="$(mktemp_compat -d)"
-    cd "$dist_srcdir"
+    # Create a temporary directory to hold both the extracted source
+    # directory and the build directory
+    oot_dist_topdir="$(mktemp_compat -d)"
+    oot_dist_srcdir="$oot_dist_topdir/src"
+    builddir="$oot_dist_topdir/build"
+    archivedir="$oot_dist_topdir"
+    mkdir "$oot_dist_srcdir" "$builddir"
 
     # Extract the distribution tar in the new source directory,
     # ignore the first directory level
-    $TAR xvf "$builddir"/*.tar.* --strip 1
+    cd "$oot_dist_srcdir"
+    $TAR xvf "$oot_dist_gendir"/*.tar.* --strip 1
 
-    # Create and enter a second temporary build directory
-    builddir="$(mktemp_compat -d)"
+    # Enter the build directory
     cd "$builddir"
 
     # Run configure from the extracted distribution tar,
     # out of the source tree
-    "$dist_srcdir/configure" "${CONF_OPTS[@]}" || failed_configure
+    "$oot_dist_srcdir/configure" "${CONF_OPTS[@]}" || failed_configure
     ;;
 
 *)
     print_header "Build: Standard In-tree"
+    archivedir="$WORKSPACE/src"
     ./configure "${CONF_OPTS[@]}" || failed_configure
     ;;
 esac
@@ -592,10 +600,10 @@ if [ "$BABELTRACE_GIT_UNTRACKED" = "yes" ]; then
     popd
 fi
 
-# Archive the un-cleaned source directory as a compressed tarball on failure only,
-# so that developers can re-use the built test artifacts for manual investigations.
+# Archive `archivedir`, which each build type sets to the directory
+# that is the most meaningful to archive, in case of failure.
 if [[ "$exit_status" != "0" ]]; then
-    tar -c -J -f "${WORKSPACE}/src.tar.xz" -C "${WORKSPACE}/src/" "./"
+    tar -c -J -f "${WORKSPACE}/src.tar.xz" -C "$archivedir" "./"
 fi
 
 # Clean the build directory
