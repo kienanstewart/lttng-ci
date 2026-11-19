@@ -539,8 +539,8 @@ if [ "$BABELTRACE_RUN_TESTS" = "yes" ]; then
             # shellcheck disable=SC1091
             source ./tests/utils/env.sh
 
-            # Back to source directory where all tests reside
-            cd "$SRCDIR/tests"
+            # Go to the source directory where all tests reside
+            cd "$BT_TESTS_SRCDIR"
 
             # Build pytest options
             pytest_opts=(
