@@ -1,0 +1,26 @@
+---
+
+# If parent roles names doesn't have a value, fail
+- name: Fail is not called from include_role
+  when: ansible_parent_role_names | length == 0
+  ansible.builtin.fail:
+    msg: "Must be called from include_role"
+  tags:
+    - always
+
+- name: Set rolename to use
+  ansible.builtin.set_fact:
+    common_include_setup_os_vars_path: "{{ ansible_parent_role_paths[0] }}"
+
+- name: Include OS specific variables
+  ansible.builtin.include_vars:
+    file: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}-{{ ansible_facts['architecture'] }}.yml"
+        - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+        - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_release'] }}.yml"
+        - "{{ ansible_facts['distribution'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}.yml"
+      path: "{{ common_include_setup_os_vars_path }}/vars"
+      skip: true
