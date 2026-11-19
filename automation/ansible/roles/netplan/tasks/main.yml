@@ -19,7 +19,7 @@
       ansible.builtin.package:
         name: "{{ netplan_package }}"
     - name: Update netplan default.yaml
-      when: netplan_content
+      when: netplan_content | length > 0
       ansible.builtin.copy:
         content: "{{ netplan_content }}"
         dest: /etc/netplan/default.yaml
