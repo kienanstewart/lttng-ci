@@ -85,6 +85,7 @@
       retries: 5
       delay: 10
       loop: "{{ groups['test_resources'] }}"
+      changed_when: false
 
 - name: Update hostnames
   hosts: test_resources
