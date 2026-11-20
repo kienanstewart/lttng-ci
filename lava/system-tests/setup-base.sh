@@ -34,7 +34,8 @@ if [[ "${CONFIGURE_DAX}" == "True" ]]; then
     apt-get install -y ndctl
     ndctl list -v
     ndctl create-namespace --mode fsdax --map mem -e namespace0.0 -f
-    mkfs.ext4 -b 4096 -E stride=512 -F /dev/pmem0
+    # Use ext2, since ext3, ext4, and xfs w/ DAX don't play nice with sparseness
+    mkfs.ext2 -b 4096 -E stride=512 -F /dev/pmem0
     umount /dev/shm
-    mount -o dax=always /dev/pmem0 /dev/shm
+    mount -t ext2 -o dax /dev/pmem0 /dev/shm
 fi
