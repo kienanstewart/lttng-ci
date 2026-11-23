@@ -385,8 +385,10 @@ buildDevices.each { build_device ->
             echo "Job ${job} result: ${job.result}"
             // A node is assigned since s3Upload requires a file context even if only text is used
             node('master') {
-              withAWS(endpointUrl: "https://${params.S3_HOST}", credentials: 's3_obj_lava_key') {
-                s3Upload(text: "${job.result}", bucket: params.S3_BUCKET, path: "${params.S3_BASE_DIR}/job-state/${parameter_key}",pathStyleAccessEnabled: true)
+              withEnv(['AWS_DEFAULT_REGION=us-east-1']) {
+                withAWS(endpointUrl: "https://${params.S3_HOST}", credentials: 's3_obj_lava_key') {
+                  s3Upload(text: "${job.result}", bucket: params.S3_BUCKET, path: "${params.S3_BASE_DIR}/job-state/${parameter_key}",pathStyleAccessEnabled: true)
+                }
               }
             }
           }
@@ -394,8 +396,10 @@ buildDevices.each { build_device ->
             print("Job failed: ${exc}")
             // A node is assigned since s3Upload requires a file context even if only text is used
             node('master') {
-              withAWS(endpointUrl: "https://${params.S3_HOST}", credentials: 's3_obj_lava_key') {
-                s3Upload(text: "FAILED", bucket: params.S3_BUCKET, path: "${params.S3_BASE_DIR}/job-state/${parameter_key}", pathStyleAccessEnabled: true)
+              withEnv(['AWS_DEFAULT_REGION=us-east-1']) {
+                withAWS(endpointUrl: "https://${params.S3_HOST}", credentials: 's3_obj_lava_key') {
+                  s3Upload(text: "FAILED", bucket: params.S3_BUCKET, path: "${params.S3_BASE_DIR}/job-state/${parameter_key}", pathStyleAccessEnabled: true)
+                }
               }
             }
             throw exc
