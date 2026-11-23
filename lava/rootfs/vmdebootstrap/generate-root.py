@@ -35,6 +35,7 @@ packages = [
     "automake",
     "bash-completion",
     "bison",
+    "black",
     "build-essential",
     "chrpath",
     "clang",
