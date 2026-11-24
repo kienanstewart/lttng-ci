@@ -116,6 +116,18 @@ export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
 P3_VERSION=$(python3 -c 'import sys;v = sys.version.split()[0].split("."); print("{}.{}".format(v[0], v[1]))')
 export PYTHONPATH="$PREFIX/lib/python$P3_VERSION/site-packages"
 
+# The lttng-tools build script creates a virtualenv for python packages not
+# provided by the system. Since this test runs in a different lava stage
+# than the build script which creates and activates the virtualenv, the
+# activation (e.g. entry in $PATH) is lost.
+while read -r line ; do
+    ACTIVATE="$(dirname $line)/bin/activate"
+    if test -f "${ACTIVATE}" ; then
+        source "${ACTIVATE}"
+        break
+    fi
+done < <(find "${SCRATCH_DIR}" -type f -and -iname pyvenv.cfg)
+
 # Fail tests with missing optionnal dependencies
 export LTTNG_TEST_ABORT_ON_MISSING_PLATFORM_REQUIREMENTS=1
 

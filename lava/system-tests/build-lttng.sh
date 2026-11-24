@@ -60,5 +60,6 @@ scripts/lttng-ust/build.sh
 export LTTNG_TOOLS_MAKE_INSTALL=no
 export LTTNG_TOOLS_MAKE_CLEAN=no
 export LTTNG_TOOLS_RUN_TESTS=no
+export LTTNG_TOOLS_INSTALL_VERMIN=True
 
 scripts/lttng-tools/build.sh
