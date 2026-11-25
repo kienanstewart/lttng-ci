@@ -64,6 +64,7 @@ packages = [
     "libtool",
     "libxml2",
     "libxml2-dev",
+    "ndctl",
     "netcat-traditional",
     "openssh-server",
     "psmisc",
