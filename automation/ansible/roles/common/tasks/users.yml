@@ -10,6 +10,15 @@
         key: "{% for key in query('fileglob', 'public_keys/*.pub') %}{{ lookup('file', key) ~ '\n'}}{% endfor %}\n{% for key in lookup('vars', 'extra_root_ssh_authorized_keys', default=[]) %}{{ key ~ '\n' }}{% endfor %}"
         exclusive: true
 
+
+    - name: Remove alpine user
+      ansible.builtin.user:
+        name: alpine
+        state: absent
+        remove: true
+      tags:
+        - access
+
     - name: Remove ubuntu user
       ansible.builtin.user:
         name: ubuntu
