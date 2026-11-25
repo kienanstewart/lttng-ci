@@ -3,15 +3,16 @@ babeltrace_packages:
   - asciidoctor
   - chrpath
   - docbook-xsl-ns
+  - elfutils-dev
   - glib-dev
   - libdwarf-dev
-  - libelf-dev
   - popt-dev
   - python3-dev
   - py3-pip
   - py3-pytest
   - py3-pytest-xdist
   - py3-sphinx
-  - py3-tap
+  - py3-tappy
   - swig
   - util-linux-dev
+

@@ -1,5 +1,5 @@
 ---
 lttng_modules_packages:
-  - libelf-dev
+  - elfutils-dev
   - bc
   - gawk

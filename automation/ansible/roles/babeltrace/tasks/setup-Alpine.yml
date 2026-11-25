@@ -9,4 +9,4 @@
 
 - name: Ensure babeltrace test dependencies are installed
   ansible.builtin.pip:
-    name: "{{ babletrace_packages_pip }}"
+    name: "{{ babeltrace_packages_pip }}"
