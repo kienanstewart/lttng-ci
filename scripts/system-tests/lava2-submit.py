@@ -127,6 +127,7 @@ def main():
     parser.add_argument("--ci-branch", required=False, default="master")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--configure-dax", action="store_true", default=False)
+    parser.add_argument("--parallel", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -195,6 +196,9 @@ def main():
 
     if args.configure_dax:
         context["configure_dax"] = True
+
+    if args.parallel:
+        context["lttng_tools_parallel_tests"] = True
 
     # Render the lava job template
     jinja_loader = FileSystemLoader(os.path.dirname(os.path.realpath(__file__)))

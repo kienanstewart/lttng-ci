@@ -3,6 +3,10 @@
 - _system_tests_parameters_defaults: &system_tests_parameters_defaults
     name: 'system_tests_parameters_defaults'
     parameters:
+      - bool:
+          name: 'LTTNG_TOOLS_PARALLEL_TESTS'
+          default: '{lttng_tools_parallel_tests}'
+          description: 'make check tests are run with parallelism'
       - string:
           name: 'BT_BRANCH'
           default: '{bt_branch}'
@@ -165,6 +169,7 @@
     bt_branch: 'master'
     configure_dax: 'false'
     email_to: ''
+    lttng_tools_parallel_tests: True
     prefix: ''
     suffix: ''
     urcu_branch: 'master'
@@ -274,6 +279,7 @@
       - '{prefix}system_tests-{lttngversion}{suffix}'
       - '{prefix}system_tests-{lttngversion}{suffix}':
           bt_branch: stable-2.0
+          lttng_tools_parallel_tests: false
           lttngversion:
             - stable-2.13
       - 'system_tests_build_kernel_and_modules':
@@ -299,7 +305,6 @@
       - stable-2.16
       - stable-2.15
       - stable-2.14
-      - stable-2.13
     suffix: '_dax'
     urcu_branch: stable-0.15
     jobs:
@@ -309,6 +314,11 @@
             - master
           urcu_branch: 'master'
       - '{prefix}system_tests-{lttngversion}{suffix}'
+      - '{prefix}system_tests-{lttngversion}{suffix}':
+          bt_branch: stable-2.0
+          lttng_tools_parallel_tests: false
+          lttngversion:
+            - stable-2.13
 
 ## Views
 - view-template:

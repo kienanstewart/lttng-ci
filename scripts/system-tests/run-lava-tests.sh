@@ -49,6 +49,10 @@ if [[ "${CONFIGURE_DAX}" == "true" ]]; then
     EXTRA_ARGS+=(--configure-dax)
 fi
 
+if [[ "${LTTNG_TOOLS_PARALLEL_TESTS:-}" == "true" ]]; then
+    EXTRA_ARGS+=(--parallel)
+fi
+
 python3 -u "$WORKSPACE/src/lttng-ci/scripts/system-tests/lava2-submit.py" \
                           --type "$BUILD_DEVICE-tests" \
                           --lttng-version "$LTTNG_VERSION" \

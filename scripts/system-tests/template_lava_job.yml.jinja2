@@ -57,6 +57,7 @@ environment:
   SCRATCH_DEVICE: "/dev/sda"
 {% endif %}
   CONFIGURE_DAX: "{{ configure_dax|default(false) }}"
+  LTTNG_TOOLS_PARALLEL_TESTS: "{{lttng_tools_parallel_tests|default(false) }}"
 
 tags:
 {% if device_type == DeviceType.kvm %}

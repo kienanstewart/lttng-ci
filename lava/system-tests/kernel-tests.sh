@@ -145,8 +145,13 @@ print_header "Run full test suite"
 # When make check is interrupted, the default test driver
 # (`config/test-driver`) will still delete the log and trs
 # files for the currently running test.
+MAKE_ARGS=('--keep-going')
+if [[ "${LTTNG_TOOLS_PARALLEL_TESTS:-False}" == "True" ]]; then
+    MAKE_ARGS+=("-j$(${NPROC})")
+fi
+
 test_result="pass"
-test_timeout 90 make --keep-going check || test_result="fail"
+test_timeout 90 make "${MAKE_ARGS[@]}" check || test_result="fail"
 lava-test-case run-test-suite --result $test_result
 
 # Archive the test logs produced by 'make check'
